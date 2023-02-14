@@ -1,3 +1,4 @@
+from collections import namedtuple
 from dataclasses import dataclass
 from typing import Union
 import yaml
@@ -5,11 +6,13 @@ from helpers import (make_list, get_modded_key, get_layer)
 
 from key_codes import MODIFIERS, KEY_CODES_REF_LIST
 
+KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code"])
+
 
 @dataclass
 class UserMapping:
 
-    from_key: str
+    from_keys: str
     maps: Union[str, list]
 
     def __post_init__(self):
@@ -39,7 +42,7 @@ class MapTranslator:
             usr_key = modified_key.key
 
         elif layer := get_layer(self.map):
-            return "layer", layer
+            return KeyStruct("layer", layer)
 
         return self.key_code_translator(usr_key)
 
@@ -54,7 +57,7 @@ class MapTranslator:
             return
         alias = ref_list[usr_key]
         self.modifiers.append(alias.modifier) if alias.modifier else None
-        return "key_code", alias.key_code
+        return KeyStruct("key_code", alias.key_code)
 
     def key_code_translator(self, usr_key):
 
@@ -63,14 +66,17 @@ class MapTranslator:
 
         for kcr in KEY_CODES_REF_LIST:
             key_type, ref = kcr.key_type, kcr.ref
+
             if usr_key not in ref:
                 continue
+
             if alias := self.resolve_alias(usr_key, key_type, ref):
                 return alias
-            key_code = ref[usr_key] if isinstance(kcr, dict) else usr_key
-            return key_type, key_code
 
-        raise Exception(exceptionWriter("key code", self.map, usr_key))
+            key_code = ref[usr_key] if isinstance(kcr, dict) else usr_key
+            return KeyStruct(key_type, key_code)
+
+        raise Exception(invalidKey("key code", self.map, usr_key))
 
     def mod_translator(self, usr_mods):
         for mod in usr_mods:
