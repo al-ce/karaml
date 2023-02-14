@@ -26,6 +26,10 @@ class UserMapping:
 
     def items(self):
         return self.tap, self.hold, self.desc
+
+    def __repr__(self):
+        return f"Tap: {self.tap}\nHold: {self.hold}\nDesc: {self.desc}"
+
 @dataclass
 class MapTranslator:
 
@@ -83,4 +87,40 @@ class MapTranslator:
             if mod_query := MODIFIERS.get(mod):
                 self.modifiers.append(mod_query)
                 continue
-            raise Exception(exceptionWriter("modifier", self.map, mod))
+            raise Exception(invalidKey("modifier", self.map, mod))
+
+    def __repr__(self):
+        # Type: {self.key_type}
+        return f"""\
+        Key: {self.keys}
+        Modifiers:{[m for m in self.modifiers]}"""
+
+
+@dataclass
+class Converter:
+
+    mapping: UserMapping
+
+    def __post_init__(self):
+        self.from_keys = {}
+        from_map = MapTranslator(self.mapping.from_keys)
+        self.from_keycode_localization(from_map)
+        self.from_modifiers_localization(from_map)
+        # self.to_localization()
+
+    def from_keycode_localization(self, from_map):
+        # from: is a dictionary in karabiner.config
+        container = [{k.key_type: k.key_code} for k in from_map.keys]
+
+        if len(container) == 1:
+            self.from_keys.update(container[0])
+        else:
+            self.from_keys["simultaneous"] = [k for k in container]
+
+    def from_modifiers_localization(self, from_map):
+        # modifiers are a dict in the from dict, but a list in the to list
+        user_modifiers = from_map.modifiers
+        if not user_modifiers:
+            return
+        rule = validate_modifier_rules(self.mapping.from_keys)
+        self.from_keys["modifiers"] = {rule: user_modifiers}
