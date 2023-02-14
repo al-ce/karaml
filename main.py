@@ -30,7 +30,7 @@ class MapTranslator:
 
     def __post_init__(self):
         self.modifiers = []
-        self.key_type, self.key = self.parse_map(self.map)
+        self.keys = make_list(self.parse_map(self.map))
 
     def parse_map(self, usr_key):
 
@@ -39,26 +39,26 @@ class MapTranslator:
             usr_key = modified_key.key
 
         elif layer := get_layer(self.map):
-            return ["layer"], [layer]
+            return "layer", layer
 
         return self.key_code_translator(usr_key)
 
-    def simul_key_parser(self, user_input):
-        if simul_keys := get_simultaneous_keys(user_input):
+    def multi_key_parser(self, user_input):
+
+        if simul_keys := get_multi_keys(user_input):
             keys = [self.key_code_translator(k.strip()) for k in simul_keys]
-            key_types, key_codes = zip(*keys)
-            return list(key_types), list(key_codes)
+            return keys
 
     def resolve_alias(self, usr_key: str, key_type: str, ref_list):
         if key_type != "alias":
             return
         alias = ref_list[usr_key]
         self.modifiers.append(alias.modifier) if alias.modifier else None
-        return ["key_code"], [alias.key_code]
+        return "key_code", alias.key_code
 
     def key_code_translator(self, usr_key):
 
-        if simul_keys := self.simul_key_parser(usr_key):
+        if simul_keys := self.multi_key_parser(usr_key):
             return simul_keys
 
         for kcr in KEY_CODES_REF_LIST:
@@ -68,7 +68,7 @@ class MapTranslator:
             if alias := self.resolve_alias(usr_key, key_type, ref):
                 return alias
             key_code = ref[usr_key] if isinstance(kcr, dict) else usr_key
-            return [key_type], [key_code]
+            return key_type, key_code
 
         raise Exception(exceptionWriter("key code", self.map, usr_key))
 
