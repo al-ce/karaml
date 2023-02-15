@@ -1,5 +1,6 @@
 from re import search
 from collections import namedtuple
+from itertools import chain
 
 
 def invalidKey(key_type: str, map: str, key: str):
@@ -19,12 +20,17 @@ def all_in(items: list, container: iter) -> bool:
     return True
 
 
+def filter_list(unfiltered):
+    return list(chain.from_iterable([x for x in unfiltered if x]))
+
+
 def make_list(x) -> list:
     return [x] if not isinstance(x, list) else x
 
 
 def is_modded_key(string):
-    if query := search("[<(](\\w+)-(.+)[)>]", string):
+    expr = "(\\w+)-([^)>]+)"
+    if query := search(expr, string):
         ModifiedKey = namedtuple("ModifiedKey", ["modifier", "key"])
         return ModifiedKey(*query.groups())
 
@@ -39,8 +45,9 @@ def is_layer(string):
 
 
 def get_multi_keys(string):
-    if query := search("\\(([^)]+)\\)", string):
-        return query.group(1).split(",")
+    expr = "\\(([^,]+.*)\\)"
+    if search(expr, string):
+        return string[1:-1].split(",")
 
 
 def validate_modifier_rules(usr_from_map: str):

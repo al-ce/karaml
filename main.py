@@ -3,13 +3,13 @@ from dataclasses import dataclass
 from typing import Union
 import yaml
 from helpers import (
-    invalidKey, make_list, is_modded_key,
-    is_layer, get_multi_keys, validate_modifier_rules
+    invalidKey, filter_list, make_list, is_modded_key,
+    is_layer, get_multi_keys,
 )
 
 from key_codes import MODIFIERS, KEY_CODE_REF_LISTS
 
-KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code"])
+KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 
 
 @dataclass
@@ -23,7 +23,6 @@ class UserMapping:
 
     def map_interpreter(self, maps):
         maps = make_list(maps)
-        # Set any undefined attributes to None so we avoid AttributeError
         [maps.append(None) for i in range(3-len(maps))]
         self.tap, self.hold, self.desc = maps
 
@@ -40,23 +39,21 @@ class MapTranslator:
     map: str
 
     def __post_init__(self):
-        self.modifiers = []
-        parsed_key = self.parse_modifiers(self.map)
-        translated_keys = self.queue_translations(parsed_key)
+        translated_keys = self.queue_translations(self.map)
         self.keys = translated_keys
 
     def parse_modifiers(self, usr_key):
-        if modified_key := is_modded_key(self.map):
-            self.append_modifiers(modified_key.modifier)
-            return modified_key.key
-        return usr_key
+        if modified_key := is_modded_key(usr_key):
+            return modified_key.key, self.get_modifiers(modified_key.modifier)
+        return usr_key, None
 
-    def append_modifiers(self, usr_mods):
-        for mod in usr_mods:
-            if mod_query := MODIFIERS.get(mod):
-                self.modifiers.append(mod_query)
-                continue
-            raise Exception(invalidKey("modifier", self.map, mod))
+    def get_modifiers(self, usr_mods):
+        modifiers = [
+            MODIFIERS.get(mod) for mod in usr_mods if MODIFIERS.get(mod)
+        ]
+        if not modifiers:
+            raise Exception(invalidKey("modifier", self.map, usr_mods))
+        return modifiers
 
     def queue_translations(self, parsed_key):
         if multi_keys := get_multi_keys(parsed_key):
@@ -67,17 +64,18 @@ class MapTranslator:
     def key_code_translator(self, usr_key):
 
         if layer := is_layer(self.map):
-            return KeyStruct("layer", layer)
+            return KeyStruct("layer", layer, None)
 
         for ref_list in KEY_CODE_REF_LISTS:
+            parsed_key, modifiers = self.parse_modifiers(usr_key)
             key_type, ref = ref_list.key_type, ref_list.ref
 
-            if usr_key not in ref:
+            if parsed_key not in ref:
                 continue
 
-            if dealiased_key := self.resolve_alias(usr_key, key_type, ref):
-                return KeyStruct("key_code", dealiased_key)
-            return KeyStruct(key_type, usr_key)
+            if dealiased_key := self.resolve_alias(parsed_key, key_type, ref):
+                return KeyStruct("key_code", dealiased_key, modifiers)
+            return KeyStruct(key_type, parsed_key, modifiers)
 
         raise Exception(invalidKey("key code", self.map, usr_key))
 
@@ -85,14 +83,12 @@ class MapTranslator:
         if key_type != "alias":
             return
         alias = aliases_list[usr_key]
-        self.modifiers.append(alias.modifier) if alias.modifier else None
+        self.get_modifiers(alias.modifier) if alias.modifier else None
         return alias.key_code
 
     def __repr__(self):
         # Type: {self.key_type}
-        return f"""\
-        Key: {self.keys}
-        Modifiers:{[m for m in self.modifiers]}"""
+        return f""" Key: {self.keys}"""
 
 
 @dataclass
@@ -101,48 +97,45 @@ class Converter:
     mapping: UserMapping
 
     def __post_init__(self):
-        self.from_keys = {}
+        self.from_keys = {"from": {}}
         from_map = MapTranslator(self.mapping.from_keys)
         self.from_keycode_localization(from_map)
-        self.from_modifiers_localization(from_map)
+
+        self.to_keys = {}
+
+        tap_key_name = "to"
+        if hold := self.mapping.hold:
+            hold_outputs = self.to_localization(MapTranslator(hold))
+            self.to_keys.update({"to": hold_outputs})
+            tap_key_name = "to_if_alone"
 
         if tap := self.mapping.tap:
-            converted_tap_map = MapTranslator(tap)
-            self.to_localization(converted_tap_map)
-            self.to_modifiers_localization(converted_tap_map)
-
-        if hold := self.mapping.hold:
-            # If hold, then to_localization needs to be a 'to if alone' key,
-            # else just 'to'
-            pass
+            tap_outputs = self.to_localization(MapTranslator(tap))
+            self.to_keys.update({tap_key_name: tap_outputs})
 
     def from_keycode_localization(self, from_map):
-        # from: is a dictionary in karabiner.config
         container = [{k.key_type: k.key_code} for k in from_map.keys]
+        modifiers = filter_list([k.modifiers for k in from_map.keys])
 
         if len(container) == 1:
-            self.from_keys.update(container[0])
+            self.from_keys["from"] = container[0]
         else:
-            self.from_keys["simultaneous"] = [k for k in container]
+            self.from_keys["from"]["simultaneous"] = [k for k in container]
 
-    def from_modifiers_localization(self, from_map):
-        # modifiers are a dict in the from dict, but a list in the to list
-        user_modifiers = from_map.modifiers
-        if not user_modifiers:
-            return
-        rule = validate_modifier_rules(self.mapping.from_keys)
-        self.from_keys["modifiers"] = {rule: user_modifiers}
+        if modifiers:
+            self.from_keys["from"]["modifiers"] = modifiers
+
+    def _update_to_keys(self, to_map, to_key_name):
+        outputs = self.to_localization(to_map, to_key_name)
+        self.to_keys.update({to_key_name: outputs})
 
     def to_localization(self, to_map):
-        # to: is a list in karabiner.config
         if not to_map:
-            self.to_keys = None
             return
-        self.to_keys = [{k.key_type: k.key_code} for k in to_map.keys]
-
-    def to_modifiers_localization(self, to_map):
-        # modifiers a list in the to list. No modifier rules to check
-        user_modifiers = to_map.modifiers
-        if not user_modifiers:
-            return
-        self.to_keys.append({"modifiers": user_modifiers})
+        to_list = []
+        for k in to_map.keys:
+            key_dict = {k.key_type: k.key_code}
+            if k.modifiers:
+                key_dict["modifiers"] = k.modifiers
+            to_list.append(key_dict)
+        return to_list
