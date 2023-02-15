@@ -59,7 +59,8 @@ MODIFIERS = {
     "C": "right_control",
     "S": "right_shift",
     "f": "fn",
-    "l": "caps_lock"
+    "l": "caps_lock",
+    "x": "any",
 }
 
 KEY_CODE = [
@@ -327,7 +328,7 @@ POINTING_BUTTON = [
 
 KeyCodesRef = namedtuple("KeyCodesRef", ["key_type", "ref"])
 
-KEY_CODES_REF_LIST = [
+KEY_CODE_REF_LISTS = [
     KeyCodesRef("alias", ALIASES),
     KeyCodesRef("key_code", KEY_CODE),
     KeyCodesRef("consumer_key_code", CONSUMER_KEY_CODE),

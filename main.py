@@ -2,9 +2,12 @@ from collections import namedtuple
 from dataclasses import dataclass
 from typing import Union
 import yaml
-from helpers import (make_list, get_modded_key, get_layer)
+from helpers import (
+    invalidKey, make_list, is_modded_key,
+    is_layer, get_multi_keys, validate_modifier_rules
+)
 
-from key_codes import MODIFIERS, KEY_CODES_REF_LIST
+from key_codes import MODIFIERS, KEY_CODE_REF_LISTS
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code"])
 
@@ -30,6 +33,7 @@ class UserMapping:
     def __repr__(self):
         return f"Tap: {self.tap}\nHold: {self.hold}\nDesc: {self.desc}"
 
+
 @dataclass
 class MapTranslator:
 
@@ -37,57 +41,52 @@ class MapTranslator:
 
     def __post_init__(self):
         self.modifiers = []
-        self.keys = make_list(self.parse_map(self.map))
+        parsed_key = self.parse_modifiers(self.map)
+        translated_keys = self.queue_translations(parsed_key)
+        self.keys = translated_keys
 
-    def parse_map(self, usr_key):
+    def parse_modifiers(self, usr_key):
+        if modified_key := is_modded_key(self.map):
+            self.append_modifiers(modified_key.modifier)
+            return modified_key.key
+        return usr_key
 
-        if modified_key := get_modded_key(self.map):
-            self.mod_translator(modified_key.modifier)
-            usr_key = modified_key.key
-
-        elif layer := get_layer(self.map):
-            return KeyStruct("layer", layer)
-
-        return self.key_code_translator(usr_key)
-
-    def multi_key_parser(self, user_input):
-
-        if simul_keys := get_multi_keys(user_input):
-            keys = [self.key_code_translator(k.strip()) for k in simul_keys]
-            return keys
-
-    def resolve_alias(self, usr_key: str, key_type: str, ref_list):
-        if key_type != "alias":
-            return
-        alias = ref_list[usr_key]
-        self.modifiers.append(alias.modifier) if alias.modifier else None
-        return KeyStruct("key_code", alias.key_code)
-
-    def key_code_translator(self, usr_key):
-
-        if simul_keys := self.multi_key_parser(usr_key):
-            return simul_keys
-
-        for kcr in KEY_CODES_REF_LIST:
-            key_type, ref = kcr.key_type, kcr.ref
-
-            if usr_key not in ref:
-                continue
-
-            if alias := self.resolve_alias(usr_key, key_type, ref):
-                return alias
-
-            key_code = ref[usr_key] if isinstance(kcr, dict) else usr_key
-            return KeyStruct(key_type, key_code)
-
-        raise Exception(invalidKey("key code", self.map, usr_key))
-
-    def mod_translator(self, usr_mods):
+    def append_modifiers(self, usr_mods):
         for mod in usr_mods:
             if mod_query := MODIFIERS.get(mod):
                 self.modifiers.append(mod_query)
                 continue
             raise Exception(invalidKey("modifier", self.map, mod))
+
+    def queue_translations(self, parsed_key):
+        if multi_keys := get_multi_keys(parsed_key):
+            return [self.key_code_translator(k.strip()) for k in multi_keys]
+        else:
+            return [self.key_code_translator(parsed_key)]
+
+    def key_code_translator(self, usr_key):
+
+        if layer := is_layer(self.map):
+            return KeyStruct("layer", layer)
+
+        for ref_list in KEY_CODE_REF_LISTS:
+            key_type, ref = ref_list.key_type, ref_list.ref
+
+            if usr_key not in ref:
+                continue
+
+            if dealiased_key := self.resolve_alias(usr_key, key_type, ref):
+                return KeyStruct("key_code", dealiased_key)
+            return KeyStruct(key_type, usr_key)
+
+        raise Exception(invalidKey("key code", self.map, usr_key))
+
+    def resolve_alias(self, usr_key: str, key_type: str, aliases_list):
+        if key_type != "alias":
+            return
+        alias = aliases_list[usr_key]
+        self.modifiers.append(alias.modifier) if alias.modifier else None
+        return alias.key_code
 
     def __repr__(self):
         # Type: {self.key_type}
@@ -106,7 +105,16 @@ class Converter:
         from_map = MapTranslator(self.mapping.from_keys)
         self.from_keycode_localization(from_map)
         self.from_modifiers_localization(from_map)
-        # self.to_localization()
+
+        if tap := self.mapping.tap:
+            converted_tap_map = MapTranslator(tap)
+            self.to_localization(converted_tap_map)
+            self.to_modifiers_localization(converted_tap_map)
+
+        if hold := self.mapping.hold:
+            # If hold, then to_localization needs to be a 'to if alone' key,
+            # else just 'to'
+            pass
 
     def from_keycode_localization(self, from_map):
         # from: is a dictionary in karabiner.config
@@ -124,3 +132,17 @@ class Converter:
             return
         rule = validate_modifier_rules(self.mapping.from_keys)
         self.from_keys["modifiers"] = {rule: user_modifiers}
+
+    def to_localization(self, to_map):
+        # to: is a list in karabiner.config
+        if not to_map:
+            self.to_keys = None
+            return
+        self.to_keys = [{k.key_type: k.key_code} for k in to_map.keys]
+
+    def to_modifiers_localization(self, to_map):
+        # modifiers a list in the to list. No modifier rules to check
+        user_modifiers = to_map.modifiers
+        if not user_modifiers:
+            return
+        self.to_keys.append({"modifiers": user_modifiers})
