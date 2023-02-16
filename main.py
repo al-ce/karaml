@@ -5,11 +5,11 @@ from pprint import pprint
 from typing import Union
 import yaml
 from helpers import (
-    invalidKey, filter_list, make_list, is_modded_key,
-    is_layer, get_multi_keys,
+    invalidKey, make_list, is_modded_key, is_layer, get_multi_keys,
+    modifier_lookup, parse_chars_in_parens
 )
 
-from key_codes import MODIFIERS, KEY_CODE_REF_LISTS
+from key_codes import KEY_CODE_REF_LISTS
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 
@@ -46,16 +46,18 @@ class MapTranslator:
 
     def parse_modifiers(self, usr_key):
         if modified_key := is_modded_key(usr_key):
-            return modified_key.key, self.get_modifiers(modified_key.modifier)
+            return modified_key.key, self.get_modifiers(modified_key.modifiers)
         return usr_key, None
 
     def get_modifiers(self, usr_mods):
-        modifiers = [
-            MODIFIERS.get(mod) for mod in usr_mods if MODIFIERS.get(mod)
-        ]
-        if not modifiers:
+        mods = {}
+        mandatory, optional = parse_chars_in_parens(usr_mods)
+        mods["mandatory"] = modifier_lookup(mandatory) if mandatory else None
+        mods["optional"] = modifier_lookup(optional) if optional else None
+
+        if not mods:
             raise Exception(invalidKey("modifier", self.map, usr_mods))
-        return modifiers
+        return mods
 
     def queue_translations(self, parsed_key):
         if multi_keys := get_multi_keys(parsed_key):
