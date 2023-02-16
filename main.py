@@ -1,5 +1,7 @@
 from collections import namedtuple
 from dataclasses import dataclass
+from json import dumps
+from pprint import pprint
 from typing import Union
 import yaml
 from helpers import (
@@ -92,50 +94,63 @@ class MapTranslator:
 
 
 @dataclass
-class Converter:
+class KeyConverter:
 
     mapping: UserMapping
 
     def __post_init__(self):
-        self.from_keys = {"from": {}}
-        from_map = MapTranslator(self.mapping.from_keys)
-        self.from_keycode_localization(from_map)
 
-        self.to_keys = {}
+        # self.desc = {}
+        # self.insert_desc()
+        from_map = self.mapping.from_keys
+        self._from = {"from": self.from_keycode_localization(from_map)}
 
+        self._to = {}
         tap_key_name = "to"
         if hold := self.mapping.hold:
-            hold_outputs = self.to_localization(MapTranslator(hold))
-            self.to_keys.update({"to": hold_outputs})
+            self._to.update(self.to_keycodes_localization(hold, "to"))
             tap_key_name = "to_if_alone"
 
         if tap := self.mapping.tap:
-            tap_outputs = self.to_localization(MapTranslator(tap))
-            self.to_keys.update({tap_key_name: tap_outputs})
+            self._to.update(self.to_keycodes_localization(tap, tap_key_name))
+
+        if not self._to:
+            raise Exception("Must map 'to' key")
+    def parse_keystruct(self, key_dict):
+        converted_key_dict = MapTranslator(key_dict)
+        key_list = []
+        for k in converted_key_dict.keys:
+            key = {k.key_type: k.key_code}
+            if modifiers := k.modifiers:
+                key["modifiers"] = modifiers
+            key_list.append(key)
+        return key_list
 
     def from_keycode_localization(self, from_map):
-        container = [{k.key_type: k.key_code} for k in from_map.keys]
-        modifiers = filter_list([k.modifiers for k in from_map.keys])
+        k_list = self.parse_keystruct(from_map)
+        simple = len(k_list) == 1
+        return k_list[0] if simple else {"simultaneous": k_list}
 
-        if len(container) == 1:
-            self.from_keys["from"] = container[0]
-        else:
-            self.from_keys["from"]["simultaneous"] = [k for k in container]
-
-        if modifiers:
-            self.from_keys["from"]["modifiers"] = modifiers
+    def to_keycodes_localization(self, to_map, to_key_name):
+        outputs = self.parse_keystruct(to_map) if to_map else None
+        return {to_key_name: outputs}
+            self._from["from"]["modifiers"] = modifiers
 
     def _update_to_keys(self, to_map, to_key_name):
-        outputs = self.to_localization(to_map, to_key_name)
-        self.to_keys.update({to_key_name: outputs})
+        converted = MapTranslator(to_map)
+        outputs = self.to_localization(converted)
+        self._to.update({to_key_name: outputs})
+        modifiers = self.to_modifiers_localization(converted)
+        if modifiers:
+            self._to.update({"modifiers": modifiers})
 
     def to_localization(self, to_map):
         if not to_map:
             return
-        to_list = []
-        for k in to_map.keys:
-            key_dict = {k.key_type: k.key_code}
-            if k.modifiers:
-                key_dict["modifiers"] = k.modifiers
-            to_list.append(key_dict)
+        return {k.key_type: k.key_code for k in to_map.keys}
+
+    def to_modifiers_localization(self, to_map):
+        modifiers = filter_list([k.modifiers for k in to_map.keys])
+        if modifiers:
+            return modifiers
         return to_list
