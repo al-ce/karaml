@@ -49,6 +49,8 @@ def get_multi_keys(string):
     if search(expr, string):
         return string[1:-1].split(",")
 
+    if "+" in string:
+        return string.split("+")
 
 def validate_modifier_rules(usr_from_map: str):
     if all_in(["<", ">"], usr_from_map):
