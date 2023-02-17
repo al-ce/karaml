@@ -40,23 +40,6 @@ class MapTranslator:
         translated_keys = self.queue_translations(self.map)
         self.keys = translated_keys
 
-    def parse_modifiers(self, usr_key: str):
-        if modified_key := is_modded_key(usr_key):
-            return modified_key.key, self.get_modifiers(modified_key.modifiers)
-        return usr_key, None
-
-    def get_modifiers(self, usr_mods: str):
-        mods = {}
-        mandatory, optional = parse_chars_in_parens(usr_mods)
-        if mandatory:
-            mods["mandatory"] = modifier_lookup(mandatory)
-        if optional:
-            mods["optional"] = modifier_lookup(optional)
-
-        if not mods:
-            raise Exception(invalidKey("modifier", self.map, usr_mods))
-        return mods
-
     def queue_translations(self, parsed_key: str):
         if multi_keys := get_multi_keys(parsed_key):
             return [self.key_code_translator(k.strip()) for k in multi_keys]
@@ -81,6 +64,23 @@ class MapTranslator:
 
         raise Exception(invalidKey("key code", self.map, usr_key))
 
+    def parse_modifiers(self, usr_key: str):
+        if modified_key := is_modded_key(usr_key):
+            return modified_key.key, self.get_modifiers(modified_key.modifiers)
+        return usr_key, None
+
+    def get_modifiers(self, usr_mods: str):
+        mods = {}
+        mandatory, optional = parse_chars_in_parens(usr_mods)
+        if mandatory:
+            mods["mandatory"] = modifier_lookup(mandatory)
+        if optional:
+            mods["optional"] = modifier_lookup(optional)
+
+        if not mods:
+            raise Exception(invalidKey("modifier", self.map, usr_mods))
+        return mods
+
     def resolve_alias(self, usr_key: str, key_type: str, aliases_dict: dict):
         if key_type != "alias":
             return
@@ -98,6 +98,7 @@ class KeyConverter:
 
         desc = self.mapping.desc
         self.desc = {"description": desc} if desc else None
+
         from_map = self.mapping.from_keys
         self._from = {"from": self.from_keycode_localization(from_map)}
 
@@ -106,19 +107,19 @@ class KeyConverter:
         if hold := self.mapping.hold:
             self._to.update(self.to_keycodes_localization(hold, "to"))
             tap_key_name = "to_if_alone"
-
         if tap := self.mapping.tap:
             self._to.update(self.to_keycodes_localization(tap, tap_key_name))
-
         if not self._to:
             raise Exception(f"Must map 'to' key for: {self.mapping.from_keys}")
 
-    def local_mods(self, mods: dict, direction: str, key_map) -> dict:
-        if direction == "from":
-            return {"modifiers": mods}
-        if mods.get("optional"):
-            invalidToModType(self.mapping)
-        return {"modifiers": mods.get("mandatory")}
+    def from_keycode_localization(self, from_map: str):
+        k_list = self.parse_keystruct(from_map, "from")
+        simple = len(k_list) == 1
+        return k_list.pop() if simple else {"simultaneous": k_list}
+
+    def to_keycodes_localization(self, to_map: str, to_key_type: str):
+        outputs = self.parse_keystruct(to_map, "to") if to_map else None
+        return {to_key_type: outputs}
 
     def parse_keystruct(self, key_map: str, direction: str):
         translated_key = MapTranslator(key_map)
@@ -131,10 +132,12 @@ class KeyConverter:
             key_list.append(key)
         return key_list
 
-    def from_keycode_localization(self, from_map: str):
-        k_list = self.parse_keystruct(from_map, "from")
-        simple = len(k_list) == 1
-        return k_list.pop() if simple else {"simultaneous": k_list}
+    def local_mods(self, mods: dict, direction: str, key_map) -> dict:
+        if direction == "from":
+            return {"modifiers": mods}
+        if mods.get("optional"):
+            invalidToModType(self.mapping)
+        return {"modifiers": mods.get("mandatory")}
 
     def to_keycodes_localization(self, to_map: str, to_key_type: str):
         outputs = self.parse_keystruct(to_map, "to") if to_map else None

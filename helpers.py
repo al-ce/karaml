@@ -1,16 +1,7 @@
 from re import search
 from collections import namedtuple
 from itertools import chain
-
-
-def invalidKey(key_type: str, map: str, key: str):
-    key_type = "modifier" if key_type == "mod" else "key code"
-    return f"Invalid user-defined {key_type} in map {map}: {key}"
-
-
-def invalidModifierRule(usr_from_map: str):
-    return f"Invalid modifier rule for {usr_from_map}. Must use " \
-        "'< >' for mandatory, '( )' for optional modifiers"
+from key_codes import MODIFIERS
 
 
 def all_in(items: list, container: iter) -> bool:
@@ -24,20 +15,18 @@ def filter_list(unfiltered):
     return list(chain.from_iterable([x for x in unfiltered if x]))
 
 
-def make_list(x) -> list:
-    return [x] if not isinstance(x, list) else x
+def get_multi_keys(string: str):
+    if "+" in string:
+        return string.split("+")
 
 
-def modifier_lookup(usr_mods: list) -> list:
-    return [MODIFIERS.get(mod) for mod in usr_mods if MODIFIERS.get(mod)]
+def invalidKey(key_type: str, map: str, key: str):
+    key_type = "modifier" if key_type == "mod" else "key code"
+    return f"Invalid user-defined {key_type} in map {map}: {key}"
 
 
-def is_modded_key(string: str):
-    expr = "<(.+)-(.+)>"
-
-    if query := search(expr, string):
-        ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
-        return ModifiedKey(*query.groups())
+def invalidToModType(usr_to_map: str):
+    raise Exception(f"Opt flag for 'to.modifiers' not allowed: {usr_to_map}")
 
 
 def is_dict(obj):
@@ -49,9 +38,20 @@ def is_layer(string: str):
         return layer.group(1)
 
 
-def get_multi_keys(string: str):
-    if "+" in string:
-        return string.split("+")
+def is_modded_key(string: str):
+    expr = "<(.+)-(.+)>"
+
+    if query := search(expr, string):
+        ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
+        return ModifiedKey(*query.groups())
+
+
+def make_list(x) -> list:
+    return [x] if not isinstance(x, list) else x
+
+
+def modifier_lookup(usr_mods: list) -> list:
+    return [MODIFIERS.get(mod) for mod in usr_mods if MODIFIERS.get(mod)]
 
 
 def parse_chars_in_parens(string: str):
