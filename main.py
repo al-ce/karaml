@@ -1,12 +1,11 @@
 from collections import namedtuple
 from dataclasses import dataclass
 from json import dumps
-from pprint import pprint
 from typing import Union
 import yaml
 from helpers import (
-    invalidKey, make_list, is_modded_key, is_layer, get_multi_keys,
-    modifier_lookup, parse_chars_in_parens
+    invalidKey, invalidToModType, make_list, is_modded_key, is_layer,
+    get_multi_keys, modifier_lookup, parse_chars_in_parens
 )
 
 from key_codes import KEY_CODE_REF_LISTS
@@ -31,9 +30,6 @@ class UserMapping:
     def items(self):
         return self.tap, self.hold, self.desc
 
-    def __repr__(self):
-        return f"Tap: {self.tap}\nHold: {self.hold}\nDesc: {self.desc}"
-
 
 @dataclass
 class MapTranslator:
@@ -44,28 +40,30 @@ class MapTranslator:
         translated_keys = self.queue_translations(self.map)
         self.keys = translated_keys
 
-    def parse_modifiers(self, usr_key):
+    def parse_modifiers(self, usr_key: str):
         if modified_key := is_modded_key(usr_key):
             return modified_key.key, self.get_modifiers(modified_key.modifiers)
         return usr_key, None
 
-    def get_modifiers(self, usr_mods):
+    def get_modifiers(self, usr_mods: str):
         mods = {}
         mandatory, optional = parse_chars_in_parens(usr_mods)
-        mods["mandatory"] = modifier_lookup(mandatory) if mandatory else None
-        mods["optional"] = modifier_lookup(optional) if optional else None
+        if mandatory:
+            mods["mandatory"] = modifier_lookup(mandatory)
+        if optional:
+            mods["optional"] = modifier_lookup(optional)
 
         if not mods:
             raise Exception(invalidKey("modifier", self.map, usr_mods))
         return mods
 
-    def queue_translations(self, parsed_key):
+    def queue_translations(self, parsed_key: str):
         if multi_keys := get_multi_keys(parsed_key):
             return [self.key_code_translator(k.strip()) for k in multi_keys]
         else:
             return [self.key_code_translator(parsed_key)]
 
-    def key_code_translator(self, usr_key):
+    def key_code_translator(self, usr_key: str):
 
         if layer := is_layer(self.map):
             return KeyStruct("layer", layer, None)
@@ -83,16 +81,12 @@ class MapTranslator:
 
         raise Exception(invalidKey("key code", self.map, usr_key))
 
-    def resolve_alias(self, usr_key: str, key_type: str, aliases_list):
+    def resolve_alias(self, usr_key: str, key_type: str, aliases_dict: dict):
         if key_type != "alias":
             return
-        alias = aliases_list[usr_key]
+        alias = aliases_dict[usr_key]
         self.get_modifiers(alias.modifier) if alias.modifier else None
         return alias.key_code
-
-    def __repr__(self):
-        # Type: {self.key_type}
-        return f""" Key: {self.keys}"""
 
 
 @dataclass
@@ -117,25 +111,35 @@ class KeyConverter:
             self._to.update(self.to_keycodes_localization(tap, tap_key_name))
 
         if not self._to:
-            raise Exception("Must map 'to' key")
+            raise Exception(f"Must map 'to' key for: {self.mapping.from_keys}")
     def parse_keystruct(self, key_dict):
         converted_key_dict = MapTranslator(key_dict)
+    def local_mods(self, mods: dict, direction: str, key_map) -> dict:
+        if direction == "from":
+            return {"modifiers": mods}
+        if mods.get("optional"):
+            invalidToModType(self.mapping)
+        return {"modifiers": mods.get("mandatory")}
+
+    def parse_keystruct(self, key_map: str, direction: str):
+        translated_key = MapTranslator(key_map)
         key_list = []
-        for k in converted_key_dict.keys:
+
+        for k in translated_key.keys:
             key = {k.key_type: k.key_code}
             if modifiers := k.modifiers:
-                key["modifiers"] = modifiers
+                key.update(self.local_mods(modifiers, direction, key_map))
             key_list.append(key)
         return key_list
 
-    def from_keycode_localization(self, from_map):
-        k_list = self.parse_keystruct(from_map)
+    def from_keycode_localization(self, from_map: str):
+        k_list = self.parse_keystruct(from_map, "from")
         simple = len(k_list) == 1
-        return k_list[0] if simple else {"simultaneous": k_list}
+        return k_list.pop() if simple else {"simultaneous": k_list}
 
-    def to_keycodes_localization(self, to_map, to_key_name):
-        outputs = self.parse_keystruct(to_map) if to_map else None
-        return {to_key_name: outputs}
+    def to_keycodes_localization(self, to_map: str, to_key_type: str):
+        outputs = self.parse_keystruct(to_map, "to") if to_map else None
+        return {to_key_type: outputs}
             self._from["from"]["modifiers"] = modifiers
 
     def _update_to_keys(self, to_map, to_key_name):
