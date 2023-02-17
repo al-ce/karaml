@@ -96,8 +96,8 @@ class KeyConverter:
 
     def __post_init__(self):
 
-        # self.desc = {}
-        # self.insert_desc()
+        desc = self.mapping.desc
+        self.desc = {"description": desc} if desc else None
         from_map = self.mapping.from_keys
         self._from = {"from": self.from_keycode_localization(from_map)}
 
@@ -112,8 +112,7 @@ class KeyConverter:
 
         if not self._to:
             raise Exception(f"Must map 'to' key for: {self.mapping.from_keys}")
-    def parse_keystruct(self, key_dict):
-        converted_key_dict = MapTranslator(key_dict)
+
     def local_mods(self, mods: dict, direction: str, key_map) -> dict:
         if direction == "from":
             return {"modifiers": mods}
