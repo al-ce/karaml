@@ -28,10 +28,15 @@ def make_list(x) -> list:
     return [x] if not isinstance(x, list) else x
 
 
-def is_modded_key(string):
-    expr = "(\\w+)-([^)>]+)"
+def modifier_lookup(usr_mods: list) -> list:
+    return [MODIFIERS.get(mod) for mod in usr_mods if MODIFIERS.get(mod)]
+
+
+def is_modded_key(string: str):
+    expr = "<(.+)-(.+)>"
+
     if query := search(expr, string):
-        ModifiedKey = namedtuple("ModifiedKey", ["modifier", "key"])
+        ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
         return ModifiedKey(*query.groups())
 
 
@@ -39,22 +44,19 @@ def is_dict(obj):
     return isinstance(obj, dict)
 
 
-def is_layer(string):
+def is_layer(string: str):
     if layer := search("/(\\w+)/", string):
         return layer.group(1)
 
 
-def get_multi_keys(string):
-    expr = "\\(([^,]+.*)\\)"
-    if search(expr, string):
-        return string[1:-1].split(",")
-
+def get_multi_keys(string: str):
     if "+" in string:
         return string.split("+")
 
-def validate_modifier_rules(usr_from_map: str):
-    if all_in(["<", ">"], usr_from_map):
-        return "mandatory"
-    elif all_in(["(", ")"], usr_from_map):
-        return "optional"
-    raise Exception(invalidModifierRule(usr_from_map))
+
+def parse_chars_in_parens(string: str):
+    in_parens = search(r"\((.*?)\)", string)
+    not_in_parens = search(r"[\w+]+(?![^()]*\))", string)
+    in_parens = list(in_parens[0]) if in_parens else in_parens
+    not_in_parens = list(not_in_parens[0]) if not_in_parens else not_in_parens
+    return not_in_parens, in_parens
