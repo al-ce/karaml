@@ -326,6 +326,16 @@ POINTING_BUTTON = [
     "button32",
 ]
 
+
+TO_EVENTS = [
+    "app",
+    "input",
+    "mouse",
+    "sfunc",
+    "shell",
+]
+
+
 KeyCodesRef = namedtuple("KeyCodesRef", ["key_type", "ref"])
 
 KEY_CODE_REF_LISTS = [
