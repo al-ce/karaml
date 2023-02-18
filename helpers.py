@@ -1,7 +1,9 @@
 import ast
-from re import search
+from copy import copy
 from collections import namedtuple
 from itertools import chain
+from re import search
+
 from key_codes import MODIFIERS, TO_EVENTS
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
@@ -12,6 +14,10 @@ def all_in(items: list, container: iter) -> bool:
         if item not in container:
             return False
     return True
+
+
+def condition_dict(layer_name: str, value: int) -> dict:
+    return {"name": layer_name, "type": "variable_if", "value": value}
 
 
 def dict_eval(string: str):
@@ -75,6 +81,23 @@ def parse_chars_in_parens(string: str):
     in_parens = [in_parens[0]] if in_parens else None
     not_in_parens = [not_in_parens[0]] if not_in_parens else None
     return not_in_parens, in_parens
+
+
+def requires_sublayer(layer_name: str) -> str:
+    conditions = {"conditions": []}
+    found_layer = search("^/(\\w+)/$", layer_name)
+    if not found_layer or found_layer.group(1) == "base":
+        return conditions
+    layer_condition = condition_dict(f"{found_layer.group(1)}_sublayer", 1)
+    conditions["conditions"].append(layer_condition)
+    return conditions
+
+
+def toggle_layer_off(karamlized_key):
+    layer_off = copy(karamlized_key)
+    layer_off.conditions["conditions"][0]["value"] = 1
+    layer_off._to["to_if_alone"][0]["value"] = 0
+    return layer_off
 
 
 def to_event_check(usr_map: str):

@@ -1,0 +1,1251 @@
+{
+    "rules": [
+        {
+            "description": "/base/ layer",
+            "manipulators": [
+                {
+                    "from": {
+                        "key_code": "q"
+                    },
+                    "to": [
+                        {
+                            "key_code": "z"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "f"
+                    },
+                    "to": [
+                        {
+                            "key_code": "1"
+                        },
+                        {
+                            "key_code": "2"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "grave_accent_and_tilde"
+                    },
+                    "to": [
+                        {
+                            "key_code": "escape"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "return_or_enter"
+                    },
+                    "to": [
+                        {
+                            "key_code": "left_control"
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "return_or_enter"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "w",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_option"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "delete_or_backspace",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "h"
+                    },
+                    "to": [
+                        {
+                            "key_code": "h",
+                            "modifiers": []
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "h"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "h",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_control"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "delete_or_backspace"
+                        }
+                    ]
+                },
+                {
+                    "description": "Space Cadet L-Shift",
+                    "from": {
+                        "key_code": "left_shift",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_control"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "left_shift"
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "9"
+                        }
+                    ]
+                },
+                {
+                    "description": "Space Cadet R-Shift",
+                    "from": {
+                        "key_code": "right_shift"
+                    },
+                    "to": [
+                        {
+                            "key_code": "right_shift"
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "0"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "right_shift",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_shift"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "close_bracket"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "left_shift",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_shift"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "open_bracket"
+                        }
+                    ]
+                },
+                {
+                    "description": "hyper-q: Lock Screen on hold",
+                    "from": {
+                        "key_code": "q",
+                        "modifiers": {
+                            "mandatory": []
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "q",
+                            "modifiers": []
+                        }
+                    ]
+                },
+                {
+                    "description": "simul jk for escape",
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "j"
+                            },
+                            {
+                                "key_code": "k"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "escape"
+                        }
+                    ]
+                },
+                {
+                    "description": "Quit App",
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "pointing_button": "button1"
+                            },
+                            {
+                                "key_code": "q"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "q",
+                            "modifiers": [
+                                "left_command"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "left_option"
+                            },
+                            {
+                                "key_code": "s"
+                            },
+                            {
+                                "key_code": "m"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "mute"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "up_arrow",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_shift"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "volume_up"
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "g",
+                            "modifiers": [
+                                "left_shift"
+                            ]
+                        },
+                        {
+                            "key_code": "k",
+                            "modifiers": [
+                                "right_control"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "m",
+                                "modifiers": {
+                                    "mandatory": [
+                                        "left_control"
+                                    ],
+                                    "optional": []
+                                }
+                            },
+                            {
+                                "key_code": "u"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "mute"
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "pointing_button": "button1"
+                        },
+                        {
+                            "key_code": "m"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "1",
+                        "modifiers": {
+                            "mandatory": [
+                                "any"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "hyphen"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "down_arrow",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_shift"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "volume_down"
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "g"
+                        },
+                        {
+                            "key_code": "j"
+                        }
+                    ]
+                },
+                {
+                    "description": "simul jk for escape",
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "j",
+                                "modifiers": {
+                                    "mandatory": [
+                                        "left_command"
+                                    ]
+                                }
+                            },
+                            {
+                                "key_code": "k"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "escape"
+                        }
+                    ]
+                },
+                {
+                    "description": "simul jk for escape",
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "j"
+                            },
+                            {
+                                "key_code": "k",
+                                "modifiers": {
+                                    "mandatory": [
+                                        "left_control"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "escape"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "period",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_option"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "period",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "comma",
+                        "modifiers": {
+                            "optional": []
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "comma",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "caps_lock"
+                    },
+                    "to_after_key_up": [
+                        {
+                            "set_variable": {
+                                "name": "nav_layer",
+                                "type": "variable_if",
+                                "value": 0
+                            }
+                        }
+                    ],
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "nav_layer",
+                                "type": "variable_if",
+                                "value": 1
+                            }
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "escape"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "fn_layer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "escape"
+                    },
+                    "to": [
+                        {
+                            "key_code": "q",
+                            "modifiers": [
+                                "left_command"
+                            ]
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "set_variable": {
+                                "name": "fn_layer",
+                                "type": "variable_if",
+                                "value": 1
+                            },
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "fn_layer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "escape"
+                    },
+                    "to": [
+                        {
+                            "key_code": "q",
+                            "modifiers": [
+                                "left_command"
+                            ]
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "set_variable": {
+                                "name": "fn_layer",
+                                "type": "variable_if",
+                                "value": 1
+                            },
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "k"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Kitty'.app"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "s"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "mkdir ~Downloads/testDir; touch ~/Downloads/testDir/testFile.txt"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "i"
+                    },
+                    "to": [
+                        {
+                            "select_input_source": {
+                                "language": "language regex",
+                                "input_source_id": "input source id regex",
+                                "input_mode_id": "input mode id regex"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "j"
+                    },
+                    "to": [
+                        {
+                            "mouse_key": {
+                                "x": 1000,
+                                "y": 1000,
+                                "vertical_wheel": 1000,
+                                "horizontal_wheel": 1000,
+                                "speed_multiplier": 1.0
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "/nav/ layer",
+            "manipulators": [
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "h"
+                    },
+                    "to": [
+                        {
+                            "key_code": "left_arrow"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "j"
+                    },
+                    "to": [
+                        {
+                            "key_code": "down_arrow"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "k"
+                    },
+                    "to": [
+                        {
+                            "key_code": "up_arrow"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "l"
+                    },
+                    "to": [
+                        {
+                            "key_code": "right_arrow"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "u"
+                    },
+                    "to": [
+                        {
+                            "key_code": "page_up"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "u"
+                    },
+                    "to": [
+                        {
+                            "key_code": "page_up"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "i"
+                    },
+                    "to": [
+                        {
+                            "key_code": "page_down"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "g"
+                    },
+                    "to": [
+                        {
+                            "key_code": "home"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "g"
+                    },
+                    "to": [
+                        {
+                            "key_code": "end"
+                        }
+                    ]
+                },
+                {
+                    "description": "newline | Open Apps layer",
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "o"
+                    },
+                    "to_after_key_up": [
+                        {
+                            "set_variable": {
+                                "name": "open_layer",
+                                "type": "variable_if",
+                                "value": 0
+                            }
+                        }
+                    ],
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "open_layer",
+                                "type": "variable_if",
+                                "value": 1
+                            }
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "return_or_enter"
+                        }
+                    ]
+                },
+                {
+                    "description": "del line | System Layer",
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "s"
+                    },
+                    "to_after_key_up": [
+                        {
+                            "set_variable": {
+                                "name": "sys_layer",
+                                "type": "variable_if",
+                                "value": 0
+                            }
+                        }
+                    ],
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "sys_layer",
+                                "type": "variable_if",
+                                "value": 1
+                            }
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "k",
+                            "modifiers": [
+                                "left_control"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "description": "next word | Windows Layer",
+                    "conditions": [
+                        {
+                            "name": "nav_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "w"
+                    },
+                    "to_after_key_up": [
+                        {
+                            "set_variable": {
+                                "name": "win_layer",
+                                "type": "variable_if",
+                                "value": 0
+                            }
+                        }
+                    ],
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "win_layer",
+                                "type": "variable_if",
+                                "value": 1
+                            }
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "right_arrow",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "/open/ layer",
+            "manipulators": [
+                {
+                    "conditions": [
+                        {
+                            "name": "open_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "k"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Kitty'.app"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "open_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "f"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Firefox'.app"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "open_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "e"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'CotEditor'.app"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "/sys/ layer",
+            "manipulators": [
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "j"
+                    },
+                    "to": [
+                        {
+                            "key_code": "volume_decrement"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "k"
+                    },
+                    "to": [
+                        {
+                            "key_code": "volume_increment"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "m"
+                    },
+                    "to": [
+                        {
+                            "key_code": "mute"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "i"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "mkdir ~Downloads/testDir; touch ~/Downloads/testDir/testFile.txt"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "comma"
+                    },
+                    "to": [
+                        {
+                            "key_code": "display_brightness_decrement"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "period"
+                    },
+                    "to": [
+                        {
+                            "key_code": "display_brightness_increment"
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "spacebar"
+                    },
+                    "to": [
+                        {
+                            "key_code": "play_or_pause"
+                        }
+                    ]
+                },
+                {
+                    "description": "Lock Screen",
+                    "conditions": [
+                        {
+                            "name": "sys_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "q"
+                    },
+                    "to": [
+                        {
+                            "key_code": "q",
+                            "modifiers": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "/win/ layer",
+            "manipulators": [
+                {
+                    "conditions": [
+                        {
+                            "name": "win_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "h"
+                    },
+                    "to": [
+                        {
+                            "key_code": "left_arrow",
+                            "modifiers": [
+                                "left_control"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "win_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "l"
+                    },
+                    "to": [
+                        {
+                            "key_code": "right_arrow",
+                            "modifiers": [
+                                "left_control"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "win_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "k"
+                    },
+                    "to": [
+                        {
+                            "key_code": "up_arrow",
+                            "modifiers": [
+                                "left_control"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "win_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "j"
+                    },
+                    "to": [
+                        {
+                            "key_code": "mission_control"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "/math/ layer",
+            "manipulators": [
+                {
+                    "conditions": [
+                        {
+                            "name": "math_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "s"
+                    },
+                    "to": [
+                        {
+                            "key_code": "s",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "math_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "p"
+                    },
+                    "to": [
+                        {
+                            "key_code": "p",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "math_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "m"
+                    },
+                    "to": [
+                        {
+                            "key_code": "m",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "math_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "equal_sign",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_shift"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "x",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "math_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "v"
+                    },
+                    "to": [
+                        {
+                            "key_code": "v",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "conditions": [
+                        {
+                            "name": "math_sublayer",
+                            "type": "variable_if",
+                            "value": 1
+                        }
+                    ],
+                    "from": {
+                        "key_code": "period",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_shift"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "period",
+                            "modifiers": [
+                                "left_option"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

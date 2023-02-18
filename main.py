@@ -2,13 +2,12 @@ from collections import namedtuple
 from dataclasses import dataclass
 from json import dumps
 from typing import Union
-from copy import copy
 import yaml
 
 from helpers import (
-    dict_eval, invalidKey, invalidToModType, make_list, is_modded_key,
-    is_layer, get_multi_keys, modifier_lookup, parse_chars_in_parens,
-    to_event_check,
+    condition_dict, dict_eval, invalidKey, invalidToModType, make_list,
+    is_modded_key, is_layer, get_multi_keys, modifier_lookup,
+    parse_chars_in_parens, requires_sublayer, toggle_layer_off, to_event_check,
 )
 
 from key_codes import KEY_CODE_REF_LISTS
@@ -96,35 +95,38 @@ class MapTranslator:
         if key_type != "alias":
             return
         alias = aliases_dict[usr_key]
-        self.get_modifiers(alias.modifier) if alias.modifier else None
         return alias.key_code
 
 
 @dataclass
 class KaramlizedKey:
 
-    mapping: UserMapping
+    usr_map: UserMapping
+    layer_name: str
 
     def __post_init__(self):
 
-        self.conditions = {}
+        self.conditions = requires_sublayer(self.layer_name)
         self.layer_toggle = False
 
-        desc = self.mapping.desc
+        desc = self.usr_map.desc
         self.desc = {"description": desc} if desc else None
 
-        from_map = self.mapping.from_keys
+        from_map = self.usr_map.from_keys
         self._from = {"from": self.from_keycode_localization(from_map)}
 
         self._to = {}
         tap_type = "to"
-        if hold := self.mapping.hold:
+        if hold := self.usr_map.hold:
             self._to.update(self.to_keycodes_localization(hold, "to"))
             tap_type = "to_if_alone"
-        if tap := self.mapping.tap:
+        if tap := self.usr_map.tap:
             self._to.update(self.to_keycodes_localization(tap, tap_type))
         if not self._to:
-            raise Exception(f"Must map 'to' key for: {self.mapping.from_keys}")
+            raise Exception(f"Must map 'to' key for: {self.usr_map.from_keys}")
+
+        if not self.conditions.get("conditions"):
+            self.conditions = None
 
     def from_keycode_localization(self, from_map: str):
         k_list = self.keystruct_list(from_map, "from")
@@ -144,7 +146,7 @@ class KaramlizedKey:
 
             if dict_value := dict_eval(k.key_code):
                 key = {k.key_type: dict_value}
-            elif layer := self.layer_check(k, direction):
+            elif layer := self.to_layer_check(k, direction):
                 key = layer
 
             if modifiers := k.modifiers:
@@ -156,33 +158,82 @@ class KaramlizedKey:
         if direction == "from":
             return {"modifiers": mods}
         if mods.get("optional"):
-            invalidToModType(self.mapping)
+            invalidToModType(self.usr_map)
         return {"modifiers": mods.get("mandatory")}
 
-    def layer_check(self, key: namedtuple, direction: str):
+    def to_layer_check(self, key: namedtuple, direction: str):
         if key.key_type != "layer":
             return False
         layer_name = f"{key.key_code}_layer"
 
         def layer_toggle(value):
-            return {"set_variable": {"name": layer_name, "value": value}}
+            return {"set_variable": condition_dict(layer_name, value)}
 
         if direction == "to_if_alone":
             # Toggle layer on. Toggle off needs to be created later by copying
-            # this object and changing its on/off value
+            # this object and changing its on value to off
             self.layer_toggle = True
-            self.conditions = {"conditions": [layer_toggle(0)]}
+            self.conditions["conditions"].append(condition_dict(layer_name, 0))
         else:
-            # To: layer on
-            # To after key up: layer off
             self._to.update(
                 {"to_after_key_up": [layer_toggle(0)]}
             )
 
         return layer_toggle(1)
 
-    def to_modifiers_localization(self, to_map):
-        modifiers = filter_list([k.modifiers for k in to_map.keys])
-        if modifiers:
-            return modifiers
-        return to_list
+    def mapping(self):
+        mapping_dict = {}
+        if self.desc:
+            mapping_dict.update(self.desc)
+        if self.conditions:
+            mapping_dict.update(self.conditions)
+        mapping_dict.update(self._from)
+        mapping_dict.update(self._to)
+        return mapping_dict
+
+
+class Karamlizer:
+
+    def __init__(self, filename: str):
+        self.yaml_data = self.load_karml(filename)
+        self.karamlized_keys = {"rules": self.karamlize(self.yaml_data)}
+
+    def load_karml(self, from_file):
+        with open(from_file) as f:
+            yaml_data = yaml.safe_load(f)
+        return yaml_data
+
+    def karamlize(self, yaml_data: dict):
+        karamlized_keys = []
+
+        for layer_name, layer_maps in yaml_data.items():
+            manipulators = []
+            for key, to in layer_maps.items():
+                user_map = UserMapping(key, to)
+                karamlized_key = KaramlizedKey(user_map, layer_name)
+                manipulators.append(karamlized_key.mapping())
+                if karamlized_key.layer_toggle:
+                    layer_off = toggle_layer_off(karamlized_key)
+                    manipulators.append(layer_off.mapping())
+
+            layer = {"description": f"{layer_name} layer",
+                     "manipulators": manipulators}
+            karamlized_keys.append(layer)
+
+        return karamlized_keys
+
+    def write_json(self, to_file: str):
+        with open(to_file, "w") as f:
+            f.write(dumps(self.karamlized_keys, indent=4))
+
+
+def main():
+    from_file = "karaml-spec.yaml"
+    to_file = "karaml.json"
+
+    karamlizer = Karamlizer(from_file)
+    karamlizer.write_json(to_file)
+
+
+if __name__ == "__main__":
+    main()

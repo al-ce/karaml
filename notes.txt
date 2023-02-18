@@ -1,2 +1,0 @@
-LIMITATIONS:
-simultaneous mappings can only use key_code types, not pointing, etc.
