@@ -8,46 +8,45 @@ from collections import namedtuple
 Alias = namedtuple("Alias", ["key_code", "modifier"])
 
 
-modifier = "left_shift"
+alias_modifier = "left_shift"
 ALIASES = {
     "enter": Alias("return_or_enter", None),
     "backspace": Alias("delete_or_backspace", None),
     "delete": Alias("delete_forward", None),
+    "space": Alias("spacebar", None),
     "-": Alias("hyphen", None),
-    "_": Alias("hyphen", modifier),
-    "=": Alias("equal_sign", modifier),
-    "(": Alias("9", modifier),
-    ")": Alias("0", modifier),
+    "_": Alias("hyphen", alias_modifier),
+    "=": Alias("equal_sign", alias_modifier),
+    "(": Alias("9", alias_modifier),
+    ")": Alias("0", alias_modifier),
     "[": Alias("open_bracket", None),
-    "{": Alias("open_bracket", modifier),
+    "{": Alias("open_bracket", alias_modifier),
     "]": Alias("close_bracket", None),
-    "}": Alias("close_bracket", modifier),
+    "}": Alias("close_bracket", alias_modifier),
     "\\": Alias("backslash", None),
-    "|": Alias("backslash", modifier),
+    "|": Alias("backslash", alias_modifier),
     ";": Alias("semicolon", None),
-    ":": Alias("semicolon", modifier),
+    ":": Alias("semicolon", alias_modifier),
     "'": Alias("quote", None),
-    '"': Alias("quote", modifier),
+    '"': Alias("quote", alias_modifier),
     "`": Alias("grave_accent_and_tilde", None),
-    "~": Alias("grave_accent_and_tilde", modifier),
+    "~": Alias("grave_accent_and_tilde", alias_modifier),
     ",": Alias("comma", None),
-    "<": Alias("comma", modifier),
+    "<": Alias("comma", alias_modifier),
     ".": Alias("period", None),
-    ">": Alias("period", modifier),
+    ">": Alias("period", alias_modifier),
     "/": Alias("slash", None),
-    "?": Alias("slash", modifier),
+    "?": Alias("slash", alias_modifier),
     "up": Alias("up_arrow", None),
     "down": Alias("down_arrow", None),
     "left": Alias("left_arrow", None),
     "right": Alias("right_arrow", None),
     "pgup": Alias("page_up", None),
     "pgdn": Alias("page_down", None),
-    "home": Alias("home", None),
-    "end": Alias("end", None),
 }
 
 for letter in ascii_uppercase:
-    ALIASES[letter] = [letter.lower(), True]
+    ALIASES[letter] = Alias(letter.lower(), alias_modifier)
 
 MODIFIERS = {
     "m": "left_command",

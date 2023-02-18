@@ -2,10 +2,13 @@ from collections import namedtuple
 from dataclasses import dataclass
 from json import dumps
 from typing import Union
+from copy import copy
 import yaml
+
 from helpers import (
-    invalidKey, invalidToModType, make_list, is_modded_key, is_layer,
-    get_multi_keys, modifier_lookup, parse_chars_in_parens
+    dict_eval, invalidKey, invalidToModType, make_list, is_modded_key,
+    is_layer, get_multi_keys, modifier_lookup, parse_chars_in_parens,
+    to_event_check,
 )
 
 from key_codes import KEY_CODE_REF_LISTS
