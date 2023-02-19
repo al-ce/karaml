@@ -43,16 +43,19 @@ def is_modded_key(string: str) -> namedtuple:
 
 def is_valid_keycode(usr_key, usr_map) -> namedtuple:
     for ref_list in KEY_CODE_REF_LISTS:
-        key_type, ref = ref_list.key_type, ref_list.ref
+        event, ref = ref_list.key_type, ref_list.ref
         parsed_key, modifiers = parse_modifiers(usr_key, usr_map)
 
         if parsed_key not in ref:
             continue
 
-        if dealiased_key := resolve_alias(parsed_key, key_type, ref):
-            return KeyStruct("key_code", dealiased_key, modifiers)
+        if alias := resolve_alias(parsed_key, event, ref, modifiers):
+            # alias_key, alias_mods = alias.key, alias.modifiers
+            # alias_mods = update_alias_modifiers(modifiers, alias_mods)
+            # return KeyStruct("key_code", alias_key, alias_mods)
+            return alias
 
-        return KeyStruct(key_type, parsed_key, modifiers)
+        return KeyStruct(event, parsed_key, modifiers)
 
 
 def modifier_lookup(usr_mods: list) -> list:
@@ -74,11 +77,19 @@ def parse_modifiers(usr_key: str, usr_map) -> tuple:
     return usr_key, None
 
 
-def resolve_alias(usr_key: str, key_type: str, aliases_dict: dict) -> str:
-    if key_type != "alias":
+def resolve_alias(usr_key: str, event: str, aliases_dict, mod_dict):
+    if event != "alias":
         return
     alias = aliases_dict[usr_key]
-    return alias.key_code
+    alias_key, alias_mods = alias.key_code, alias.modifiers
+    alias_mods = update_alias_modifiers(mod_dict, alias_mods)
+    return KeyStruct("key_code", alias_key, alias_mods)
+
+
+def update_alias_modifiers(modifiers_dict: dict, alias_mods: list):
+    if not alias_mods:
+        return modifiers_dict
+    return {'mandatory': alias_mods}
 
 
 def to_event_check(usr_map: str) -> namedtuple:

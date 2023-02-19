@@ -5,40 +5,40 @@
 from string import ascii_uppercase
 from collections import namedtuple
 
-Alias = namedtuple("Alias", ["key_code", "modifier"])
+Alias = namedtuple("Alias", ["key_code", "modifiers"])
 
 
-alias_modifier = "left_shift"
+alias_modifiers = ["left_shift"]
 ALIASES = {
     "enter": Alias("return_or_enter", None),
     "backspace": Alias("delete_or_backspace", None),
     "delete": Alias("delete_forward", None),
     "space": Alias("spacebar", None),
     "-": Alias("hyphen", None),
-    "underscore": Alias("hyphen", alias_modifier),
-    "_": Alias("hyphen", alias_modifier),
+    "underscore": Alias("hyphen", alias_modifiers),
+    "_": Alias("hyphen", alias_modifiers),
     "=": Alias("equal_sign", None),
-    "(": Alias("9", alias_modifier),
-    ")": Alias("0", alias_modifier),
+    "(": Alias("9", alias_modifiers),
+    ")": Alias("0", alias_modifiers),
     "[": Alias("open_bracket", None),
-    "{": Alias("open_bracket", alias_modifier),
+    "{": Alias("open_bracket", alias_modifiers),
     "]": Alias("close_bracket", None),
-    "}": Alias("close_bracket", alias_modifier),
+    "}": Alias("close_bracket", alias_modifiers),
     "\\": Alias("backslash", None),
-    "|": Alias("backslash", alias_modifier),
+    "|": Alias("backslash", alias_modifiers),
     ";": Alias("semicolon", None),
-    ":": Alias("semicolon", alias_modifier),
+    ":": Alias("semicolon", alias_modifiers),
     "'": Alias("quote", None),
-    '"': Alias("quote", alias_modifier),
+    '"': Alias("quote", alias_modifiers),
     "grave": Alias("grave_accent_and_tilde", None),
     "`": Alias("grave_accent_and_tilde", None),
-    "~": Alias("grave_accent_and_tilde", alias_modifier),
+    "~": Alias("grave_accent_and_tilde", alias_modifiers),
     ",": Alias("comma", None),
-    "<": Alias("comma", alias_modifier),
+    "<": Alias("comma", alias_modifiers),
     ".": Alias("period", None),
-    ">": Alias("period", alias_modifier),
+    ">": Alias("period", alias_modifiers),
     "/": Alias("slash", None),
-    "?": Alias("slash", alias_modifier),
+    "?": Alias("slash", alias_modifiers),
     "up": Alias("up_arrow", None),
     "down": Alias("down_arrow", None),
     "left": Alias("left_arrow", None),
@@ -67,7 +67,7 @@ ALIASES = {
 }
 
 for letter in ascii_uppercase:
-    ALIASES[letter] = Alias(letter.lower(), alias_modifier)
+    ALIASES[letter] = Alias(letter.lower(), alias_modifiers)
 
 MODIFIERS = {
     "m": "left_command",
