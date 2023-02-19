@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from re import search
 from typing import Union
 
-from helpers import dict_eval, make_list
+from helpers import dict_eval, flag_check, make_list, valid_opt
 from exceptions import invalidToModType
 from map_translator import TranslatedMap
 
@@ -20,7 +20,6 @@ def event_value(k: namedtuple):
 
 def layer_toggle(layer_name, value):
     return {"set_variable": {"name": layer_name, "value": value}}
-# return {"set_variable": condition_dict(layer_name, value)}
 
 
 def local_mods(mods: dict, direction: str, usr_map) -> dict:
@@ -43,6 +42,26 @@ def requires_sublayer(layer_name: str) -> str:
     return conditions
 
 
+def get_to_opts(opts: list) -> dict:
+    if not opts:
+        return {}
+    to_opts = {}
+    for opt in opts:
+        to_opts.update(to_opt_dict(opt))
+    return to_opts
+
+
+def to_opt_dict(opt):
+    if not opt:
+        return {}
+    if isinstance(opt, int):
+        return {"hold_down_milliseconds": int(opt)}
+    _opt, flag = valid_opt(opt), flag_check(opt)
+    if _opt and flag:
+        return {_opt: flag}
+    return {}
+
+
 @dataclass
 class UserMapping:
 
@@ -57,8 +76,8 @@ class UserMapping:
 
     def map_interpreter(self, maps):
         maps = make_list(maps)
-        [maps.append(None) for i in range(3-len(maps))]
-        self.tap, self.hold, self.desc = maps
+        [maps.append(None) for i in range(4-len(maps))]
+        self.tap, self.hold, self.desc, self.opts = maps
 
 
 @dataclass
@@ -92,6 +111,8 @@ class KaramlizedKey:
             key = layer if layer else event_value(k)
             mod_list = local_mods(k.modifiers, direction, self.usr_map)
             key.update(mod_list)
+            opts = get_to_opts(self.usr_map.opts) if direction == "to" else {}
+            key.update(opts)
             key_list.append(key)
 
         return key_list

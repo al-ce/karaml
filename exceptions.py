@@ -4,4 +4,14 @@ def invalidKey(key_type: str, map: str, key: str):
 
 
 def invalidToModType(usr_to_map: str):
-    raise Exception(f"Opt flag for 'to.modifiers' not allowed: {usr_to_map}")
+    raise Exception(f"'optional' not allowed for 'to.modifiers': {usr_to_map}")
+
+
+def invalidFlag(string: str):
+    raise Exception(
+        f"Bool flag for opts must be `+` or `-`, got `{string[0]}`: {string}")
+
+
+def invalidOpt(string: str):
+    raise Exception(
+        f"Valid opts: 'halt', 'lazy', 'repeat', got {string[1:]}: {string}")

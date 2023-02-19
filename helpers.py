@@ -1,5 +1,6 @@
 import ast
 from copy import copy
+from exceptions import invalidFlag, invalidOpt
 
 
 def dict_eval(string: str):
@@ -8,6 +9,20 @@ def dict_eval(string: str):
         return eval(string) if isinstance(ast_dict, dict) else None
     except (ValueError, SyntaxError):
         return False
+
+
+def flag_check(string: str):
+    flags = {"+": True, "-": False}
+    if (flag := string[0]) in flags:
+        return flags[flag]
+    invalidFlag(string)
+
+
+def valid_opt(string: str) -> str:
+    valid = ["lazy", "halt", "repeat"]
+    if (opt := string[1:]) in valid:
+        return opt
+    invalidOpt(string)
 
 
 def is_dict(obj):

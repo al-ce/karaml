@@ -15,9 +15,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# TODO: Implement to: [ "lazy": bool ]
-# TODO: Figure out yaml syntax for shift, control etc.
-# (as opposed to left_shift, etc)
-
-# TODO: Implement default parameters (100, 101, 500, 50/500)

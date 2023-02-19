@@ -50,9 +50,6 @@ def is_valid_keycode(usr_key, usr_map) -> namedtuple:
             continue
 
         if alias := resolve_alias(parsed_key, event, ref, modifiers):
-            # alias_key, alias_mods = alias.key, alias.modifiers
-            # alias_mods = update_alias_modifiers(modifiers, alias_mods)
-            # return KeyStruct("key_code", alias_key, alias_mods)
             return alias
 
         return KeyStruct(event, parsed_key, modifiers)
