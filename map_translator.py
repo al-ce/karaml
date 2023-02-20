@@ -99,6 +99,11 @@ def to_event_check(usr_map: str) -> namedtuple:
         return KeyStruct(event, command, None)
 
 
+def notification(params_as_str: str) -> dict:
+    id, text = params_as_str.split(",")
+    return {"id": id.strip(), "text": text.strip()}
+
+
 def translate_event(event: str, command: str) -> tuple:
 
     match event:
@@ -110,6 +115,8 @@ def translate_event(event: str, command: str) -> tuple:
             event = "select_input_source"
         case "mouse":
             event = "mouse_key"
+        case "notify":
+            event, command = "set_notification_message", notification(command)
         case "softFunc":
             event = "software_function"
     return event, command

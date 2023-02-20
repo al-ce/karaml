@@ -160,7 +160,7 @@ class KaramlizedKey:
         self._to = {}
 
         tap_type = "to"
-        # NOTE: to_after_key_up must be first so it can be overridden by the
+        # NOTE: to_after_key_up must execute first so it is overridden by the
         # automated layer-toggle-off if a layer is activated when a key is held
         if after := self.usr_map.after:
             self._to.update(self.to_keycodes_localization(after, "to_after_key_up"))

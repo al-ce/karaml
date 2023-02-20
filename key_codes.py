@@ -350,6 +350,7 @@ POINTING_BUTTON = [
 TO_EVENTS = [
     "app",
     "input",
+    "notify",
     "mouse",
     "sfunc",
     "shell",
