@@ -358,6 +358,7 @@ TO_EVENTS = [
     "input",
     "notify",
     "mouse",
+    "var",
     "sfunc",
     "shell",
 ]

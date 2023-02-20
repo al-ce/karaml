@@ -104,6 +104,11 @@ def notification(params_as_str: str) -> dict:
     return {"id": id.strip(), "text": text.strip()}
 
 
+def variable(params_as_str: str) -> dict:
+    name, value = params_as_str.split(",")
+    return {"name": name.strip(), "value": value.strip()}
+
+
 def translate_event(event: str, command: str) -> tuple:
 
     match event:
@@ -119,6 +124,8 @@ def translate_event(event: str, command: str) -> tuple:
             event, command = "set_notification_message", notification(command)
         case "softFunc":
             event = "software_function"
+        case "var":
+            event, command = "set_variable", variable(command)
     return event, command
 
 

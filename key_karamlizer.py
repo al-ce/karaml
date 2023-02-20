@@ -76,8 +76,8 @@ class UserMapping:
 
     def map_interpreter(self, maps):
         maps = make_list(maps)
-        [maps.append(None) for i in range(5-len(maps))]
-        self.tap, self.hold, self.after, self.desc, self.opts = maps
+        [maps.append(None) for i in range(6-len(maps))]
+        self.tap, self.hold, self.after, self.desc, self.opts, self.params = maps
 
 
 @dataclass
@@ -97,7 +97,7 @@ class KaramlizedKey:
         self.update_conditions()
         self.update_type()
 
-    def from_keycode_localization(self, from_map: str):
+    def from_keycode_dict(self, from_map: str):
         k_list = self.keystruct_list(from_map, "from")
         simple = len(k_list) == 1
         return k_list.pop() if simple else {"simultaneous": k_list}
@@ -122,7 +122,7 @@ class KaramlizedKey:
                      self._from, self._to, self._type]
         return {k: v for d in map_attrs if d for k, v in d.items()}
 
-    def to_keycodes_localization(self, to_map: str, to_key_type: str):
+    def to_keycodes_dict(self, to_map: str, to_key_type: str):
         outputs = self.keystruct_list(to_map, to_key_type) if to_map else None
         return {to_key_type: outputs}
 
@@ -154,7 +154,7 @@ class KaramlizedKey:
 
     def update_from(self):
         from_map = self.usr_map.from_keys
-        self._from = {"from": self.from_keycode_localization(from_map)}
+        self._from = {"from": self.from_keycode_dict(from_map)}
 
     def update_to(self):
         self._to = {}
@@ -163,12 +163,12 @@ class KaramlizedKey:
         # NOTE: to_after_key_up must execute first so it is overridden by the
         # automated layer-toggle-off if a layer is activated when a key is held
         if after := self.usr_map.after:
-            self._to.update(self.to_keycodes_localization(after, "to_after_key_up"))
+            self._to.update(self.to_keycodes_dict(after, "to_after_key_up"))
         if hold := self.usr_map.hold:
-            self._to.update(self.to_keycodes_localization(hold, "to"))
+            self._to.update(self.to_keycodes_dict(hold, "to"))
             tap_type = "to_if_alone"
         if tap := self.usr_map.tap:
-            self._to.update(self.to_keycodes_localization(tap, tap_type))
+            self._to.update(self.to_keycodes_dict(tap, tap_type))
         if not self._to:
             raise Exception(f"Must map 'to' key for: {self.usr_map.from_keys}")
 
