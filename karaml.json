@@ -1,4 +1,12 @@
 {
+    "title": "KaramlConfig",
+    "parameters": {
+        "basic.simultaneous_threshold_milliseconds": 50,
+        "basic.to_delayed_action_delay_milliseconds": 500,
+        "basic.to_if_alone_timeout_milliseconds": 1000,
+        "basic.to_if_held_down_threshold_milliseconds": 500,
+        "mouse_motion_to_scroll.speed": 100
+    },
     "rules": [
         {
             "description": "/math/ layer",
@@ -6,7 +14,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -22,7 +30,10 @@
                     },
                     "to": [
                         {
-                            "key_code": "g"
+                            "key_code": "g",
+                            "modifiers": [
+                                "left_shift"
+                            ]
                         }
                     ],
                     "type": "basic"
@@ -30,7 +41,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -39,13 +50,16 @@
                         "key_code": "g",
                         "modifiers": {
                             "optional": [
-                          "left_control"
+                                "left_control"
                             ]
                         }
                     },
                     "to": [
                         {
-                            "key_code": "g"
+                            "key_code": "g",
+                            "modifiers": [
+                                "left_shift"
+                            ]
                         }
                     ],
                     "type": "basic"
@@ -53,7 +67,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -81,7 +95,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -113,7 +127,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -140,7 +154,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -161,7 +175,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -182,7 +196,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -203,7 +217,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -229,7 +243,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -250,7 +264,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -267,7 +281,7 @@
                         {
                             "key_code": "period",
                             "modifiers": [
-                                "left_option"
+                                "left_shift"
                             ]
                         }
                     ],
@@ -276,7 +290,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -300,7 +314,7 @@
                     "description": "test layers",
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         },
@@ -317,7 +331,6 @@
                         {
                             "set_variable": {
                                 "name": "test2_layer",
-                                "type": "variable_if",
                                 "value": 0
                             }
                         }
@@ -326,7 +339,6 @@
                         {
                             "set_variable": {
                                 "name": "test2_layer",
-                                "type": "variable_if",
                                 "value": 1
                             }
                         }
@@ -335,7 +347,6 @@
                         {
                             "set_variable": {
                                 "name": "test1_layer",
-                                "type": "variable_if",
                                 "value": 1
                             },
                             "value": 0
@@ -347,7 +358,7 @@
                     "description": "test layers",
                     "conditions": [
                         {
-                            "name": "math_sublayer",
+                            "name": "math_layer",
                             "type": "variable_if",
                             "value": 1
                         },
@@ -364,7 +375,6 @@
                         {
                             "set_variable": {
                                 "name": "test2_layer",
-                                "type": "variable_if",
                                 "value": 0
                             }
                         }
@@ -373,7 +383,6 @@
                         {
                             "set_variable": {
                                 "name": "test2_layer",
-                                "type": "variable_if",
                                 "value": 1
                             }
                         }
@@ -382,7 +391,6 @@
                         {
                             "set_variable": {
                                 "name": "test1_layer",
-                                "type": "variable_if",
                                 "value": 1
                             },
                             "value": 0
@@ -398,7 +406,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "win_sublayer",
+                            "name": "win_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -419,7 +427,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "win_sublayer",
+                            "name": "win_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -440,7 +448,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "win_sublayer",
+                            "name": "win_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -461,7 +469,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "win_sublayer",
+                            "name": "win_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -484,7 +492,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -502,7 +510,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -520,7 +528,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -538,7 +546,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -556,7 +564,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -574,7 +582,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -592,7 +600,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -611,7 +619,7 @@
                     "description": "Lock Screen",
                     "conditions": [
                         {
-                            "name": "sys_sublayer",
+                            "name": "sys_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -638,7 +646,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "open_sublayer",
+                            "name": "open_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -656,7 +664,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "open_sublayer",
+                            "name": "open_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -674,7 +682,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "open_sublayer",
+                            "name": "open_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -697,7 +705,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -715,7 +723,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -733,7 +741,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -751,7 +759,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -769,7 +777,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -787,13 +795,18 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
                     ],
                     "from": {
-                        "key_code": "u"
+                        "key_code": "u",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_shift"
+                            ]
+                        }
                     },
                     "to": [
                         {
@@ -805,7 +818,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -823,7 +836,7 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -841,13 +854,18 @@
                 {
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
                     ],
                     "from": {
-                        "key_code": "g"
+                        "key_code": "g",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_shift"
+                            ]
+                        }
                     },
                     "to": [
                         {
@@ -860,7 +878,7 @@
                     "description": "newline | Open Apps layer",
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -872,7 +890,6 @@
                         {
                             "set_variable": {
                                 "name": "open_layer",
-                                "type": "variable_if",
                                 "value": 0
                             }
                         }
@@ -881,7 +898,6 @@
                         {
                             "set_variable": {
                                 "name": "open_layer",
-                                "type": "variable_if",
                                 "value": 1
                             }
                         }
@@ -897,7 +913,7 @@
                     "description": "del line | System Layer",
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -909,7 +925,6 @@
                         {
                             "set_variable": {
                                 "name": "sys_layer",
-                                "type": "variable_if",
                                 "value": 0
                             }
                         }
@@ -918,7 +933,6 @@
                         {
                             "set_variable": {
                                 "name": "sys_layer",
-                                "type": "variable_if",
                                 "value": 1
                             }
                         }
@@ -937,7 +951,7 @@
                     "description": "next word | Windows Layer",
                     "conditions": [
                         {
-                            "name": "nav_sublayer",
+                            "name": "nav_layer",
                             "type": "variable_if",
                             "value": 1
                         }
@@ -949,7 +963,6 @@
                         {
                             "set_variable": {
                                 "name": "win_layer",
-                                "type": "variable_if",
                                 "value": 0
                             }
                         }
@@ -958,7 +971,6 @@
                         {
                             "set_variable": {
                                 "name": "win_layer",
-                                "type": "variable_if",
                                 "value": 1
                             }
                         }
@@ -1016,16 +1028,51 @@
                 },
                 {
                     "from": {
+                        "key_code": "m",
+                        "modifiers": {
+                            "optional": [
+                                "any"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "equal_sign"
+                        }
+                    ],
+                    "type": "basic"
+                },
+                {
+                    "from": {
                         "key_code": "return_or_enter"
                     },
                     "to": [
                         {
-                            "key_code": "left_control"
+                            "key_code": "left_control",
+                            "lazy": true
                         }
                     ],
                     "to_if_alone": [
                         {
                             "key_code": "return_or_enter"
+                        }
+                    ],
+                    "type": "basic"
+                },
+                {
+                    "from": {
+                        "key_code": "backslash"
+                    },
+                    "to": [
+                        {
+                            "key_code": "left_option",
+                            "lazy": true,
+                            "hold_down_milliseconds": 200
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "backslash"
                         }
                     ],
                     "type": "basic"
@@ -1102,7 +1149,10 @@
                     ],
                     "to_if_alone": [
                         {
-                            "key_code": "9"
+                            "key_code": "9",
+                            "modifiers": [
+                                "left_shift"
+                            ]
                         }
                     ],
                     "type": "basic"
@@ -1119,7 +1169,10 @@
                     ],
                     "to_if_alone": [
                         {
-                            "key_code": "0"
+                            "key_code": "0",
+                            "modifiers": [
+                                "left_shift"
+                            ]
                         }
                     ],
                     "type": "basic"
@@ -1135,7 +1188,10 @@
                     },
                     "to": [
                         {
-                            "key_code": "close_bracket"
+                            "key_code": "close_bracket",
+                            "modifiers": [
+                                "left_shift"
+                            ]
                         }
                     ],
                     "type": "basic"
@@ -1151,7 +1207,10 @@
                     },
                     "to": [
                         {
-                            "key_code": "open_bracket"
+                            "key_code": "open_bracket",
+                            "modifiers": [
+                                "left_shift"
+                            ]
                         }
                     ],
                     "type": "basic"
@@ -1418,7 +1477,7 @@
                         "key_code": "period",
                         "modifiers": {
                             "mandatory": [
-                                "left_option"
+                                "left_shift"
                             ]
                         }
                     },
@@ -1436,8 +1495,8 @@
                     "from": {
                         "key_code": "comma",
                         "modifiers": {
-                            "optional": [
-                                "left_option"
+                            "mandatory": [
+                                "left_shift"
                             ]
                         }
                     },
@@ -1459,7 +1518,6 @@
                         {
                             "set_variable": {
                                 "name": "nav_layer",
-                                "type": "variable_if",
                                 "value": 0
                             }
                         }
@@ -1468,7 +1526,6 @@
                         {
                             "set_variable": {
                                 "name": "nav_layer",
-                                "type": "variable_if",
                                 "value": 1
                             }
                         }
@@ -1503,7 +1560,6 @@
                         {
                             "set_variable": {
                                 "name": "fn_layer",
-                                "type": "variable_if",
                                 "value": 1
                             },
                             "value": 0
@@ -1534,7 +1590,6 @@
                         {
                             "set_variable": {
                                 "name": "fn_layer",
-                                "type": "variable_if",
                                 "value": 1
                             },
                             "value": 0
