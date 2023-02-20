@@ -81,6 +81,12 @@ MODIFIERS = {
     "f": "fn",
     "l": "caps_lock",
     "x": "any",
+
+    # HACK: g and a are sensible aliases but r and h are stretches
+    "g": "command",
+    "r": "control",
+    "a": "option",
+    "h": "shift"
 }
 
 KEY_CODE = [

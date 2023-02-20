@@ -6,8 +6,6 @@ def main():
     # to_file = "karaml.json"
     from_file = "my_karaml.yaml"
     to_file = "mykaraml.json"
-    # from_file = "test.yaml"
-    # to_file = "test.json"
 
     karamlizer = LayerKaramlizer(from_file)
     karamlizer.write_json(to_file)
