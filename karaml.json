@@ -1097,6 +1097,28 @@
                     "type": "basic"
                 },
                 {
+                    "description": "Mission Control While Held",
+                    "from": {
+                        "key_code": "m",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_option"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "mission_control"
+                        }
+                    ],
+                    "to_after_key_up": [
+                        {
+                            "key_code": "mission_control"
+                        }
+                    ],
+                    "type": "basic"
+                },
+                {
                     "from": {
                         "key_code": "h"
                     },
@@ -1173,6 +1195,25 @@
                             "modifiers": [
                                 "left_shift"
                             ]
+                        }
+                    ],
+                    "type": "basic"
+                },
+                {
+                    "from": {
+                        "key_code": "i",
+                        "modifiers": {
+                            "mandatory": [
+                                "left_option"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "set_notification_message": {
+                                "id": "org.pqrs.some_msg",
+                                "text": " Hello!"
+                            }
                         }
                     ],
                     "type": "basic"
@@ -1593,6 +1634,32 @@
                                 "value": 1
                             },
                             "value": 0
+                        }
+                    ],
+                    "type": "basic"
+                },
+                {
+                    "description": "This is a strange combination!",
+                    "from": {
+                        "key_code": "grave_accent_and_tilde"
+                    },
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "sys_layer",
+                                "value": 1
+                            },
+                            "lazy": true
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "grave_accent_and_tilde"
+                        }
+                    ],
+                    "to_after_key_up": [
+                        {
+                            "key_code": "caps_lock"
                         }
                     ],
                     "type": "basic"

@@ -72,12 +72,12 @@ class UserMapping:
         self.map_interpreter(self.maps)
 
     def items(self):
-        return self.tap, self.hold, self.desc
+        return self.tap, self.hold, self.after, self.desc, self.opts
 
     def map_interpreter(self, maps):
         maps = make_list(maps)
-        [maps.append(None) for i in range(4-len(maps))]
-        self.tap, self.hold, self.desc, self.opts = maps
+        [maps.append(None) for i in range(5-len(maps))]
+        self.tap, self.hold, self.after, self.desc, self.opts = maps
 
 
 @dataclass
@@ -133,7 +133,8 @@ class KaramlizedKey:
 
         if direction == "to_if_alone":
             # Toggle off needs to be created later by copying this object,
-            # changing its on value to off, and adding it to the mapping
+            # changing its on value to off, and adding it to the mapping.
+            # This automation overrides any to_after_key_up set by the user
             self.layer_toggle = True
             self.conditions["conditions"].append(condition_dict(layer_name, 0))
         else:
@@ -159,6 +160,10 @@ class KaramlizedKey:
         self._to = {}
 
         tap_type = "to"
+        # NOTE: to_after_key_up must be first so it can be overridden by the
+        # automated layer-toggle-off if a layer is activated when a key is held
+        if after := self.usr_map.after:
+            self._to.update(self.to_keycodes_localization(after, "to_after_key_up"))
         if hold := self.usr_map.hold:
             self._to.update(self.to_keycodes_localization(hold, "to"))
             tap_type = "to_if_alone"
