@@ -72,12 +72,12 @@ class UserMapping:
         self.map_interpreter(self.maps)
 
     def items(self):
-        return self.tap, self.hold, self.after, self.desc, self.opts
+        return self.tap, self.hold, self.after, self.opts
 
     def map_interpreter(self, maps):
         maps = make_list(maps)
-        [maps.append(None) for i in range(6-len(maps))]
-        self.tap, self.hold, self.after, self.desc, self.opts, self.params = maps
+        [maps.append(None) for i in range(5-len(maps))]
+        self.tap, self.hold, self.after, self.opts, self.params = maps
 
 
 @dataclass
@@ -91,7 +91,6 @@ class KaramlizedKey:
         self.conditions = requires_sublayer(self.layer_name)
         self.layer_toggle = False
 
-        self.update_desc()
         self.update_from()
         self.update_to()
         self.update_conditions()
@@ -118,8 +117,7 @@ class KaramlizedKey:
         return key_list
 
     def mapping(self):
-        map_attrs = [self.desc, self.conditions,
-                     self._from, self._to, self._type]
+        map_attrs = [self.conditions, self._from, self._to, self._type]
         return {k: v for d in map_attrs if d for k, v in d.items()}
 
     def to_keycodes_dict(self, to_map: str, to_key_type: str):
@@ -147,10 +145,6 @@ class KaramlizedKey:
     def update_conditions(self):
         if not self.conditions.get("conditions"):
             self.conditions = None
-
-    def update_desc(self):
-        desc = self.usr_map.desc
-        self.desc = {"description": desc} if desc else None
 
     def update_from(self):
         from_map = self.usr_map.from_keys
