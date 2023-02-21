@@ -1,6 +1,8 @@
 import ast
 from copy import copy
-from exceptions import invalidFlag, invalidOpt
+from exceptions import (
+    invalidFlag, invalidOpt, invalidParamKeys, invalidParamValues
+)
 
 
 def dict_eval(string: str):
@@ -38,3 +40,31 @@ def toggle_layer_off(karamlized_key):
     layer_off.conditions["conditions"][0]["value"] = 1
     layer_off._to["to_if_alone"][0]["value"] = 0
     return layer_off
+
+
+def translate_params(params: dict) -> dict:
+    param_aliases = {
+        "a": "basic.to_if_alone_timeout_milliseconds",
+        "h": "basic.to_if_held_down_threshold_milliseconds",
+        "d": "basic.to_delayed_action_delay_milliseconds",
+        "s": "basic.simultaneous_threshold_milliseconds",
+        "m": "mouse_motion_to_scroll.speed",
+    }
+    default_param_names = [
+        "basic.simultaneous_threshold_milliseconds",
+        "basic.to_delayed_action_delay_milliseconds",
+        "basic.to_if_alone_timeout_milliseconds",
+        "basic.to_if_held_down_threshold_milliseconds",
+        "mouse_motion_to_scroll.speed",
+    ]
+    translated = {}
+    for k, v in params.items():
+        if k in param_aliases:
+            translated[param_aliases.get(k)] = v
+        elif k in default_param_names:
+            translated[k] = v
+        else:
+            invalidParamKeys(params, k)
+        if type(v) != int:
+            invalidParamValues(params, v)
+    return {"parameters": translated} if translated else None

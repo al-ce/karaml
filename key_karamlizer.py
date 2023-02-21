@@ -3,7 +3,9 @@ from dataclasses import dataclass
 from re import search
 from typing import Union
 
-from helpers import dict_eval, flag_check, make_list, valid_opt
+from helpers import (
+    dict_eval, flag_check, make_list, valid_opt, translate_params
+)
 from exceptions import invalidToModType
 from map_translator import TranslatedMap
 
@@ -72,12 +74,12 @@ class UserMapping:
         self.map_interpreter(self.maps)
 
     def items(self):
-        return self.tap, self.hold, self.after, self.opts
+        return self.tap, self.hold, self.after, self.opts, self.rule_params
 
     def map_interpreter(self, maps):
         maps = make_list(maps)
         [maps.append(None) for i in range(5-len(maps))]
-        self.tap, self.hold, self.after, self.opts, self.params = maps
+        self.tap, self.hold, self.after, self.opts, self.rule_params = maps
 
 
 @dataclass
@@ -94,6 +96,7 @@ class KaramlizedKey:
         self.update_from()
         self.update_to()
         self.update_conditions()
+        self.update_params()
         self.update_type()
 
     def from_keycode_dict(self, from_map: str):
@@ -117,7 +120,8 @@ class KaramlizedKey:
         return key_list
 
     def mapping(self):
-        map_attrs = [self.conditions, self._from, self._to, self._type]
+        map_attrs = [self.conditions, self._from,
+                     self._to, self._type, self.rule_params]
         return {k: v for d in map_attrs if d for k, v in d.items()}
 
     def to_keycodes_dict(self, to_map: str, to_key_type: str):
@@ -149,6 +153,10 @@ class KaramlizedKey:
     def update_from(self):
         from_map = self.usr_map.from_keys
         self._from = {"from": self.from_keycode_dict(from_map)}
+
+    def update_params(self):
+        params = self.usr_map.rule_params
+        self.rule_params = translate_params(params) if params else None
 
     def update_to(self):
         self._to = {}

@@ -1,7 +1,7 @@
 from json import dumps
 import yaml
 
-from helpers import toggle_layer_off
+from helpers import toggle_layer_off, translate_params
 from key_karamlizer import KaramlizedKey, UserMapping
 
 
@@ -37,7 +37,7 @@ class LayerKaramlizer:
 
     def get_params(self, d: dict) -> dict:
         params = d.pop("parameters") if d.get("parameters") else None
-        return {"parameters": params} if params else None
+        return translate_params(params) if params else None
 
     def get_title(self, d: dict):
         title = d.pop("title") if d.get("title") else None
