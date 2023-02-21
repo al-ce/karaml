@@ -12,6 +12,13 @@ def invalidFlag(string: str):
         f"Bool flag for opts must be `+` or `-`, got `{string[0]}`: {string}")
 
 
+def invalidLayerName(string: str):
+    raise Exception(
+        f"Invalid layer name: {string}. "
+        "Layer names must be in the form `/layer_name/`"
+    )
+
+
 def invalidOpt(string: str):
     raise Exception(
         f"Valid opts: 'halt', 'lazy', 'repeat', got {string[1:]}: {string}")

@@ -2,6 +2,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
 
+from helpers import get_multi_keys
 from exceptions import invalidKey
 from key_codes import KEY_CODE_REF_LISTS, MODIFIERS, TO_EVENTS
 
@@ -19,11 +20,6 @@ def get_modifiers(usr_mods: str, usr_map: str) -> dict:
     if not mods:
         raise Exception(invalidKey("modifier", usr_map, usr_mods))
     return mods
-
-
-def get_multi_keys(string: str) -> list:
-    if "+" in string:
-        return string.split("+")
 
 
 def is_layer(string: str) -> namedtuple:
@@ -155,6 +151,6 @@ class TranslatedMap:
 
     def queue_translations(self, parsed_key: str) -> list:
         if multi_keys := get_multi_keys(parsed_key):
-            return [self.key_code_translator(k.strip()) for k in multi_keys]
+            return [self.key_code_translator(k) for k in multi_keys]
         else:
             return [self.key_code_translator(parsed_key)]

@@ -54,7 +54,7 @@ class LayerKaramlizer:
             return
         self.layers["rules"].append(
             {
-                "description": "JSON",
+                "description": "/Karaml JSON/",
                 "manipulators": self.json
             }
         )

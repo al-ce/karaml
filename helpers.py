@@ -1,8 +1,14 @@
 import ast
+from re import search
 from copy import copy
 from exceptions import (
-    invalidFlag, invalidOpt, invalidParamKeys, invalidParamValues
+    invalidFlag, invalidLayerName, invalidOpt, invalidParamKeys,
+    invalidParamValues
 )
+
+
+def validate_layer(string: str):
+    return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
 
 
 def dict_eval(string: str):
@@ -18,6 +24,11 @@ def flag_check(string: str):
     if (flag := string[0]) in flags:
         return flags[flag]
     invalidFlag(string)
+
+
+def get_multi_keys(string: str) -> list:
+    if "+" in string:
+        return [s.strip() for s in string.split("+")]
 
 
 def valid_opt(string: str) -> str:

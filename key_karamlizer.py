@@ -1,10 +1,10 @@
 from collections import namedtuple
 from dataclasses import dataclass
-from re import search
 from typing import Union
 
 from helpers import (
-    dict_eval, flag_check, make_list, valid_opt, translate_params
+    dict_eval, flag_check, get_multi_keys, make_list, valid_opt,
+    translate_params, validate_layer
 )
 from exceptions import invalidToModType
 from map_translator import TranslatedMap
@@ -36,11 +36,13 @@ def local_mods(mods: dict, direction: str, usr_map) -> dict:
 
 def requires_sublayer(layer_name: str) -> str:
     conditions = {"conditions": []}
-    found_layer = search("^/(\\w+)/$", layer_name)
-    if not found_layer or found_layer.group(1) == "base":
-        return conditions
-    layer_condition = condition_dict(f"{found_layer.group(1)}_layer", 1)
-    conditions["conditions"].append(layer_condition)
+    layers = get_multi_keys(layer_name) or [layer_name]
+    for layer in layers:
+        found_layer = validate_layer(layer)
+        if found_layer == "base":
+            return conditions
+        layer_condition = condition_dict(f"{found_layer}_layer", 1)
+        conditions["conditions"].append(layer_condition)
     return conditions
 
 
