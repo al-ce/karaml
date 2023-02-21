@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from json import dumps
 import yaml
 
@@ -5,10 +6,13 @@ from helpers import toggle_layer_off, translate_params
 from key_karamlizer import KaramlizedKey, UserMapping
 
 
+@dataclass
 class LayerKaramlizer:
+    from_file: str
+    hold_flavor: str
 
-    def __init__(self, filename: str):
-        self.yaml_data = self.load_karml_config(filename)
+    def __post_init__(self):
+        self.yaml_data = self.load_karml_config(self.from_file)
         self.title = self.get_title(self.yaml_data)
         self.params = self.get_params(self.yaml_data)
         self.json = self.get_json(self.yaml_data)
@@ -31,7 +35,7 @@ class LayerKaramlizer:
         manipulators = []
         for from_keys, to_keys in layer_maps.items():
             user_map = UserMapping(from_keys, to_keys)
-            karamlized_key = KaramlizedKey(user_map, layer_name)
+            karamlized_key = KaramlizedKey(user_map, layer_name, self.hold_flavor)
             manipulators.append(karamlized_key.mapping())
             manipulators = self.insert_toggle_off(karamlized_key, manipulators)
 

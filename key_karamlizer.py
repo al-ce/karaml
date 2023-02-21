@@ -89,6 +89,7 @@ class KaramlizedKey:
 
     usr_map: UserMapping
     layer_name: str
+    hold_flavor: str
 
     def __post_init__(self):
 
@@ -169,7 +170,8 @@ class KaramlizedKey:
         if after := self.usr_map.after:
             self._to.update(self.to_keycodes_dict(after, "to_after_key_up"))
         if hold := self.usr_map.hold:
-            self._to.update(self.to_keycodes_dict(hold, "to"))
+            self._to.update(self.to_keycodes_dict(hold, self.hold_flavor))
+            # self._to.update(self.to_keycodes_dict(hold, "to_if_held_down"))
             tap_type = "to_if_alone"
         if tap := self.usr_map.tap:
             self._to.update(self.to_keycodes_dict(tap, tap_type))
