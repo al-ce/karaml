@@ -102,7 +102,7 @@ def notification(params_as_str: str) -> dict:
 
 def variable(params_as_str: str) -> dict:
     name, value = params_as_str.split(",")
-    return {"name": name.strip(), "value": value.strip()}
+    return {"name": name.strip(), "value": int(value.strip())}
 
 
 def translate_event(event: str, command: str) -> tuple:
@@ -138,10 +138,10 @@ class TranslatedMap:
 
     def key_code_translator(self, parsed_key: str) -> namedtuple:
 
-        if layer := is_layer(self.map):
+        if layer := is_layer(parsed_key):
             return layer
 
-        if to_event := to_event_check(self.map):
+        if to_event := to_event_check(parsed_key):
             return to_event
 
         if keystruct := is_valid_keycode(parsed_key, self.map):
