@@ -11,7 +11,9 @@ class LayerKaramlizer:
         self.yaml_data = self.load_karml_config(filename)
         self.title = self.get_title(self.yaml_data)
         self.params = self.get_params(self.yaml_data)
+        self.json = self.get_json(self.yaml_data)
         self.layers = self.gen_layers(self.yaml_data)
+        self.insert_json()
 
     def gen_layers(self, yaml_data: dict):
         karamlized_keys = []
@@ -35,6 +37,10 @@ class LayerKaramlizer:
 
         return manipulators
 
+    def get_json(self, d: dict):
+        json = d.pop("json") if d.get("json") else None
+        return json if json else None
+
     def get_params(self, d: dict) -> dict:
         params = d.pop("parameters") if d.get("parameters") else None
         return translate_params(params) if params else None
@@ -42,6 +48,16 @@ class LayerKaramlizer:
     def get_title(self, d: dict):
         title = d.pop("title") if d.get("title") else None
         return {"title": title} if title else None
+
+    def insert_json(self):
+        if not self.json:
+            return
+        self.layers["rules"].append(
+            {
+                "description": "JSON",
+                "manipulators": self.json
+            }
+        )
 
     def insert_toggle_off(self, karamlized_key, manipulators: list) -> list:
         if not karamlized_key.layer_toggle:
