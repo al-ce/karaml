@@ -100,7 +100,10 @@ def update_karabiner_json(karaml_config):
             f"Updated karabiner.json {update_detail}profile: {profile_name}.")
 
 
-def write_rules_json(to_file: str, karaml_config):
+def write_complex_mods_json(karaml_config, to_file: str):
+    if not to_file or not karaml_config:
+        print("No destination file or karaml config provided. Aborting.")
+        return
     complex_mods_path = Path(
         "~/.config/karabiner/assets/complex_modifications"
     ).expanduser()

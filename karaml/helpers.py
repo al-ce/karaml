@@ -1,12 +1,12 @@
 import ast
 from re import search
 from copy import copy
-from exceptions import (
+
+from karaml.exceptions import (
     invalidFlag, invalidStickyModifier, invalidLayerName, invalidOpt,
     invalidParamKeys, invalidParamValues, invalidStickyModValue
 )
-
-from key_codes import STICKY_MODS
+from karaml.key_codes import STICKY_MODS
 
 
 def dict_eval(string: str):

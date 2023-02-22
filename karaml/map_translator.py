@@ -2,9 +2,9 @@ from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
 
-from helpers import get_multi_keys, validate_sticky_mod_value
-from exceptions import invalidKey
-from key_codes import KEY_CODE_REF_LISTS, MODIFIERS, TO_EVENTS
+from karaml.helpers import get_multi_keys, validate_sticky_mod_value
+from karaml.exceptions import invalidKey
+from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, TO_EVENTS
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 

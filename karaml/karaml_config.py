@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import yaml
 
-from helpers import toggle_layer_off, translate_params
-from key_karamlizer import KaramlizedKey, UserMapping
+from karaml.helpers import toggle_layer_off, translate_params
+from karaml.key_karamlizer import KaramlizedKey, UserMapping
 
 
 @dataclass
@@ -43,15 +43,15 @@ class KaramlConfig:
 
     def get_json(self, d: dict):
         json = d.pop("json") if d.get("json") else None
-        return json if json else None
+        return json
 
     def get_params(self, d: dict) -> dict:
         params = d.pop("parameters") if d.get("parameters") else None
-        return translate_params(params) if params else None
+        return translate_params(params)
 
     def get_profile_name(self, d: dict):
         profile_name = d.pop("profile_name") if d.get("profile_name") else None
-        return profile_name if profile_name else None
+        return profile_name
 
     def get_title(self, d: dict):
         title = d.pop("title") if d.get("title") else None
@@ -76,7 +76,3 @@ class KaramlConfig:
         with open(from_file) as f:
             yaml_data = yaml.safe_load(f)
         return yaml_data
-
-    # def write_rules_json(self, to_file: str):
-    #     with open(to_file, "w") as f:
-    #         f.write(dumps(self.karaml_dict(), indent=4))

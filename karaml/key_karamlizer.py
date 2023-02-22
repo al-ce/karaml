@@ -2,12 +2,12 @@ from collections import namedtuple
 from dataclasses import dataclass
 from typing import Union
 
-from helpers import (
+from karaml.helpers import (
     dict_eval, flag_check, get_multi_keys, make_list, validate_opt,
     translate_params, validate_layer
 )
-from exceptions import invalidToModType
-from map_translator import TranslatedMap
+from karaml.exceptions import invalidToModType
+from karaml.map_translator import TranslatedMap
 
 
 def condition_dict(layer_name: str, value: int) -> dict:
