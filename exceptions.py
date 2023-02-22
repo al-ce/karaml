@@ -1,3 +1,5 @@
+from key_codes import STICKY_MODS
+
 def invalidKey(key_type: str, map: str, key: str):
     key_type = "modifier" if key_type == "mod" else "key code"
     return f"Invalid user-defined {key_type} in map {map}: {key}"
@@ -46,4 +48,20 @@ def invalidParamValues(param_dict: dict, value):
         "From the param dict:\n"
         f"{param_dict}\n"
         f"Invalid value: {value} of type {type(value)}"
+    )
+
+
+def invalidStickyModValue(string: str):
+    raise Exception(
+        f"Invalid sticky modifier value: {string}. "
+        "Must be 'on', 'off', or 'toggle'"
+    )
+
+
+def invalidStickyModifier(string: str):
+    raise Exception(
+        f"Invalid modifier: {string}"
+        f"Valid modifiers are:\n"
+        "left_control, left_shift, left_option, left_command, right_control, "
+        "right_shift, right_option, right_command, fn"
     )

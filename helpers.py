@@ -2,13 +2,26 @@ import ast
 from re import search
 from copy import copy
 from exceptions import (
-    invalidFlag, invalidLayerName, invalidOpt, invalidParamKeys,
-    invalidParamValues
+    invalidFlag, invalidStickyModifier, invalidLayerName, invalidOpt,
+    invalidParamKeys, invalidParamValues, invalidStickyModValue
 )
+
+from key_codes import STICKY_MODS
 
 
 def validate_layer(string: str):
     return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
+
+
+def validate_sticky_mod_value(string: str):
+    if string not in ["on", "off", "toggle"]:
+        invalidStickyModValue(string)
+
+
+def validate_sticky_modifier(string: str):
+    if string not in STICKY_MODS:
+        invalidStickyModifier(string)
+    print("SUCCESS!")
 
 
 def dict_eval(string: str):
@@ -31,7 +44,8 @@ def get_multi_keys(string: str) -> list:
         return [s.strip() for s in string.split("+")]
 
 
-def valid_opt(string: str) -> str:
+def validate_opt(string: str) -> str:
+    # BUG: "halt" is meant for to_if_held_down or to_if_alone, not to:
     valid = ["lazy", "halt", "repeat"]
     if (opt := string[1:]) in valid:
         return opt

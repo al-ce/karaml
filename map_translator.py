@@ -2,7 +2,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
 
-from helpers import get_multi_keys
+from helpers import get_multi_keys, validate_sticky_mod_value
 from exceptions import invalidKey
 from key_codes import KEY_CODE_REF_LISTS, MODIFIERS, TO_EVENTS
 
@@ -100,6 +100,12 @@ def notification(params_as_str: str) -> dict:
     return {"id": id.strip(), "text": text.strip()}
 
 
+def sticky_mod(params_as_str: str) -> dict:
+    modifier, value = params_as_str.split(",")
+    validate_sticky_mod_value(value.strip())
+    return {modifier.strip(): value.strip()}
+
+
 def variable(params_as_str: str) -> dict:
     name, value = params_as_str.split(",")
     return {"name": name.strip(), "value": int(value.strip())}
@@ -120,6 +126,8 @@ def translate_event(event: str, command: str) -> tuple:
             event, command = "set_notification_message", notification(command)
         case "softFunc":
             event = "software_function"
+        case "sticky":
+            event, command = "sticky_modifier", sticky_mod(command)
         case "var":
             event, command = "set_variable", variable(command)
     return event, command

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Union
 
 from helpers import (
-    dict_eval, flag_check, get_multi_keys, make_list, valid_opt,
+    dict_eval, flag_check, get_multi_keys, make_list, validate_opt,
     translate_params, validate_layer
 )
 from exceptions import invalidToModType
@@ -60,7 +60,7 @@ def to_opt_dict(opt):
         return {}
     if isinstance(opt, int):
         return {"hold_down_milliseconds": int(opt)}
-    _opt, flag = valid_opt(opt), flag_check(opt)
+    _opt, flag = validate_opt(opt), flag_check(opt)
     if _opt and flag:
         return {_opt: flag}
     return {}
@@ -165,7 +165,7 @@ class KaramlizedKey:
         self._to = {}
 
         tap_type = "to"
-        # NOTE: to_after_key_up must execute first so it is overridden by the
+        # to_after_key_up must execute first so it is overridden by the
         # automated layer-toggle-off if a layer is activated when a key is held
         if after := self.usr_map.after:
             self._to.update(self.to_keycodes_dict(after, "to_after_key_up"))

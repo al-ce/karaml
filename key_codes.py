@@ -358,9 +358,10 @@ TO_EVENTS = [
     "input",
     "notify",
     "mouse",
-    "var",
     "sfunc",
     "shell",
+    "sticky",
+    "var",
 ]
 
 
@@ -371,4 +372,17 @@ KEY_CODE_REF_LISTS = [
     KeyCodesRef("key_code", KEY_CODE),
     KeyCodesRef("consumer_key_code", CONSUMER_KEY_CODE),
     KeyCodesRef("pointing_button", POINTING_BUTTON),
+]
+
+# TODO: check if newer aliases (e.g. shift, command, caps_lock etc.) are supported
+STICKY_MODS = [
+    "left_control",
+    "left_shift",
+    "left_option",
+    "left_command",
+    "right_control",
+    "right_shift",
+    "right_option",
+    "right_command",
+    "fn",
 ]
