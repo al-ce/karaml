@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from json import dumps
 import yaml
 
 from helpers import toggle_layer_off, translate_params
@@ -7,19 +6,20 @@ from key_karamlizer import KaramlizedKey, UserMapping
 
 
 @dataclass
-class LayerKaramlizer:
+class KaramlConfig:
     from_file: str
     hold_flavor: str
 
     def __post_init__(self):
         self.yaml_data = self.load_karml_config(self.from_file)
+        self.profile_name = self.get_profile_name(self.yaml_data)
         self.title = self.get_title(self.yaml_data)
         self.params = self.get_params(self.yaml_data)
         self.json = self.get_json(self.yaml_data)
-        self.layers = self.gen_layers(self.yaml_data)
+        self.rules = self.gen_rules(self.yaml_data)
         self.insert_json()
 
-    def gen_layers(self, yaml_data: dict):
+    def gen_rules(self, yaml_data: dict) -> list:
         karamlized_keys = []
 
         for layer_name, layer_maps in yaml_data.items():
@@ -29,15 +29,15 @@ class LayerKaramlizer:
             karamlized_keys.append(layer)
 
         karamlized_keys.reverse()
-        return {"rules": karamlized_keys}
+        return karamlized_keys
 
     def gen_manipulators(self, layer_maps, layer_name):
         manipulators = []
         for from_keys, to_keys in layer_maps.items():
             user_map = UserMapping(from_keys, to_keys)
-            karamlized_key = KaramlizedKey(user_map, layer_name, self.hold_flavor)
-            manipulators.append(karamlized_key.mapping())
-            manipulators = self.insert_toggle_off(karamlized_key, manipulators)
+            key_tuple = KaramlizedKey(user_map, layer_name, self.hold_flavor)
+            manipulators.append(key_tuple.mapping())
+            manipulators = self.insert_toggle_off(key_tuple, manipulators)
 
         return manipulators
 
@@ -49,19 +49,21 @@ class LayerKaramlizer:
         params = d.pop("parameters") if d.get("parameters") else None
         return translate_params(params) if params else None
 
+    def get_profile_name(self, d: dict):
+        profile_name = d.pop("profile_name") if d.get("profile_name") else None
+        return profile_name if profile_name else None
+
     def get_title(self, d: dict):
         title = d.pop("title") if d.get("title") else None
-        return {"title": title} if title else None
+        return title if title else "Karaml Rules"
 
     def insert_json(self):
         if not self.json:
             return
-        self.layers["rules"].append(
-            {
-                "description": "/Karaml JSON/",
-                "manipulators": self.json
-            }
-        )
+        self.rules.append({
+            "description": "/Karaml JSON/",
+            "manipulators": self.json
+        })
 
     def insert_toggle_off(self, karamlized_key, manipulators: list) -> list:
         if not karamlized_key.layer_toggle:
@@ -70,19 +72,11 @@ class LayerKaramlizer:
         manipulators.append(layer_off.mapping())
         return manipulators
 
-    def karaml_dict(self):
-        k = {}
-        for d in [self.title, self.params, self.layers]:
-            if not d:
-                continue
-            k.update(d)
-        return k
-
     def load_karml_config(self, from_file):
         with open(from_file) as f:
             yaml_data = yaml.safe_load(f)
         return yaml_data
 
-    def write_json(self, to_file: str):
-        with open(to_file, "w") as f:
-            f.write(dumps(self.karaml_dict(), indent=4))
+    # def write_rules_json(self, to_file: str):
+    #     with open(to_file, "w") as f:
+    #         f.write(dumps(self.karaml_dict(), indent=4))

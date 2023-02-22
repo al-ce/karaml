@@ -9,21 +9,6 @@ from exceptions import (
 from key_codes import STICKY_MODS
 
 
-def validate_layer(string: str):
-    return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
-
-
-def validate_sticky_mod_value(string: str):
-    if string not in ["on", "off", "toggle"]:
-        invalidStickyModValue(string)
-
-
-def validate_sticky_modifier(string: str):
-    if string not in STICKY_MODS:
-        invalidStickyModifier(string)
-    print("SUCCESS!")
-
-
 def dict_eval(string: str):
     try:
         ast_dict = ast.literal_eval(string)
@@ -42,14 +27,6 @@ def flag_check(string: str):
 def get_multi_keys(string: str) -> list:
     if "+" in string:
         return [s.strip() for s in string.split("+")]
-
-
-def validate_opt(string: str) -> str:
-    # BUG: "halt" is meant for to_if_held_down or to_if_alone, not to:
-    valid = ["lazy", "halt", "repeat"]
-    if (opt := string[1:]) in valid:
-        return opt
-    invalidOpt(string)
 
 
 def is_dict(obj):
@@ -93,3 +70,26 @@ def translate_params(params: dict) -> dict:
         if type(v) != int:
             invalidParamValues(params, v)
     return {"parameters": translated} if translated else None
+
+
+def validate_layer(string: str):
+    return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
+
+
+def validate_opt(string: str) -> str:
+    # BUG: "halt" is meant for to_if_held_down or to_if_alone, not to:
+    valid = ["lazy", "halt", "repeat"]
+    if (opt := string[1:]) in valid:
+        return opt
+    invalidOpt(string)
+
+
+def validate_sticky_mod_value(string: str):
+    if string not in ["on", "off", "toggle"]:
+        invalidStickyModValue(string)
+
+
+def validate_sticky_modifier(string: str):
+    if string not in STICKY_MODS:
+        invalidStickyModifier(string)
+    print("SUCCESS!")
