@@ -1,7 +1,8 @@
+from copy import deepcopy
 from dataclasses import dataclass
 import yaml
 
-from karaml.helpers import toggle_layer_off, translate_params
+from karaml.helpers import translate_params
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
 
 
@@ -47,7 +48,7 @@ class KaramlConfig:
 
     def get_params(self, d: dict) -> dict:
         params = d.pop("parameters") if d.get("parameters") else None
-        return translate_params(params)
+        return translate_params(params) if params else None
 
     def get_profile_name(self, d: dict):
         profile_name = d.pop("profile_name") if d.get("profile_name") else None
@@ -66,13 +67,24 @@ class KaramlConfig:
         })
 
     def insert_toggle_off(self, karamlized_key, manipulators: list) -> list:
-        if not karamlized_key.layer_toggle:
+        layer_name = karamlized_key.layer_toggle
+        if not layer_name:
             return manipulators
-        layer_off = toggle_layer_off(karamlized_key)
+        layer_off = self.toggle_layer_off(karamlized_key, layer_name)
         manipulators.append(layer_off.mapping())
+        print(manipulators)
         return manipulators
 
     def load_karml_config(self, from_file):
         with open(from_file) as f:
             yaml_data = yaml.safe_load(f)
         return yaml_data
+
+    def toggle_layer_off(self, karamlized_key, layer_name):
+        layer_off = deepcopy(karamlized_key)
+        layer_off._to["to_if_alone"][0]["set_variable"]["value"] = 0
+        for condition in layer_off.conditions["conditions"]:
+            if condition["name"] == layer_name:
+                condition["value"] = 1
+
+        return layer_off

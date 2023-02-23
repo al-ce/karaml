@@ -94,7 +94,7 @@ class KaramlizedKey:
     def __post_init__(self):
 
         self.conditions = requires_sublayer(self.layer_name)
-        self.layer_toggle = False
+        self.layer_toggle = None
 
         self.update_from()
         self.update_to()
@@ -140,7 +140,7 @@ class KaramlizedKey:
             # Toggle off needs to be created later by copying this object,
             # changing its on value to off, and adding it to the mapping.
             # This automation overrides any to_after_key_up set by the user
-            self.layer_toggle = True
+            self.layer_toggle = layer_name
             self.conditions["conditions"].append(condition_dict(layer_name, 0))
         else:
             self._to.update(

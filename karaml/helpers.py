@@ -1,6 +1,5 @@
 import ast
 from re import search
-from copy import copy
 
 from karaml.exceptions import (
     invalidFlag, invalidStickyModifier, invalidLayerName, invalidOpt,
@@ -35,13 +34,6 @@ def is_dict(obj):
 
 def make_list(x) -> list:
     return [x] if not isinstance(x, list) else x
-
-
-def toggle_layer_off(karamlized_key):
-    layer_off = copy(karamlized_key)
-    layer_off.conditions["conditions"][0]["value"] = 1
-    layer_off._to["to_if_alone"][0]["value"] = 0
-    return layer_off
 
 
 def translate_params(params: dict) -> dict:
