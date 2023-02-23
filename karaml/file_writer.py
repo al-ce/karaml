@@ -64,10 +64,8 @@ def update_complex_mods(profile_dict: dict, karaml_config):
     karaml_dict = basic_rules_dict(karaml_config)
     complex_mods = profile_dict["complex_modifications"]
     complex_mods.update(karaml_dict)
-    # TODO: This still doesn't override what the app sets, so maybe it can't be
-    # set by writing directly to the file
     if karaml_config.params:
-        complex_mods["parameters"] = karaml_config.params
+        complex_mods.update(karaml_config.params)
     return profile_dict
 
 
