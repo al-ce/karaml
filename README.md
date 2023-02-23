@@ -34,14 +34,15 @@ Use this simple configuration as a template. If you're unfamiliar with yaml, tak
                           #   l, f, x    (caps_lock, fn, any)
 
 
+
   <(x)-enter>: [enter, left_control]   # from return_or_enter (any optional modifier)
                                        #   to enter when tapped, left_control when held
 
   left_shift: [<s-comma>, left_shift]  # When a modifier is the primary key being modified,
-                                       # use its proper key_code
+                                       # use its proper key_code.
   right_shift: [">", right_shift]      # Aliases are available for many keys, but not required.
                                        # `">"` is equivalent to `<s-period>` or `<s-.>`
-                                       # Check README.md for available aliases
+                                       # Check README.md for available aliases.
 
   # Simultaneous from keys (or multiple to keys) are concatenated with `+`
   # You can add or omit spaces between concatenated keys - your choice!
@@ -50,11 +51,22 @@ Use this simple configuration as a template. If you're unfamiliar with yaml, tak
   <o-h>: h+e+l+l+o  
 
   # Enable layers using the format `/layername/` in the 'to' part of the modification
-  end: /symnum/                        # to: symnum layer (tapped or held)
+
+  right_control: /nav/                 # Tap-toggle nav layer.
+  right_command: [null, /sys/]         # Hold to enable sys layer, release to disable.
+                                       # No event on tap.
+
+  end: /symnum/                        # Tap-toggle symnum layer.
+
   delete: [/sys/, <moc-left_shift>]    # to: toggle /sys/ layer when tapped, hyper when held`
+                                       # This combination sets the hold key event to
+                                       # "to_if_held_down" regardless of hold flavor
+                                       # to prevent 'chatty' key events.
+
   <(x)-caps_lock>: [escape, /nav/]     # to: escape when tapped, nav layer when held
                                        # Wrap the 'from' key in <(x)-`from_key`> so keys in the
                                        # enabled layer can take any modifier.
+
 
 
 # The following maps require the nav layer to be enabled

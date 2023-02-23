@@ -1,5 +1,6 @@
 from collections import namedtuple
 from dataclasses import dataclass
+from re import search
 from typing import Union
 
 from karaml.helpers import (
@@ -7,6 +8,7 @@ from karaml.helpers import (
     translate_params, validate_layer
 )
 from karaml.exceptions import invalidToModType
+from karaml.key_codes import MODIFIERS
 from karaml.map_translator import TranslatedMap
 
 
@@ -107,16 +109,16 @@ class KaramlizedKey:
         simple = len(k_list) == 1
         return k_list.pop() if simple else {"simultaneous": k_list}
 
-    def keystruct_list(self, key_map: str, direction: str):
+    def keystruct_list(self, key_map: str, to_event: str):
         translated_key = TranslatedMap(key_map)
         key_list = []
 
         for k in translated_key.keys:
-            layer = self.to_layer_check(k, direction)
+            layer = self.to_layer_check(k, to_event)
             key = layer if layer else event_value(k)
-            mod_list = local_mods(k.modifiers, direction, self.usr_map)
+            mod_list = local_mods(k.modifiers, to_event, self.usr_map)
             key.update(mod_list)
-            opts = get_to_opts(self.usr_map.opts) if direction == "to" else {}
+            opts = get_to_opts(self.usr_map.opts) if to_event == "to" else {}
             key.update(opts)
             key_list.append(key)
 
@@ -127,27 +129,38 @@ class KaramlizedKey:
                      self._to, self._type, self.rule_params]
         return {k: v for d in map_attrs if d for k, v in d.items()}
 
-    def to_keycodes_dict(self, to_map: str, to_key_type: str):
-        outputs = self.keystruct_list(to_map, to_key_type) if to_map else None
-        return {to_key_type: outputs}
+    def to_keycodes_dict(self, to_map: str, to_event: str):
+        outputs = self.keystruct_list(to_map, to_event) if to_map else None
+        return {to_event: outputs}
 
-    def to_layer_check(self, key: namedtuple, direction: str):
+    def to_layer_check(self, key: namedtuple, to_event: str):
         if key.key_type != "layer":
             return False
         layer_name = f"{key.key_code}_layer"
 
-        if direction == "to_if_alone":
-            # Toggle off needs to be created later by copying this object,
+        no_hold = to_event == "to" and not self.usr_map.hold
+        if to_if_alone := (to_event == "to_if_alone") or no_hold:
+
+            # Toggle off needs to be created later by deep-copying this object,
             # changing its on value to off, and adding it to the mapping.
             # This automation overrides any to_after_key_up set by the user
-            self.layer_toggle = layer_name
-            self.conditions["conditions"].append(condition_dict(layer_name, 0))
+            self.setup_layer_toggle(layer_name, to_event)
+
+            # Override "to" hold flavor in case of layer toggle to prevent
+            # "non-harmless" key sends
+            if self._to.get("to") and to_if_alone:
+                self._to["to_if_held_down"] = self._to.pop("to")
+
         else:
             self._to.update(
                 {"to_after_key_up": [layer_toggle(layer_name, 0)]}
             )
 
         return layer_toggle(layer_name, 1)
+
+    def setup_layer_toggle(self, layer_name, to_event):
+        self.layer_toggle = layer_name, to_event
+        self.conditions["conditions"].append(condition_dict(layer_name, 0))
 
     def update_conditions(self):
         if not self.conditions.get("conditions"):
@@ -170,8 +183,9 @@ class KaramlizedKey:
         if after := self.usr_map.after:
             self._to.update(self.to_keycodes_dict(after, "to_after_key_up"))
         if hold := self.usr_map.hold:
-            self._to.update(self.to_keycodes_dict(hold, self.hold_flavor))
-            # self._to.update(self.to_keycodes_dict(hold, "to_if_held_down"))
+            hold_type = self.hold_flavor
+
+            self._to.update(self.to_keycodes_dict(hold, hold_type))
             tap_type = "to_if_alone"
         if tap := self.usr_map.tap:
             self._to.update(self.to_keycodes_dict(tap, tap_type))

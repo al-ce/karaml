@@ -67,12 +67,12 @@ class KaramlConfig:
         })
 
     def insert_toggle_off(self, karamlized_key, manipulators: list) -> list:
-        layer_name = karamlized_key.layer_toggle
-        if not layer_name:
+        toggle_info = karamlized_key.layer_toggle
+        if not toggle_info:
             return manipulators
-        layer_off = self.toggle_layer_off(karamlized_key, layer_name)
+        layer_name, to_event = toggle_info
+        layer_off = self.toggle_layer_off(karamlized_key, layer_name, to_event)
         manipulators.append(layer_off.mapping())
-        print(manipulators)
         return manipulators
 
     def load_karml_config(self, from_file):
@@ -80,9 +80,9 @@ class KaramlConfig:
             yaml_data = yaml.safe_load(f)
         return yaml_data
 
-    def toggle_layer_off(self, karamlized_key, layer_name):
+    def toggle_layer_off(self, karamlized_key, layer_name, to_event):
         layer_off = deepcopy(karamlized_key)
-        layer_off._to["to_if_alone"][0]["set_variable"]["value"] = 0
+        layer_off._to[to_event][0]["set_variable"]["value"] = 0
         for condition in layer_off.conditions["conditions"]:
             if condition["name"] == layer_name:
                 condition["value"] = 1
