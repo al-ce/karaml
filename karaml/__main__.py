@@ -38,17 +38,15 @@ def main():
     )
 
     parser.add_argument(
-        "--hf", "-HF",
-        dest="hold_flavor",
-        help="The flavor of hold to use. Defaults to 'to'.",
-        nargs="?",
-        default="to",
-        action="store",
-        choices=["to", "to_if_held_down"],
+        "--hd", "-HD",
+        dest="hold_down",
+        help="The flavor of hold to use. Default is 'to', but setting this "
+        "flag changes it to 'to_if_held_down'",
+        action="store_true",
     )
 
     args = parser.parse_args()
-    config_file, complex_mods_output, k_profile, hold_flavor = vars(
+    config_file, complex_mods_output, k_profile, hold_down = vars(
         args).values()
 
     # For those who want to update their karabiner.json automatically,
@@ -61,6 +59,7 @@ def main():
 
     print(f"\nReading from Karaml config: {config_file}...\n")
 
+    hold_flavor = "to" if not hold_down else "to_if_held_down"
     karaml_config = KaramlConfig(config_file, hold_flavor)
 
     if complex_mods_output:
