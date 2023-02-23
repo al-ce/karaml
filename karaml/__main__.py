@@ -19,7 +19,7 @@ def main():
     )
 
     parser.add_argument(
-        "--c", "-C",
+        "-c",
         dest="complex_mods_output",
         help="Add/update the complex modifications folder to include the "
         "Karaml config passed as an argument. Takes an optional argument as "
@@ -30,7 +30,7 @@ def main():
     )
 
     parser.add_argument(
-        "--k", "-K",
+        "-k",
         dest="k_profile",
         help="Add/update the karabiner.json file's proflies list to include "
         "the Karaml config passed as an argument",
@@ -38,7 +38,7 @@ def main():
     )
 
     parser.add_argument(
-        "--hd", "-HD",
+        "-hd",
         dest="hold_down",
         help="The flavor of hold to use. Default is 'to', but setting this "
         "flag changes it to 'to_if_held_down'",
