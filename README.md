@@ -5,16 +5,17 @@ A yaml-based implementation of the layout concepts in @mxstbr's Karabiner [confi
 
 ## ✨ Features
 - Complex modifications on a single line of yaml
-- Map complex events, enable layers (set variables), and require conditions with simple syntax
-- Events for when a key is tapped, held, and released in a sequential array with no keys
-- Simple schema for requiring mandatory or optional modifiers
-- Sensible aliases for symbols, shifted keys, and complex names (e.g. `grave_accent_and_tilde` → `grave`)
-- Accepts regular Karabiner JSON in an 'appendix' table
+- Map complex events (app launches, shell commands, etc.), enable layers (set variables), and require conditions with shorthand syntax
+- Events for when a key is tapped, held, and released in a sequential array (rather than k/v pairs)
+- Simple schema for requiring mandatory or optional modifiers in a pseudo-Vim style
+- Sensible aliases for symbols, shifted keys, and complex names (e.g. `grave_accent_and_tilde` → `grave`, `left_shift` + `9` → `(`)
+- Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml can't or doesn't plan to handle can still be in one config
 - Automatically update your `karabiner.json` or write to the complex modifications folder and import manually
 
 ## ⚡️ Quickstart template
-**karaml** is built around the concept of layers. All maps belong to a layer, including any modifications you add to your base layer.
-Use this simple configuration as a template. If you're unfamiliar with yaml, take a few minutes to learn its [syntax](https://learnxinyminutes.com/docs/yaml/).
+**karaml** is built around the concept of layers, which are top-level yaml keys in the format `/layername/`. All maps belong to a layer, including any modifications you add to your base layer. Layer order in the configuration matters: a key mapped in a 'higher' layer, i.e. a layer written later in the config, will override that same key in a 'lower-level' layer *if* that higher layer is active.
+
+Use this simple configuration as a template with an eye to the layer staucture. If you're unfamiliar with yaml, take a few minutes to learn its [syntax](https://learnxinyminutes.com/docs/yaml/).
 
 <details>
   <summary>Click to expand code block</summary>
@@ -179,5 +180,27 @@ pip install .
 karaml my_karaml_config.yaml
 ```
 
---IN PROGRESS--
+Without any optional arguments, you will be prompted to make a configuration choice:
 
+```
+Reading from Karaml config: {your_karaml_config_filename}.yaml...
+
+1. Update karabiner.json with my_karaml.yaml
+2. Update complex modifications folder with my_karaml.yaml.
+   Writes to: karaml_complex_mods.json
+3. Quit
+```
+
+`1.` updates your karabiner.json file directly, either creating a new profile or updating an existing one depending on the `profile_name` key in your config. Before every update, karaml makes a backup copy of your previous `karabiner.json` in the `automatic_backups` folder. This can add up! But I didn't want to risk a bug in the program destroying your config.
+
+`2.` writes a json file to your karabiner complex modifications folder which you can will appear in the Karabiner GUI. Then you can enable or disable layers individually (or enable them all at once). The file is named `karaml_complex_mods.json` by default, but you can change this in your karaml config with the `title` key, (and so, easily switch between rulsets).
+
+`3.` quits the program.
+
+## -k mode
+
+By passing the `-k` flag, you will not be prompted and karaml will update your karabiner.json file directly. This is the fastest way to update your config and make fast, experimental changes.
+
+## -c mode
+
+By passing the `-c` flag, you will not be prompted and karaml will update your complex modifications folder directly, but you will have to remove the old comflex modifications and enable the new complex modifications manually on every update. This is a more cautious and prudent approach. No backup files will be created for complex rules, but you will get a confirmation prompt to allow the program to overwrite a previous rule set (if it has the same name as an existing one).
