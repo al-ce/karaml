@@ -63,3 +63,7 @@ def invalidStickyModifier(string: str):
         "left_control, left_shift, left_option, left_command, right_control, "
         "right_shift, right_option, right_command, fn"
     )
+
+
+def missingToMap(from_map: str):
+    raise Exception(f"Must map 'to' key for: {from_map}")

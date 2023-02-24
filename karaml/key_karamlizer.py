@@ -3,10 +3,11 @@ from dataclasses import dataclass
 from typing import Union
 
 from karaml.helpers import (
-    dict_eval, flag_check, get_multi_keys, make_list, validate_opt,
+    dict_eval, flag_check, is_layer, get_multi_keys, make_list, validate_opt,
     translate_params, validate_layer
 )
-from karaml.exceptions import invalidToModType
+from karaml.key_codes import MODIFIERS
+from karaml.exceptions import invalidToModType, missingToMap
 from karaml.map_translator import TranslatedMap
 
 
@@ -20,14 +21,14 @@ def event_value(k: namedtuple):
     return {k.key_type: k.key_code}
 
 
-def layer_toggle(layer_name, value):
+def layer_toggle(layer_name, value) -> dict:
     return {"set_variable": {"name": layer_name, "value": value}}
 
 
-def local_mods(mods: dict, direction: str, usr_map) -> dict:
+def local_mods(mods: dict, event: str, usr_map) -> dict:
     if not mods:
         return {}
-    if direction == "from":
+    if event == "from":
         return {"modifiers": mods}
     if mods.get("optional"):
         invalidToModType(usr_map)
@@ -122,16 +123,17 @@ class KaramlizedKey:
             "modifiers": merged_mods
         }
 
-    def keystruct_list(self, key_map: str, to_event: str):
+    def keystruct_list(self, key_map: str, event: str) -> list:
         translated_key = TranslatedMap(key_map)
         key_list = []
 
         for k in translated_key.keys:
-            layer = self.to_layer_check(k, to_event)
-            key = layer if layer else event_value(k)
-            mod_list = local_mods(k.modifiers, to_event, self.usr_map)
+            layer: dict = self.to_layer_check(k, event)
+            key: dict = layer if layer else event_value(k)
+            mod_list = local_mods(k.modifiers, event, self.usr_map)
             key.update(mod_list)
-            opts = get_to_opts(self.usr_map.opts) if to_event == "to" else {}
+            # BUG: not just if == 'to', since 'halt' goes elsewhere
+            opts = get_to_opts(self.usr_map.opts) if event == "to" else {}
             key.update(opts)
             key_list.append(key)
 
@@ -142,11 +144,42 @@ class KaramlizedKey:
                      self._to, self._type, self.rule_params]
         return {k: v for d in map_attrs if d for k, v in d.items()}
 
+    def chatter_safeguard(self, key_list: list, to_event: str) -> str:
+        """If a key is intended to be triggered when held, only map it to a
+        'to' event if it is a layer or modifier key, otherwise map it to
+        'to_if_held_down'.
+
+        This is to prevent unwanted 'to' events from being triggered when the
+        user taps the 'from key. We let this happen only if the event would be
+        otherwise 'benign', i.e. a layer or modifier key, which are events that
+        we don't want to wait for the 'to_if_held_down' threshold to be reached
+        before triggering.
+
+        'Chatter' is a side-effect of karaml's opinionated handling of handling
+        'when held' events, since we prefer to map 'when held' events to 'to'
+        over 'to_if_held_down' for the sake of triggering layers and modifiers
+        as soon as possible."""
+
+        if to_event != "to" or not self.usr_map.hold:
+            return to_event
+
+        for key in key_list:
+            key_code = key.get("key_code")
+            if not key_code:
+                continue
+            if key_code not in MODIFIERS.values() and not is_layer(key_code):
+                return "to_if_held_down"
+
+        return "to"
+
     def to_keycodes_dict(self, to_map: str, to_event: str):
-        outputs = self.keystruct_list(to_map, to_event) if to_map else None
+        if not to_map:
+            return None
+        outputs = self.keystruct_list(to_map, to_event)
+        to_event = self.chatter_safeguard(outputs, to_event)
         return {to_event: outputs}
 
-    def to_layer_check(self, key: namedtuple, to_event: str):
+    def to_layer_check(self, key: namedtuple, to_event: str) -> dict:
         if key.key_type != "layer":
             return False
         layer_name = f"{key.key_code}_layer"
@@ -194,8 +227,6 @@ class KaramlizedKey:
         self._to = {}
 
         tap_type = "to"
-        # to_after_key_up must execute first so it is overridden by the
-        # automated layer-toggle-off if a layer is activated when a key is held
         if after := self.usr_map.after:
             self._to.update(self.to_keycodes_dict(after, "to_after_key_up"))
         if hold := self.usr_map.hold:
@@ -206,7 +237,7 @@ class KaramlizedKey:
         if tap := self.usr_map.tap:
             self._to.update(self.to_keycodes_dict(tap, tap_type))
         if not self._to:
-            raise Exception(f"Must map 'to' key for: {self.usr_map.from_keys}")
+            missingToMap(self.usr_map.from_keys)
 
     def update_type(self):
         # TODO: implement other types (mouse_motion_to_scroll)

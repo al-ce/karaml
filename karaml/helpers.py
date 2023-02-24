@@ -28,6 +28,10 @@ def get_multi_keys(string: str) -> list:
         return [s.strip() for s in string.split("+")]
 
 
+def is_layer(string: str):
+    return search("^/(\\w+)/$", string)
+
+
 def is_dict(obj):
     return isinstance(obj, dict)
 
