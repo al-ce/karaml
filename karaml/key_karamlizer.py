@@ -103,9 +103,24 @@ class KaramlizedKey:
         self.update_type()
 
     def from_keycode_dict(self, from_map: str):
-        k_list = self.keystruct_list(from_map, "from")
-        simple = len(k_list) == 1
-        return k_list.pop() if simple else {"simultaneous": k_list}
+        from_event_list = self.keystruct_list(from_map, "from")
+
+        if len(from_event_list) == 1:
+            return from_event_list.pop()
+        return self.from_simultaneous_dict(from_event_list)
+
+    def from_simultaneous_dict(self, from_event_list: list) -> dict:
+        merged_mods = {}
+        key_codes = []
+        for k in from_event_list:
+            if k.get("modifiers"):
+                merged_mods.update(k.pop("modifiers"))
+            key_codes.append(k.pop("key_code"))
+
+        return {
+            "simultaneous": [{"key_code": k} for k in key_codes],
+            "modifiers": merged_mods
+        }
 
     def keystruct_list(self, key_map: str, to_event: str):
         translated_key = TranslatedMap(key_map)
