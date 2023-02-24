@@ -1,6 +1,5 @@
 from collections import namedtuple
 from dataclasses import dataclass
-from re import search
 from typing import Union
 
 from karaml.helpers import (
@@ -8,7 +7,6 @@ from karaml.helpers import (
     translate_params, validate_layer
 )
 from karaml.exceptions import invalidToModType
-from karaml.key_codes import MODIFIERS
 from karaml.map_translator import TranslatedMap
 
 
@@ -139,10 +137,11 @@ class KaramlizedKey:
         layer_name = f"{key.key_code}_layer"
 
         no_hold = to_event == "to" and not self.usr_map.hold
+
         if to_if_alone := (to_event == "to_if_alone") or no_hold:
 
-            # Toggle off needs to be created later by deep-copying this object,
-            # changing its on value to off, and adding it to the mapping.
+            # Toggle off on tap event needs to be created later by deep-copying
+            # this object, toggling its value, and adding it to the mapping.
             # This automation overrides any to_after_key_up set by the user
             self.setup_layer_toggle(layer_name, to_event)
 
@@ -150,11 +149,13 @@ class KaramlizedKey:
             # "non-harmless" key sends
             if self._to.get("to") and to_if_alone:
                 self._to["to_if_held_down"] = self._to.pop("to")
+            return layer_toggle(layer_name, 1)
 
+        hold_toggle_off = layer_toggle(layer_name, 0)
+        if not self._to.get("to_after_key_up"):
+            self._to.update({"to_after_key_up": [hold_toggle_off]})
         else:
-            self._to.update(
-                {"to_after_key_up": [layer_toggle(layer_name, 0)]}
-            )
+            self._to["to_after_key_up"].append(hold_toggle_off)
 
         return layer_toggle(layer_name, 1)
 
