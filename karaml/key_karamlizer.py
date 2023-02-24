@@ -96,7 +96,7 @@ class KaramlizedKey:
     def __post_init__(self):
 
         self.conditions = requires_sublayer(self.layer_name)
-        self.layer_toggle = None
+        self.layer_toggle = []
 
         self.update_from()
         self.update_to()
@@ -159,7 +159,7 @@ class KaramlizedKey:
         return layer_toggle(layer_name, 1)
 
     def setup_layer_toggle(self, layer_name, to_event):
-        self.layer_toggle = layer_name, to_event
+        self.layer_toggle.append((layer_name, to_event))
         self.conditions["conditions"].append(condition_dict(layer_name, 0))
 
     def update_conditions(self):
