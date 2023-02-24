@@ -57,7 +57,7 @@ def main():
     # For those who want to manage rules from assets/complex_modifications,
     # set complex_mods (-C or --c)
 
-    print(f"\nReading from Karaml config: {config_file}...\n")
+    print(f"\nReading from: {config_file}...\n")
 
     hold_flavor = "to" if not hold_down else "to_if_held_down"
     karaml_config = KaramlConfig(config_file, hold_flavor)
@@ -73,10 +73,10 @@ def main():
         return
 
     while True:
-        print(f"1. Update karabiner.json with {config_file}")
-        print(f"2. Update complex modifications folder with {config_file}.\n"
-              "   Writes to: karaml_complex_mods.json")
-        print("3. Quit")
+        print(f"  1. Update karabiner.json with {config_file}")
+        print(f"  2. Update complex modifications folder with {config_file}.\n"
+              "     Writes to: karaml_complex_mods.json")
+        print("  3. Quit")
         choice = input("\nCommand: ")
 
         if choice == "1":

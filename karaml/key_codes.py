@@ -79,10 +79,17 @@ MODIFIERS = {
     "C": "right_control",
     "S": "right_shift",
     "f": "fn",
+    "F": "fn",
     "l": "caps_lock",
+    "L": "caps_lock",
     "x": "any",
+    "X": "any",
 
     # HACK: g and a are sensible aliases but r and h are stretches
+    "G": "command",
+    "R": "control",
+    "A": "option",
+    "H": "shift",
     "g": "command",
     "r": "control",
     "a": "option",
