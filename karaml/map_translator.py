@@ -142,6 +142,8 @@ def translate_event(event: str, command: str) -> tuple:
     match event:
         case "app":
             event, command = "shell_command", f"open -a '{command}'.app"
+        case "open":
+            event, command = "shell_command", f"open {command}"
         case "shell":
             event = "shell_command"
         case "input":
