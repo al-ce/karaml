@@ -111,6 +111,32 @@ def variable(params_as_str: str) -> dict:
     return {"name": name.strip(), "value": int(value.strip())}
 
 
+def input_source(params_as_str: str) -> dict:
+    if params_as_str.startswith("{") and type(eval(params_as_str)) == dict:
+        return eval(params_as_str)
+
+    return {"language": params_as_str.strip()}
+
+
+def mouse_key(params_as_str: str) -> dict:
+    if params_as_str.startswith("{") and type(eval(params_as_str)) == dict:
+        return eval(params_as_str)
+
+    key, value = params_as_str.split(",")
+    return {key.strip(): float(value.strip())}
+
+
+def soft_func(params_as_str: str) -> dict:
+    # Only accept well formed dict here
+    sf_dict = eval(params_as_str)
+    if type(sf_dict) != dict:
+        raise Exception(
+            f"Invalid softwatre function argument: need well formed dict. Got:"
+            f" {params_as_str}"
+        )
+    return sf_dict
+
+
 def translate_event(event: str, command: str) -> tuple:
 
     match event:
@@ -119,9 +145,9 @@ def translate_event(event: str, command: str) -> tuple:
         case "shell":
             event = "shell_command"
         case "input":
-            event = "select_input_source"
+            event, command = "select_input_source", input_source(command)
         case "mouse":
-            event = "mouse_key"
+            event, command = "mouse_key", mouse_key(command)
         case "notify":
             event, command = "set_notification_message", notification(command)
         case "softFunc":
