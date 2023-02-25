@@ -62,7 +62,8 @@ def to_opt_dict(opt):
     if isinstance(opt, int):
         return {"hold_down_milliseconds": int(opt)}
     _opt, flag = validate_opt(opt), flag_check(opt)
-    if _opt and flag:
+    # flag may be 'False' and we want to log that
+    if _opt and flag is not None:
         return {_opt: flag}
     return {}
 
