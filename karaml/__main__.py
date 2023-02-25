@@ -22,8 +22,8 @@ def main():
         "-c",
         dest="complex_mods_output",
         help="Add/update the complex modifications folder to include the "
-        "Karaml config passed as an argument. Takes an optional argument as "
-        "the name of the file to write to. "
+        "Karaml config passed as an argument. Takes an argument as the name of"
+        "the file to write to. "
         "Defaults to `karaml_complex_mods.json`",
         action="store",
 
@@ -77,6 +77,7 @@ def main():
         print(f"  2. Update complex modifications folder with {config_file}.\n"
               "     Writes to: karaml_complex_mods.json")
         print("  3. Quit")
+        print("\n`karaml -h` for more options")
         choice = input("\nCommand: ")
 
         if choice == "1":

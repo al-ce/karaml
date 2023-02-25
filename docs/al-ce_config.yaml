@@ -1,0 +1,243 @@
+profile_name:
+  Karaml Config
+
+title:
+  KaramlConfig
+
+parameters:
+  {
+    "basic.to_if_alone_timeout_milliseconds": 100,
+    "basic.to_if_held_down_threshold_milliseconds": 101,
+    basic.to_delayed_action_delay_milliseconds: 150,
+    "basic.simultaneous_threshold_milliseconds": 75,
+    "mouse_motion_to_scroll.speed": 100,
+  }
+
+/base/:
+
+  <(x)-caps_lock>: [escape, /nav/]  # ESC   | Nav Sublayer
+  <(x)-end>: [grave, /symnum/]      # grave | SymNum Sublayer
+
+  <so-g>: [ g + i + t + space, null, null, [-repeat] ]
+
+  <o-w>: <o-backspace>  # Delete Previous Word
+  <o-f>: <o-delete>     # Delete Next Word
+  <o-p>: <m-v>          # Paste
+
+  <(x)-enter>:
+    - enter
+    - left_control
+    - null
+    - [+lazy]
+    # - { a: 100, s: 50, d: 500, h: 100 }
+
+  \: [\, left_option, null, [+lazy]]
+  # Various hypers
+  backspace: [backspace, <mco-left_shift>]
+  grave: [grave, <mco-left_shift>]
+  quote: [quote, <mco-left_shift>]
+
+  left_shift: ["<", left_shift]
+  right_shift: [">", right_shift]
+  # left_shift: ["<s-,>", left_shift]
+  # right_shift: [<s-.>, right_shift]
+
+  h + `: shell(open ~)
+
+  right_control: /nav/      # tap toggle nav layer
+  <o-right_shift>: sticky(left_shift, toggle)
+
+
+/nav/:
+
+  <o-quote>: /mouse/
+
+  # Cmd + key to Rectangle modifier (Cmd+Shift+Ctrl (ghr))
+  # enter, j, k, h, l, x, z, v, g, d, c, t, s, p, f, r, a, w, q
+  <m-enter>: [<ghr-enter>, <sm-left_control>]
+  <m-j>: <ghr-j>
+  <m-k>: <ghr-k>
+  <m-h>: <ghr-h>
+  <m-l>: <ghr-l>
+  <m-x>: <ghr-x>
+  <m-z>: <ghr-z>
+  <m-v>: <ghr-v>
+  <m-g>: <ghr-g>
+  <m-d>: <ghr-d>
+  <m-c>: <ghr-c>
+  <m-t>: <ghr-t>
+  <m-s>: <ghr-s>
+  <m-p>: <ghr-p>
+  <m-f>: <ghr-f>
+  <m-r>: <ghr-r>
+  <m-a>: <ghr-a>
+  <m-w>: <ghr-w>
+  <m-q>: <ghr-q>
+
+  # Vim-ish navigation with any optional modifier
+  <(x)-m>: left
+  <(x)-n>: down
+  <(x)-e>: up
+  <(x)-i>: right
+
+  <(x)-,>: backspace
+  <(x)-.>: delete
+
+
+  u: pgup
+  d: [pgdn, /win/] # Pgdn | win(dow control) sublayer
+  g: home
+  <h-g>: end
+  spacebar: underscore
+  x: app(Finder)
+  r: app(Brave Browser)
+
+
+  # Display 'Layer Enabled' notification. Also a good case for using sequence
+  # syntax instead of array syntax
+
+  # Watch your commas!!
+  # s: [app(Safari), '/sys/ + notify(sys, System Layer Enabled)', 'notify(sys, )']
+  s:
+    - app(Safari)
+    - /sys/ + notify(sysNotification,"System Layer Enabled")
+    - notify(sysNotification,)
+
+
+  <o-g>: open(https://github.com/al-ce)
+
+  t: app(CotEditor)
+  c: app(Kitty)
+  f: [app(Firefox), /fn/] # Launch Firefox | functions sublayer
+  w: app(Warp)
+  y: app(System Preferences)
+  k: app(Karabiner-Elements)
+  kp-: app(Calca)
+
+
+/win/:
+  # BetterTouchTool Window Manipulation
+  m: <rg-m>
+  i: <rg-i>
+  e: <rg-e>
+  n: <rg-n>
+
+  pgdn: <rg-pgdn>
+  .: <rg-.>
+  ",": <rg-,>
+  "h": <rg-h>
+
+
+/mouse/:
+  spacebar: button1
+  <s-spacebar>: button2
+  m: mouse(x, -2000)
+  n: mouse(y, 2000)
+  e: mouse(y, -2000)
+  i: mouse(x, 2000)
+  <c-m>: mouse(horizontal_wheel, 100)
+  <c-n>: mouse(vertical_wheel, -100)
+  <c-e>: mouse(vertical_wheel, 100)
+  <c-i>: mouse(horizontal_wheel, -100)
+  s: mouse(speed_multiplier, 2.5)
+
+
+/sys/:
+
+  <o-e>: input(en)  # Set English input source
+  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+
+  <c-e>: <cm-[>    # Emoji Picker
+
+  t: mission_control
+  i: <o-tab>
+  e: volume_increment
+  n: volume_decrement
+  m: mute
+  <o-m>: [mute, null, mute] # Toggle mute when held
+
+  k: play_or_pause
+  j: rewind
+  "[": fastforward
+  ",": display_brightness_increment
+  h: display_brightness_decrement
+  q: <CM-q> # Lock Screen
+  u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+  y: app(togglemenubar) # Show and Hide Menubar
+
+  # Notification displays when held
+  <o-i>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
+
+
+
+/fn/:
+  <(x)-h>: f1
+  <(x)-,>: f2
+  <(x)-.>: f3
+  <(x)-n>: f4
+  <(x)-e>: f5
+  <(x)-i>: f6
+  <(x)-l>: f7
+  <(x)-u>: f8
+  <(x)-y>: f9
+  <(x)-7>: f10
+  <(x)-8>: f11
+  <(x)-9>: f12
+
+/symnum/:
+  <(x)-caps_lock>: escape
+  <(x)-enter>: [enter, left_control]
+  <(x)-space>: space
+  <(x)-j>: "0"
+  <(x)-h>: "1"
+  <(x)-,>: "2"
+  <(x)-.>: "3"
+  <(x)-n>: "4"
+  <(x)-e>: "5"
+  <(x)-i>: "6"
+  <(x)-l>: "7"
+  <(x)-u>: "8"
+  <(x)-y>: "9"
+  <(x)-k>: ","
+  <(x)-[>: .
+  <(x)-/>: /
+  <(x)-m>: "="
+  <(x)-o>: ;
+  <(x)-a>: ":"
+  s: (
+  <s-s>: "{"
+  t: )
+  <s-t>: "}"
+  c: "["
+  <s-c>: <
+  d: "]"
+  <s-d>: ">"
+  <(x)-r>: "-"
+  <(x)-g>: <s-=> # +
+  <(x)-quote>: quote
+  <(x)-w>: <s-quote>
+  <(x)-f>: "{"
+  <(x)-p>: "}"
+  <(x)-x>: \
+  <(x)-v>: "`"
+  <(x)-backspace>: backspace
+
+
+json:
+  - {
+      # No quotes in this rule, but note the single quotes around the
+      # description, required because of the comma, i.e. `if tapped,`
+      description: 'Right Shift to > if tapped, Shift if held',
+      from: { key_code: right_shift },
+      to: { key_code: right_shift, lazy: true },
+      to_if_alone: { key_code: period, modifiers: [right_shift] },
+      type: basic,
+    }
+  - {
+      "description": "Left Shift to < if tapped, Shift if held",
+      "from": { "key_code": "left_shift" },
+      "to": { "key_code": "left_shift", "lazy": true },
+      "to_if_alone": { "key_code": "comma", "modifiers": ["left_shift"] },
+      "type": "basic",
+    }
+
