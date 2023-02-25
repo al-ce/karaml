@@ -21,7 +21,7 @@ def invalidLayerName(string: str):
 
 def invalidOpt(string: str):
     raise Exception(
-        f"Valid opts: 'halt', 'lazy', 'repeat', got {string[1:]}: {string}")
+        f"Valid opts: 'lazy', 'repeat', got {string[1:]}: {string}")
 
 
 def invalidParamKeys(param_dict: dict, key):

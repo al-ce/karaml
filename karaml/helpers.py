@@ -73,8 +73,7 @@ def validate_layer(string: str):
 
 
 def validate_opt(string: str) -> str:
-    # BUG: "halt" is meant for to_if_held_down or to_if_alone, not to:
-    valid = ["lazy", "halt", "repeat"]
+    valid = ["lazy", "repeat"]
     if (opt := string[1:]) in valid:
         return opt
     invalidOpt(string)

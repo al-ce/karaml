@@ -132,7 +132,6 @@ class KaramlizedKey:
             key: dict = layer if layer else event_value(k)
             mod_list = local_mods(k.modifiers, event, self.usr_map)
             key.update(mod_list)
-            # BUG: not just if == 'to', since 'halt' goes elsewhere
             opts = get_to_opts(self.usr_map.opts) if event == "to" else {}
             key.update(opts)
             key_list.append(key)
