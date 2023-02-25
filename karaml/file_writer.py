@@ -12,7 +12,9 @@ def backup_karabiner_json(karabiner_path):
     backup_file = backup_dir / f"karabiner.backup.{current_time}.json"
     try:
         copyfile(karabiner_json, backup_file)
-        print(f"Backed up karabiner.json to:\n{backup_file}\n")
+        print("Backed up karabiner.json to:"
+              f"\n~/{backup_file.relative_to(Path.home())}\n")
+
         return True
     except FileNotFoundError:
         print(f"Could not find {karabiner_json}.\n"
@@ -102,12 +104,11 @@ def write_complex_mods_json(karaml_config, to_file: str):
     if not to_file or not karaml_config:
         print("No destination file or karaml config provided. Aborting.")
         return
-    complex_mods_path = Path(
-        "~/.config/karabiner/assets/complex_modifications"
-    ).expanduser()
+    complex_mods_path_str = "~/.config/karabiner/assets/complex_modifications"
+    complex_mods_path = Path(complex_mods_path_str).expanduser()
 
-    print("\nWriting complex modifications to:\n" +
-          str(complex_mods_path / to_file) + "\n")
+    print("\nWriting complex modifications to:\n"
+          f"{complex_mods_path_str}/{to_file}\n")
 
     if Path(complex_mods_path / to_file).exists():
         overwrite = None
