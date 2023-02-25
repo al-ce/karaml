@@ -2,8 +2,10 @@ import ast
 from re import search
 
 from karaml.exceptions import (
-    invalidFlag, invalidStickyModifier, invalidLayerName, invalidModifier,
-    invalidOpt, invalidParamKeys, invalidParamValues, invalidStickyModValue
+    invalidConditionName, invalidConditionValue, invalidFlag,
+    invalidStickyModifier, invalidLayerName, invalidModifier,
+    invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
+    invalidParamValues, invalidStickyModValue
 )
 from karaml.key_codes import MODIFIERS, STICKY_MODS
 
@@ -68,22 +70,36 @@ def translate_params(params: dict) -> dict:
     return {"parameters": translated} if translated else None
 
 
+def validate_condition_dict(condition_dict: dict):
+    name, cond_type, value = list(condition_dict.values())
+    if not 0 <= value <= 1:
+        invalidConditionValue(name, value)
+    if not search("^[a-zA-Z_]+$", name):
+        invalidConditionName(name)
+
+
 def validate_layer(string: str):
     return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
 
 
-def validate_mods(mods: str):
+def validate_mod_aliases(mods: str):
     mods = mods.replace("(", "").replace(")", "")
     for char in mods:
         if char not in MODIFIERS.keys():
             invalidModifier(char, mods)
+    return mods
 
 
-def validate_opt(string: str) -> str:
+def validate_to_opts(string: str) -> str:
     valid = ["lazy", "repeat"]
     if (opt := string[1:]) in valid:
         return opt
-    invalidOpt(string)
+    invalidToOpt(string)
+
+
+def validate_optional_mod_sets(mod_string: str, opt_mod_matches: list):
+    if len(opt_mod_matches) > 1 or search("\\w+\\(\\w+\\)\\w+", mod_string):
+        invalidTotalParensInMods(mod_string, opt_mod_matches)
 
 
 def validate_sticky_mod_value(string: str):
@@ -94,4 +110,12 @@ def validate_sticky_mod_value(string: str):
 def validate_sticky_modifier(string: str):
     if string not in STICKY_MODS:
         invalidStickyModifier(string)
-    print("SUCCESS!")
+
+
+def validate_var_value(name: str, value: str):
+    try:
+        value = int(value)
+    except ValueError:
+        invalidConditionValue(name, value)
+    if not 0 <= int(value) <= 1:
+        invalidConditionValue(name, value)

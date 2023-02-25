@@ -1,5 +1,6 @@
 # karaml 🍮
 
+
 **karaml** (**_Kara_**biner in ya**_ml_**) lets you write and maintain a virtual layers-based Karabiner-Elements configuration in YAML.
 
 It is a yaml-based implementation of the philosophy of [mxstbr](https://github.com/mxstbr)'s Karabiner [config](https://github.com/mxstbr/karabiner) and of [yqrashawn](https://github.com/yqrashawn/)'s [Goku](https://github.com/yqrashawn/GokuRakuJoudo) tool, using Python to translate the yaml into Karabiner-compatible JSON.
@@ -49,6 +50,20 @@ Thanks to [mxstbr](https://github.com/mxstbr) and [yqrashawn](https://github.com
   <oc-n>: /nav/              # Tap Left Opt + Left Ctrl + n to toggle /nav/
   <O-w>: <o-backspace>       # Right Opt + w to Left Opt + Backspace
 
+  # Enter when tapped, Left Control when held, lazy flag, any optional modifiers
+  <(x)-enter>:
+    - enter
+    - left_control
+    - null                   # No event when released
+    - [+lazy]
+
+  j+k: [escape, button1]     # j+k to escape when tapped, left click when held
+
+  # option (either side) + o/O to create new line below/above
+  <a-o>: <m-right> + return
+  <a-O>: up + <m-right> + return
+
+
 /nav/:
   <(x)-h>: left              # vim navigation with any optional mods
   <(x)-j>: down
@@ -83,6 +98,9 @@ json:                        # JSON integration
 - Aliases for symbols, shifted keys, and complex names (e.g. `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
 - Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml can't or doesn't plan to handle can still be in one config
 - Automatically update your `karabiner.json` or write to the complex modifications folder and import manually
+- Checks and formatting hints for your `.yaml` file - karaml will try not to let you
+  upload a config that won't create an actual modification, even if you wrote it in the
+  equivalent Karabiner-compatible JSON
 
 
 ## ❓ Why this project
@@ -168,11 +186,18 @@ the layer will be enabled when the 'from' key is held.
 ### Modifiers
 
 Follow the format `<modifiers-primary_key>`. Join multiple modifiers with `+` 
-and wrap optional modifiers in parens. Left side modifiers are lowercase, right
-side modifiers are uppercase.
+and wrap optional modifiers in parens.
+
+Whether the optional set in parens comes first or last doesn't matter, e.g. `<(c)os-g>` and `<os(c)-g>` are both valid. But a single set of optional modifiers in parens must be to the right or left of *all* mandatory modifiers (if there are any mandatory modifiers).
+
+Left side modifiers are lowercase, right side modifiers are uppercase.
 
 `<c-h>` → `left_ctrl` + `h`
+`<(x)-h` → `h` (with any optional modifiers)
 `<mOC(s)-h>` → `left_cmd` + `right_opt` + `right_ctrl` + `left_shift` (optional) + `h`
+`<(s)mOC-h>` →   (same as above)
+`<m(ocs)-h>` → `left_cmd` (mandatory) + `right_opt` `right_ctrl` + `left_shift` (optional) + `h`
+`<(ocs)m-h>`   (same as above)
 
 
 | key_code     | karaml | --- | key_code | karaml |
@@ -388,6 +413,15 @@ Namely, quotes are optional unless needed for escaping characters, elements of
 the `json` map are separated as sequence item (a properly indented dash `-`
 followed by a space), and no commas are used to separate those items.
 
+***WARNING!***: karaml 'inspects' your regular yaml-flavored configuration for
+proper formatting - not just whether you wrote it in a syntax karaml can
+intrepret, but also whether you used valid key codes, valid modifiers, etc.
+karaml also formats the modification's dictionary for you so you don't have to keep
+track of what level of bracket nesting you're in, whether you should have used
+`[]` or `{}`, added or forgot a comma, etc. Currently, karaml doesn't support
+these 'health checks' for the JSON extension map, so karaml will just append
+whatever you put in there to the rule-set.
+
 ```yaml
 /base/:
   # ...
@@ -456,17 +490,19 @@ automated when layers are enabled when held).
 
 `when_tapped` is mapped to either `to` or `to_if_alone`, and `when_held` is
 mapped to either `to` or `to_if_held_down` depending on whether the map enables
-a layer or a modifier when held.
+a layer, a modifier, or a notification ('non-chatty' events) when held.
 
 karaml was designed around toggling layers or enabling modifiers when a key is
 held down, and letting the key have some other function when tapped. I found
 that, for my typing style, a 100ms `to_if_alone_timeout_milliseconds` setting,
-mapping the 'when tapped' function to `to_if_alone` and the 'when held' functions
-to 'to' provided immediate switching between layers. This means sending the `to`
-event even when `to_if_alone` is sent, but so long as the event is 'harmless',
-or not 'chatty', i.e. it is a layer or a modifier, and so long as we set the
-`lazy` opt when necessary (e.g. for my mapping of `enter` → `control` when
-held), this doesn't cause any significant side effects.
+mapping the 'when tapped' function to `to_if_alone` and the 'when held'
+functions to a 'to' dictionary (instead of 'to_if_held_down') provided
+immediate switching between layers or enabling of modifier keys. This means
+sending the `to` event even when `to_if_alone` is sent, but so long as the
+event is 'harmless', or not 'chatty', i.e. it is a layer, a modifier, or a
+notfication, and so long as we set the `lazy` opt when necessary (e.g. for my
+mapping of `enter` → `control` when held), this doesn't cause any significant
+side effects.
 
 When a 'chatty' event would have side-effects, or when sending an event on
 'if held down' following the relevant parameters is an explicit goal (rather

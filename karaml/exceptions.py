@@ -11,6 +11,22 @@ def configError(string: str):
         exit()
 
 
+def invalidConditionValue(name: str, value: str):
+    configError(
+        f"Invalid value for condition: {name}={value}.\n"
+        "Value must be int type 0 or 1.\n"
+        f"Got: {value} of type {type(value)}"
+    )
+
+
+def invalidConditionName(name: str):
+    configError(
+        f"Invalid condition name: {name}.\n"
+        "Condition names must only contain letters.\n"
+        f"Got: {name}"
+    )
+
+
 def invalidKey(key_type: str, map: str, key: str):
     key_type = "modifier" if key_type == "mod" else "key code"
     configError(f"Invalid user-defined {key_type} in map {map}: {key}")
@@ -32,7 +48,7 @@ def invalidLayerName(string: str):
     )
 
 
-def invalidOpt(string: str):
+def invalidToOpt(string: str):
     configError(
         f"Valid opts: 'lazy', 'repeat', got {string[1:]}: {string}")
 
@@ -45,6 +61,17 @@ def invalidModifier(string: str, mods: str):
         "  - right_control, right_shift, right_option, right_command\n"
         "  - control, shift, option, command\n"
         "  - fn, caps_lock"
+    )
+
+
+def invalidTotalParensInMods(mod_string: str, opt_mod_matches: list):
+    configError(
+        f"Invalid optional modifier mapping: {mod_string}\n"
+        f"For opt mods: {opt_mod_matches}\n"
+        "Too many sets of parens for optional mods. Use a single set.\n"
+        "Put the optional mods entirely to the left or right.\n"
+        "e.g. <c(oms)> or <c(oms)>\n"
+        "NOT: <c(o)(m)s> or <(o)(m)s> or <c(om)s> etc."
     )
 
 

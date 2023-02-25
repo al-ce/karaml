@@ -26,7 +26,7 @@ def backup_karabiner_json(karabiner_path):
 
 def basic_rules_dict(karaml_config) -> dict:
     return {"title": karaml_config.title,
-            "rules": karaml_config.rules}
+            "rules": karaml_config.layers}
 
 
 def match_profile_name(profiles: dict, profile_name: str):

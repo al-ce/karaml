@@ -46,7 +46,7 @@ ALIASES = {
     "pgup": Alias("page_up", None),
     "pgdn": Alias("page_down", None),
     "kp-": Alias("keypad_hyphen", None),
-    "kp+": Alias("keypad_plus", None),
+    "kpplus": Alias("keypad_plus", None),
     "kp*": Alias("keypad_asterisk", None),
     "kp/": Alias("keypad_slash", None),
     "kp=": Alias("keypad_equal_sign", None),
@@ -393,4 +393,18 @@ STICKY_MODS = [
     "right_option",
     "right_command",
     "fn",
+]
+
+CHATTY = [
+    "key_code",
+    "consumer_key_code",
+    "pointing_button",
+    "shell_command",
+    # NOTE: I think notifications shouldn't be considered chatty,
+    # but open to reconsidering
+    # "set_notification_message",
+    "mouse_key",
+    "select_input_source",
+    "sticky_modifier",
+    "software_function"
 ]

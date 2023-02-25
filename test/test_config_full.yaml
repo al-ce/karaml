@@ -1,0 +1,298 @@
+profile_name:
+  Karaml TEST Config
+
+title:
+  KaramlTESTRules
+
+parameters:
+  {
+    "basic.to_if_alone_timeout_milliseconds": 100,
+    "basic.to_if_held_down_threshold_milliseconds": 101,
+    basic.to_delayed_action_delay_milliseconds: 150,
+    "basic.simultaneous_threshold_milliseconds": 75,
+    "mouse_motion_to_scroll.speed": 100,
+  }
+
+/base/:
+
+  # <y-8>: "8"
+
+  <(x)-end>: [grave, /symnum/] # grave | SymNum Sublayer
+  <(x)-caps_lock>: [escape, /nav/] # ESC | Nav Sublayer
+
+  # <o-s> + n: /sys/ + /nav/
+  # <o-s>: var(sys_layer, 1)
+  # <(x)o-l>+s: n+o+p+e
+  # <(oscm)-8>: [y+e+p, null, null, [-repeat] ]   # All optional mods go in the same set of parens
+  <so-g>: [ g + i + t + space, null, null, [-repeat] ]
+
+
+
+  <o-w>: <o-backspace> # Delete Previous Word
+  <o-f>: <o-delete> # Delete Next Word
+  <o-p>: <m-v> # Paste
+
+  <(x)-enter>:
+    - enter
+    - left_control
+    - null
+    - [+lazy] # - [ null ] or null to skip
+    # - { a: 100, s: 50, d: 500, h: 100 }
+
+  \: [\, left_option, null, [+lazy]]
+  backspace: [backspace, <mco-left_shift>]
+  grave: [grave, <mco-left_shift>]
+  quote: [quote, <mco-left_shift>]
+
+  # (see JSON extension at the bottom of this file)
+  left_shift: ["<", left_shift]
+  right_shift: [">", right_shift]
+  # left_shift: ["<s-,>", left_shift]
+  # right_shift: [<s-.>, right_shift]
+
+
+  # You can add or omit spaces between concatenated keys - your choice!
+  h + `: shell(open ~)
+
+  right_control: /nav/      # tap toggle nav layer
+
+  # right_control: [null, /nav/]  # to: null when tapped, nav layer when held,
+  #                               #     and no keysend when tapped
+
+  <o-right_shift>: sticky(left_shift, toggle)
+
+# This isn't in the layer syntax `/layername/` so it would raise an error
+# badlayername:
+#   "9": <s-9>
+
+
+/nav/:
+
+  # <o-z>: /some_layer/+/some_other_layer/       # Proof of concept for multiple
+  # z: [null, /some_layer/+/some_other_layer/]   # layer toggling
+
+  <o-quote>: /mouse/
+
+  # Rectangle Modifiers (Ctrl+Cmd+Shift)
+  # enter, j, k, h, l, x, z, v, g, d, c, t, s, p, f, r, a, w, q
+  <m-enter>: [<ghr-enter>, <sm-left_control>]
+  <m-j>: <ghr-j>
+  <m-k>: <ghr-k>
+  <m-h>: <ghr-h>
+  <m-l>: <ghr-l>
+  <m-x>: <ghr-x>
+  <m-z>: <ghr-z>
+  <m-v>: <ghr-v>
+  <m-g>: <ghr-g>
+  <m-d>: <ghr-d>
+  <m-c>: <ghr-c>
+  <m-t>: <ghr-t>
+  <m-s>: <ghr-s>
+  <m-p>: <ghr-p>
+  <m-f>: <ghr-f>
+  <m-r>: <ghr-r>
+  <m-a>: <ghr-a>
+  <m-w>: <ghr-w>
+  <m-q>: <ghr-q>
+
+  <(x)-m>: left
+  <(x)-n>: down
+  <(x)-e>: up
+  <(x)-i>: right
+
+  <(x)-,>: backspace
+  <(x)-.>: delete
+
+
+  u: pgup
+  d: [pgdn, /win/] # Pgdn | win(dow control) sublayer
+  <o-u>: <o-pgup>
+  <o-d>: <o-pgdn>
+  g: home
+  <h-g>: end
+  spacebar: underscore
+  x: app(Finder)
+  r: app(Brave Browser)
+
+
+  # Display 'Layer Enabled' notification. Also a good case for using sequence
+  # syntax instead of array syntax
+
+  # Watch your commas!!
+  # s: [app(Safari), '/sys/ + notify(sys, System Layer Enabled)', 'notify(sys, )']
+
+  s:
+    - app(Safari)
+    # In an array you would need to put the entire multi-key mapping in single
+    # quotes to auto-escape the double quotes. No need to in a sequence
+
+    # - var(sys_layer,1) + notify(sysNotification,"System Layer Enabled")
+    - /sys/ + notify(sysNotification,"System Layer Enabled")
+    # - var(sys_layer,0) + notify(sysNotification,)
+    - notify(sysNotification,)
+
+  # s:
+  #   - app(Safari)
+  #   # In an array you would need to put the entire multi-key mapping in single
+  #   # quotes to auto-escape the double quotes. No need to in a sequence
+  #   - var(sys_layer,1) + notify(sysNotification,"System Layer Enabled")
+
+  <o-g>: open(https://github.com/al-ce)
+
+  t: app(CotEditor)
+  c: app(Kitty)
+
+  # This is no longer true and we don't need the layer safeguard! We can
+  # enable-when-held and safely disable on release even if we add an additional
+  # to_afte_key_up_event!
+  # # Example of layer-safeguard. Third position will be overridden by automated layer toggle off setting.
+  # # f: [app(Firefox), /fn/, mute] # Launch Firefox | functions sublayer
+
+  f: [app(Firefox), /fn/] # Launch Firefox | functions sublayer
+  w: app(Warp)
+
+  y: app(System Preferences)
+  k: app(Karabiner-Elements)
+  kp-: app(Calca)
+
+
+/win/:
+  m: <rg-m>
+  i: <rg-i>
+  e: <rg-e>
+  n: <rg-n>
+  pgdn: <rg-pgdn>
+  .: <rg-.>
+  ",": <rg-,>
+  "h": <rg-h>
+
+
+/mouse/:
+  m: mouse(x, -2000)
+  n: mouse(y, 2000)
+  e: mouse(y, -2000)
+  i: mouse(x, 2000)
+  <c-m>: mouse(horizontal_wheel, 100)
+  <c-n>: mouse(vertical_wheel, -100)
+  <c-e>: mouse(vertical_wheel, 100)
+  <c-i>: mouse(horizontal_wheel, -100)
+  s: mouse(speed_multiplier, 2.5)
+
+
+/sys/:
+
+  <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
+  # <o-s>: var(sys_layer, 0)
+
+  <o-e>: input(en)  # Set English input source
+  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+
+  <c-e>: <cm-[>    # Emoji Picker
+
+  t: mission_control
+  i: <o-tab>
+  e: volume_increment
+  n: volume_decrement
+  m: mute
+  <o-m>: [mute, null, mute] # Toggle mute when held
+  <oC-m>: [null, null, mute] # Only send mute on release/after key up
+
+  k: play_or_pause
+  j: rewind
+  "[": fastforward
+  ",": display_brightness_increment
+  h: display_brightness_decrement
+  q: <CM-q> # Lock Screen
+  u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+  y: app(togglemenubar) # Show and Hide Menubar
+
+  # Notification displays when held
+  <o-i>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
+
+
+
+/fn/:
+  <(x)-h>: f1
+  <(x)-,>: f2
+  <(x)-.>: f3
+  <(x)-n>: f4
+  <(x)-e>: f5
+  <(x)-i>: f6
+  <(x)-l>: f7
+  <(x)-u>: f8
+  <(x)-y>: f9
+  <(x)-7>: f10
+  <(x)-8>: f11
+  <(x)-9>: f12
+
+/symnum/:
+  <(x)-caps_lock>: escape
+  <(x)-enter>: [enter, left_control]
+  <(x)-space>: space
+  <(x)-j>: "0"
+  <(x)-h>: "1"
+  <(x)-,>: "2"
+  <(x)-.>: "3"
+  <(x)-n>: "4"
+  <(x)-e>: "5"
+  <(x)-i>: "6"
+  <(x)-l>: "7"
+  <(x)-u>: "8"
+  <(x)-y>: "9"
+  <(x)-k>: ","
+  <(x)-[>: .
+  <(x)-/>: /
+  <(x)-m>: "="
+  <(x)-o>: ;
+  <(x)-a>: ":"
+  s: (
+  <s-s>: "{"
+  t: )
+  <s-t>: "}"
+  c: "["
+  <s-c>: <
+  d: "]"
+  <s-d>: ">"
+  <(x)-r>: "-"
+  <(x)-g>: <s-=> # +
+  <(x)-quote>: quote
+  <(x)-w>: <s-quote>
+  <(x)-f>: "{"
+  <(x)-p>: "}"
+  <(x)-x>: \
+  <(x)-v>: "`"
+  <(x)-backspace>: backspace
+
+  # Enable a layer on top of a layer.
+  kp-: [kp-, /some_condition/]
+
+# To require multiple conditions (conceptually equivalent to having two layer
+# on at the same time), concatenate layers as you would keys, with +
+/symnum/+/some_condition/:
+  pgup+pgdn: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
+
+# If the Karaml style config is too limiting or if a rule gets too comlex to be
+# worth it, you can append slightly modified JSON in the Karabiner JSON style
+# to this YAML map. Differences:
+# - Quotes are optional, but check the YAML docs for escaping rules
+# - Instead of separating rules with commas, as you would in JSON, use the YAML
+#   sequence syntax, which is a dash followed by a space, then the rule
+
+json:
+  - {
+      # No quotes in this rule, but note the single quotes around the
+      # description, required because of the comma, i.e. `if tapped,`
+      description: 'Right Shift to > if tapped, Shift if held',
+      from: { key_code: right_shift },
+      to: { key_code: right_shift, lazy: true },
+      to_if_alone: { key_code: period, modifiers: [right_shift] },
+      type: basic,
+    }
+  - {
+      "description": "Left Shift to < if tapped, Shift if held",
+      "from": { "key_code": "left_shift" },
+      "to": { "key_code": "left_shift", "lazy": true },
+      "to_if_alone": { "key_code": "comma", "modifiers": ["left_shift"] },
+      "type": "basic",
+    }
+

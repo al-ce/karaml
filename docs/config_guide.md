@@ -168,11 +168,14 @@ and control when held. By adding the `(x)`/ 'optional-any' modifier, we can
 press any modifier key before we hold enter and still get `control` plus the
 optional modifier(s) as the output.
 
-All optional modifiers go in the same set of parens. Where that is in the
-mapping doesn't matter:
+All optional modifiers go in the same set of parens. Whether that set comes
+first or last in the mapping doesn't matter, but put the mandatory modifiers (if there are any) to
+one side and the optional modifiers to the other.
+
 
 ```yaml
-<m(oc)s-enter>: <mocs-enter>  # Mandatory cmd + shift, optional alt and control
+<ms(oc)-enter>: <mocs-enter>  # Mandatory cmd + shift, optional alt and control
+<(oc)ms-enter>: <mocs-enter>  # (same as above)
 ```
 
 
