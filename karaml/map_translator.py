@@ -2,14 +2,17 @@ from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
 
-from karaml.helpers import get_multi_keys, validate_sticky_mod_value
-from karaml.exceptions import invalidKey
+from karaml.helpers import (
+    get_multi_keys, validate_mods, validate_sticky_mod_value
+)
+from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, TO_EVENTS
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 
 
 def get_modifiers(usr_mods: str, usr_map: str) -> dict:
+    validate_mods(usr_mods)
     mods = {}
     mandatory, optional = parse_chars_in_parens(usr_mods)
     if mandatory:
@@ -18,7 +21,7 @@ def get_modifiers(usr_mods: str, usr_map: str) -> dict:
         mods["optional"] = modifier_lookup(optional)
 
     if not mods:
-        raise Exception(invalidKey("modifier", usr_map, usr_mods))
+        invalidKey("modifier", usr_map, usr_mods)
     return mods
 
 
@@ -130,10 +133,7 @@ def soft_func(params_as_str: str) -> dict:
     # Only accept well formed dict here
     sf_dict = eval(params_as_str)
     if type(sf_dict) != dict:
-        raise Exception(
-            f"Invalid softwatre function argument: need well formed dict. Got:"
-            f" {params_as_str}"
-        )
+        invalidSoftFunct(params_as_str)
     return sf_dict
 
 
@@ -183,7 +183,7 @@ class TranslatedMap:
         if keystruct := is_valid_keycode(parsed_key, self.map):
             return keystruct
 
-        raise Exception(invalidKey("key code", self.map, parsed_key))
+        invalidKey("key code", self.map, parsed_key)
 
     def queue_translations(self, parsed_key: str) -> list:
         if multi_keys := get_multi_keys(parsed_key):

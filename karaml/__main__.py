@@ -1,5 +1,6 @@
 import argparse
 
+import karaml.cfg
 from karaml.file_writer import update_karabiner_json, write_complex_mods_json
 from karaml.karaml_config import KaramlConfig
 
@@ -45,8 +46,16 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "-d",
+        dest="debug",
+        help="Raise Exception when there are errors in the karaml config file"
+        " instead of just printing the error and exiting",
+        action="store_true",
+    )
+
     args = parser.parse_args()
-    config_file, complex_mods_output, k_profile, hold_down = vars(
+    config_file, complex_mods_output, k_profile, hold_down, debug = vars(
         args).values()
 
     # For those who want to update their karabiner.json automatically,
@@ -58,6 +67,9 @@ def main():
     # set complex_mods (-C or --c)
 
     print(f"\nReading from: {config_file}...\n")
+
+    if debug:
+        karaml.cfg.debug_flag = True
 
     hold_flavor = "to" if not hold_down else "to_if_held_down"
     karaml_config = KaramlConfig(config_file, hold_flavor)

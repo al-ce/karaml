@@ -2,10 +2,10 @@ import ast
 from re import search
 
 from karaml.exceptions import (
-    invalidFlag, invalidStickyModifier, invalidLayerName, invalidOpt,
-    invalidParamKeys, invalidParamValues, invalidStickyModValue
+    invalidFlag, invalidStickyModifier, invalidLayerName, invalidModifier,
+    invalidOpt, invalidParamKeys, invalidParamValues, invalidStickyModValue
 )
-from karaml.key_codes import STICKY_MODS
+from karaml.key_codes import MODIFIERS, STICKY_MODS
 
 
 def dict_eval(string: str):
@@ -70,6 +70,13 @@ def translate_params(params: dict) -> dict:
 
 def validate_layer(string: str):
     return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
+
+
+def validate_mods(mods: str):
+    mods = mods.replace("(", "").replace(")", "")
+    for char in mods:
+        if char not in MODIFIERS.keys():
+            invalidModifier(char, mods)
 
 
 def validate_opt(string: str) -> str:
