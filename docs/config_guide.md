@@ -432,6 +432,53 @@ want, you need to use `null` as a placeholder, so you could potentially have:
   g + h: [ null, null, open(https://github.com), [ null ], { s: 150} ]
 ```
 
+This is admittedly inefficient and tedious but I think it's easy to read, and
+it's the tradeoff we make for ditching dictionary keys when we can.
+
+### Frontmost-App If/unless conditions
+
+Let's set some app-specific modifications. By using a dictionary instead of a
+list or a single string, we can map the same key to have multiple functions
+depending on the frontmost app, all without having to switch layers.
+
+```yaml
+/base/:
+  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
+  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
+  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
+  <a-g>: {
+    if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
+    if CotEditor$: <g-l> # 'go to line' alternate shortcut
+      }
+
+```
+
+Above, `left_control + u` is remapped to `command + delete or backspace`
+unless (if-not) the frontmost app is either Terminal, iTerm2, or Kitty (note
+the difference in capitalization, per the bundle identifier that was shown to
+me in the Karabiner [Event-Viewer](https://karabiner-elements.pqrs.org/docs/manual/operation/eventviewer/)).
+`option + g` is remapped to typing out `git checkout` if one of the terminal
+apps is in focus, but to `command + l` if CotEditor is.
+
+Since Python can't have mutable objects (like lists) as dictionary keys, we
+need to pass a long string of space-separated sub-strings as a dictionary key,
+with either `if` or `unless` as the first 'element', followed by regex that
+matches the application's bundle identifier as a dictionary value. Read the
+Karabiner
+[documentation](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/conditions/frontmost-application/)
+on this topic. Check out [regexone.com](https://regexone.com/) if you need a
+regex brushup, but it's likely tagging the app name as it appears in the
+Event-Viewer with a `\$` should suffice.
+
+karaml will print an error message and quit before doing anything with
+your config if you try to pass anything other than `if` or `unless` as the
+first 'element' of the condition.
+
+Notice that in the last mapping, we added multiple conditions. Since it's a
+dictionary(-like object) we can add as many as we like so long as they're
+unique. 
+
+
 ### JSON extension appendix
 
 You can append slightly modified JSON in the Karabiner JSON style to this YAML

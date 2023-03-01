@@ -1,4 +1,6 @@
 import re
+import pytest
+from karaml.karaml_config import get_app_conditions_dict, get_karamlized_key
 
 from testing_assets import (
     MIN_CONFIG_SAMPLE, FULL_CONFIG_SAMPLE, AUTO_TOGGLE_CONFIG_SAMPLE,
@@ -139,3 +141,15 @@ def test_insert_toggle_off():
     assert toggle_off_rule["conditions"][0]["type"] == "variable_if"
     assert toggle_off_rule["to"][0]["set_variable"]["name"] == layer_name
     assert toggle_off_rule["to"][0]["set_variable"]["value"] == 0
+
+
+def test_get_app_conditions_dict():
+    assert get_app_conditions_dict("if firefox$ kitty$", "dummy_rhs") == {
+        "type": "frontmost_application_if",
+        "bundle_identifiers": ["firefox$", "kitty$"]
+    }
+
+    # Only valid conditionals (if or unless) should be allowed
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        get_app_conditions_dict("ifff firefox kitty", "dummy_rhs")
+    assert pytest_wrapped_e.type == SystemExit

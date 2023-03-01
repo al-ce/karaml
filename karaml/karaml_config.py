@@ -1,8 +1,10 @@
 from copy import deepcopy
 from dataclasses import dataclass
+from typing import Union
 import yaml
 
 from karaml.helpers import translate_params
+from karaml.exceptions import invalidFrontmostAppCondition
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
 
 
@@ -55,7 +57,7 @@ class KaramlConfig:
         layers_list = []
 
         for layer_name, layer_maps in yaml_data.items():
-            manipulators = self.gen_manipulators(layer_name, layer_maps)
+            manipulators = self.get_manipulators(layer_name, layer_maps)
             layer = {"description": f"{layer_name} layer",
                      "manipulators": manipulators}
             layers_list.append(layer)
@@ -66,13 +68,29 @@ class KaramlConfig:
         layers_list.reverse()
         return layers_list
 
-    def gen_manipulators(self, layer_name, layer_maps):
+    def get_manipulators(self, layer_name: str, layer_maps: dict) -> list:
         manipulators = []
-        for from_keys, to_keys in layer_maps.items():
-            user_map = UserMapping(from_keys, to_keys)
-            key_tuple = KaramlizedKey(user_map, layer_name, self.hold_flavor)
-            manipulators.append(key_tuple.make_mapping_dict())
-            manipulators = self.insert_toggle_off(key_tuple, manipulators)
+        for from_keys, rhs in layer_maps.items():
+            gkk_args = [from_keys, layer_name, self.hold_flavor]
+            if type(rhs) in [list, str]:
+                karamlized_key = get_karamlized_key(*gkk_args, rhs)
+                manipulators.append(karamlized_key.make_mapping_dict())
+                manipulators = self.insert_toggle_off(
+                    karamlized_key, manipulators)
+
+            # If this map is a dict of frontmost app based conditions
+            elif type(rhs) == dict:
+                # Append a modification for each condition
+                for frontmost_app_key, to_keys in rhs.items():
+                    karamlized_key = get_karamlized_key(*gkk_args, to_keys)
+                    frontmost_app_dict = get_app_conditions_dict(
+                        frontmost_app_key, rhs)
+                    karamlized_key.conditions["conditions"].append(
+                        frontmost_app_dict)
+
+                    manipulators.append(karamlized_key.make_mapping_dict())
+                    manipulators = self.insert_toggle_off(
+                        karamlized_key, manipulators)
 
         return manipulators
 
@@ -106,3 +124,19 @@ class KaramlConfig:
                     to_event["set_variable"]["value"] = 0
 
         return layer_off
+
+
+def get_app_conditions_dict(app_conditions: str, rhs: dict):
+    conditional, *regex = app_conditions.split(" ")
+    if conditional not in ["if", "unless"]:
+        invalidFrontmostAppCondition(conditional, rhs)
+    return {
+        "type": f"frontmost_application_{conditional}",
+        "bundle_identifiers": regex
+    }
+
+
+def get_karamlized_key(from_keys: str, layer_name: str, hold_flavor: str,
+                       rhs: Union[str, list]) -> list:
+    user_map = UserMapping(from_keys, rhs)
+    return KaramlizedKey(user_map, layer_name, hold_flavor)

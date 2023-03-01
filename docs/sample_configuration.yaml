@@ -44,7 +44,7 @@ parameters:
   <C-right_shift>: <gar-shift>    # from: right_control + right_shift
                                   # to: command + option + control + shift (hyper)
 
-  grave: [grave, <moc-left_shift] # tap for grave, hold for hyper
+  grave: [grave, <moc-left_shift>] # tap for grave, hold for hyper
 
   # enter to enter when tapped, control when held,
   # with lazy opt and mapping-specific parameters
@@ -59,10 +59,21 @@ parameters:
   j+k: escape
   <O-h>: h+e+l+l+o
   d + i + w: <o-backspace> + <o+delete>  # 'Delete Inner Word'
+  # g + h opens github on key-up, with simul threshold of 150ms
   g + h: [ null, null, open(https://github.com), [ null ], { s: 150} ]
 
+  # Adding frontmost_app_if/unless conditions
+  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
+  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
+  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
+  <a-g>: {
+    if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
+    if CotEditor$: <g-l> # 'go to line' alternate shortcut
+      }
+
+
 /nav/:
-  <(x)-h>: left               # vim navigation with any optional mods
+  <(x)-h>: left                 # vim navigation with any optional mods
   <(x)-j>: down
   <(x)-k>: up
   <(x)-l>: right
@@ -91,12 +102,17 @@ parameters:
   f: shell(open ~)
   v: shell(open -b com.apple.ScreenSaver.Engine)
 
+  # Notification changes when pressed, when released
   <o-h>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
 
-  # Change language inputs
-  <o-e>: input(en)
-  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+  # For delay opt, ints in the opt-list in the fourth position
   <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
+
+  # Change language inputs
+  # Language regex shorthand
+  <o-e>: input(en)
+  # More specific dictionary
+  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
 
 # Require multiple layers
 /sys/ + /nav/:

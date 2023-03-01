@@ -15,6 +15,7 @@ parameters:
 
 /base/:
 
+
   <(x)-caps_lock>: [escape, /nav/]  # ESC   | Nav Sublayer
   <(x)-end>: [grave, /symnum/]      # grave | SymNum Sublayer
 
@@ -47,6 +48,12 @@ parameters:
   right_control: /nav/      # tap toggle nav layer
   <o-right_shift>: sticky(left_shift, toggle)
 
+  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
+  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
+  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
+  <a-g>: { if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
+           if CotEditor$: <g-l> # 'go to line' alternate shortcut
+         }
 
 /nav/:
 

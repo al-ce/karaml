@@ -45,7 +45,6 @@ class KaramlizedKey:
         self._from: dict = self.update_from_attr(self.usr_map)
         # self._to = {}
         self.update_to()
-        self.conditions = clean_conditions_attr(self.conditions)
         self.rule_params: dict = update_params(self.usr_map)
         self.modification_type: dict = update_modification_type()
 
@@ -242,12 +241,6 @@ def to_opt_dict(opt: list) -> dict:
     if _opt and flag is not None:
         return {_opt: flag}
     return {}
-
-
-def clean_conditions_attr(conditions):
-    if not conditions.get("conditions"):
-        conditions = None
-    return conditions
 
 
 def update_params(usr_map: UserMapping):

@@ -1,4 +1,6 @@
-from karaml.karaml_config import KaramlConfig
+from karaml.karaml_config import (
+    KaramlConfig, get_app_conditions_dict, get_karamlized_key
+)
 from karaml.key_codes import ALIASES, KEY_CODE
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
 
@@ -32,13 +34,23 @@ def make_sample_KaramlizedKeys(test_config):
 
     sample_karamlized_keys = []
     for layer_name, layer_maps in sample_yaml_data.items():
-        for from_keys, to_keys in layer_maps.items():
-            user_map = UserMapping(from_keys, to_keys)
-            key_tuple = KaramlizedKey(user_map, layer_name, "to")
-            # Test the arguments are passed correctly
-            assert key_tuple.usr_map == user_map
-            assert key_tuple.layer_name == layer_name
-            sample_karamlized_keys.append(key_tuple)
+        for from_keys, rhs in layer_maps.items():
+            gkk_args = [from_keys, layer_name, "to"]
+            if type(rhs) in [list, str]:
+                karamlized_key = get_karamlized_key(*gkk_args, rhs)
+                sample_karamlized_keys.append(karamlized_key)
+
+            # If this map is a dict of frontmost app based conditions
+            elif type(rhs) == dict:
+                # Append a modification for each condition
+                for frontmost_app_key, to_keys in rhs.items():
+                    karamlized_key = get_karamlized_key(*gkk_args, to_keys)
+                    frontmost_app_dict = get_app_conditions_dict(
+                        frontmost_app_key, rhs)
+                    karamlized_key.conditions["conditions"].append(
+                        frontmost_app_dict)
+                    sample_karamlized_keys.append(karamlized_key)
+
     return sample_karamlized_keys
 
 

@@ -15,7 +15,14 @@ parameters:
 
 /base/:
 
-  # <y-8>: "8"
+  j+k: {
+      unless firefox$ kitty$: [escape, 'notify(idh, Hello!!)', 'notify(idh,)'],
+      if firefox$ kitty$: [pgdn, 'notify(idk, Goodbye!)', 'notify(idk,)']
+      }
+
+  # j+k: {
+  #       if kitty$: [escape, 'notify(idk, Hello Kitty)']
+  #      }
 
   <(x)-end>: [grave, /symnum/] # grave | SymNum Sublayer
   <(x)-caps_lock>: [escape, /nav/] # ESC | Nav Sublayer

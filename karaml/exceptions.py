@@ -27,6 +27,14 @@ def invalidConditionName(name: str):
     )
 
 
+def invalidFrontmostAppCondition(condition: str, map_rhs):
+    configError(
+        "Invalid condition for frontmost_application\n"
+        "Key must be either 'if' or 'unless'\n"
+        f"Got: {condition}\nIn:\n{map_rhs}"
+    )
+
+
 def invalidKey(key_type: str, map: str, key: str):
     key_type = "modifier" if key_type == "mod" else "key code"
     configError(f"Invalid user-defined {key_type} in map {map}: {key}")
