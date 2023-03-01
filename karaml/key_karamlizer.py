@@ -5,7 +5,9 @@ from karaml.helpers import (
     dict_eval, flag_check, is_layer, get_multi_keys, make_list,
     validate_to_opts, translate_params, validate_condition_dict, validate_layer
 )
-from karaml.key_codes import CHATTY, MODIFIERS, KEY_CODE_REF_LISTS
+from karaml.key_codes import (
+    CHATTY, MODIFIERS, KEY_CODE_REF_LISTS, PSEUDO_FUNCS
+)
 from karaml.exceptions import (
     invalidToModType, missingToMap
 )
@@ -79,7 +81,7 @@ class KaramlizedKey:
         if not to_map:
             return None
         outputs = self.keystruct_list(to_map, to_event)
-        to_event = chatter_safeguard(self.usr_map.hold, outputs, to_event)
+        to_event = chatter_safeguard(self.usr_map, outputs, to_event)
         return {to_event: outputs}
 
     def setup_layer_toggle(self, layer_name: str, to_event: str):
@@ -135,9 +137,18 @@ def get_chatty_key_type(key: dict) -> str:
             return key_type
 
 
-def chatter_safeguard(hold_map: str, key_list: list, to_event: str) -> str:
+def chatter_safeguard(usr_map: UserMapping, key_list: list, to_event: str) -> str:
+    hold_map = usr_map.hold
     if to_event != "to" or not hold_map:
         return to_event
+
+    # Pseudo funcs/special events are chatty except for notify
+    for pf in PSEUDO_FUNCS:
+        if pf == "notify":
+            continue
+        if pf in hold_map:
+            return "to_if_held_down"
+
     for key in key_list:
         key_type = get_chatty_key_type(key)
         key_code = key.get(key_type) if key_type else None

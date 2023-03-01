@@ -11,7 +11,10 @@ Alias = namedtuple("Alias", ["key_code", "modifiers"])
 alias_modifiers = ["left_shift"]
 ALIASES = {
     "enter": Alias("return_or_enter", None),
+    "CR": Alias("return_or_enter", None),
+    "ESC": Alias("escape", None),
     "backspace": Alias("delete_or_backspace", None),
+    "BS": Alias("delete_or_backspace", None),
     "delete": Alias("delete_forward", None),
     "space": Alias("spacebar", None),
     " ": Alias("spacebar", None),
@@ -370,7 +373,7 @@ POINTING_BUTTON = [
 ]
 
 
-TO_EVENTS = [
+PSEUDO_FUNCS = [
     "app",
     "input",
     "mouse",
