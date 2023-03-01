@@ -16,52 +16,55 @@ parameters:
 /base/:
 
 
-  <(x)-caps_lock>: [escape, /nav/]  # ESC   | Nav Sublayer
-  <(x)-end>: [grave, /symnum/]      # grave | SymNum Sublayer
 
-  <o-w>: <o-backspace>  # Delete Previous Word
-  <o-f>: <o-delete>     # Delete Next Word
-  <o-p>: <m-v>          # Paste
+  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
 
-  <(x)-enter>:          # Enter | Ctrl (any optional modifier) (lazy)
+  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <m-right> + enter }
+  <a-o>: { unless Terminal$ iterm2$ kitty$: <m-right> + enter }
+
+  <(x)-end>: [grave, /symnum/] # grave | SymNum Sublayer
+  <(x)-caps_lock>: [escape, /nav/] # ESC | Nav Sublayer
+
+  <o-w>: <o-backspace> # Delete Previous Word
+  <o-f>: <o-delete> # Delete Next Word
+  d + i + w: <o-backspace> + <o-delete>  # 'Delete Inner Word'
+  <o-p>: <m-v> # Paste
+
+  # Enter | Control (any mods, lazy)
+  <(x)-enter>:
     - enter
     - left_control
     - null
     - [+lazy]
-    # - { a: 100, s: 50, d: 500, h: 100 }
 
   \: [\, left_option, null, [+lazy]]
 
-  # Various hypers
+  # Various hypers when held
   backspace: [backspace, <mco-left_shift>]
   grave: [grave, <mco-left_shift>]
   quote: [quote, <mco-left_shift>]
 
-  left_shift: ["<", left_shift]
-  right_shift: [">", right_shift]
-  # left_shift: ["<s-,>", left_shift]
-  # right_shift: [<s-.>, right_shift]
+  # (see JSON extension at the bottom of this file)
+  # left_shift: ["<", left_shift]
+  # right_shift: [">", right_shift]
+
 
   h + `: shell(open ~)
 
-  right_control: /nav/      # tap toggle nav layer
+  right_control: [/nav/, right_control]      # tap toggle nav layer | r_ctrl
+
   <o-right_shift>: sticky(left_shift, toggle)
 
-  # Frontmost-app conditions
-  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
-  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
-  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
-
-                                # string() to send multiple single characters
-  <a-g>: { if Terminal$ iterm2$ kitty$: [string(git ), string(checkout )],
-           if CotEditor$: <g-l> # 'go to line' alternate shortcut 
-         }
 
 /nav/:
 
+  g:        # Home |  Git layer (waits for to_if_held_down threshold)
+    - home
+    - var(git_layer, 1) + notify(idgit,"Git Layer Enabled - <c-g> to toggle off")
+
   <o-quote>: /mouse/
 
-  # Cmd + key to Rectangle modifier (Cmd+Shift+Ctrl (ghr))
+  # Rectangle Modifiers (Ctrl+Cmd+Shift)
   # enter, j, k, h, l, x, z, v, g, d, c, t, s, p, f, r, a, w, q
   <m-enter>: [<ghr-enter>, <sm-left_control>]
   <m-j>: <ghr-j>
@@ -83,7 +86,7 @@ parameters:
   <m-w>: <ghr-w>
   <m-q>: <ghr-q>
 
-  # Vim-ish navigation with any optional modifier
+  # Vim navigation (any opt mods)
   <(x)-m>: left
   <(x)-n>: down
   <(x)-e>: up
@@ -94,43 +97,55 @@ parameters:
 
 
   u: pgup
-  d: [pgdn, /win/] # Pgdn | win(dow control) sublayer
-  g: home
+  d: [pgdn, /win/] # Pgdn | win(d)ow control sublayer
+  <o-u>: <o-pgup>
+  <o-d>: <o-pgdn>
+
   <h-g>: end
   spacebar: underscore
   x: app(Finder)
   r: app(Brave Browser)
 
 
-  # Display 'Layer Enabled' notification. Also a good case for using sequence
-  # syntax instead of array syntax
-
-  # Watch your commas!!
+  # Watch your commas!! Wrap them in quotes
   # s: [app(Safari), '/sys/ + notify(sys, System Layer Enabled)', 'notify(sys, )']
-  s:
+
+  s:  # Open Safari | Sys layer when held (does not wait for if_held_down threshold)
     - app(Safari)
     - /sys/ + notify(sysNotification,"System Layer Enabled")
     - notify(sysNotification,)
-
 
   <o-g>: open(https://github.com/al-ce)
 
   t: app(CotEditor)
   c: app(Kitty)
   f: [app(Firefox), /fn/] # Launch Firefox | functions sublayer
-  w: app(Warp)
+  w: app(WezTerm)
+
   y: app(System Preferences)
   k: app(Karabiner-Elements)
   kp-: app(Calca)
 
+/git/:
+  <c-g>: var(git_layer, 0) + notify(idgit,)  # Turn off Git layer
+
+  # Various git commands, turn off git layer after executed
+  m: string(git checkout main) + CR + var(git_layer, 0) + notify(idgit,)
+  l: string(git log) + CR + var(git_layer, 0) + notify(idgit,)
+  s: string(git status) + CR + var(git_layer, 0) + notify(idgit,)
+  S: string(git stash pop) + CR + var(git_layer, 0) + notify(idgit,)
+  a: string(git add .) + CR + var(git_layer, 0) + notify(idgit,)
+  c: string(git commit -m ")+ var(git_layer, 0) + notify(idgit,)
+  p: string(git pull) + CR + var(git_layer, 0) + notify(idgit,)
+  P: string(git push) + CR + var(git_layer, 0) + notify(idgit,)
+  <: string(cd ..) + CR
 
 /win/:
-  # BetterTouchTool Window Manipulation
+  # Move windows (BTT shortcuts)
   m: <rg-m>
   i: <rg-i>
   e: <rg-e>
   n: <rg-n>
-
   pgdn: <rg-pgdn>
   .: <rg-.>
   ",": <rg-,>
@@ -138,8 +153,6 @@ parameters:
 
 
 /mouse/:
-  spacebar: button1
-  <s-spacebar>: button2
   m: mouse(x, -2000)
   n: mouse(y, 2000)
   e: mouse(y, -2000)
@@ -153,7 +166,11 @@ parameters:
 
 /sys/:
 
+  <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
+  # <o-s>: var(sys_layer, 0)
+
   <o-e>: input(en)  # Set English input source
+                    # Set Greek input source
   <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
 
   <c-e>: <cm-[>    # Emoji Picker
@@ -164,6 +181,7 @@ parameters:
   n: volume_decrement
   m: mute
   <o-m>: [mute, null, mute] # Toggle mute when held
+  <oC-m>: [null, null, mute] # Only send mute on release/after key up
 
   k: play_or_pause
   j: rewind
@@ -222,15 +240,23 @@ parameters:
   d: "]"
   <s-d>: ">"
   <(x)-r>: "-"
-  <(x)-g>: plus
+  <(x)-g>: <s-=> # +
   <(x)-quote>: quote
-  <(x)-w>: '"'
+  <(x)-w>: <s-quote>
   <(x)-f>: "{"
   <(x)-p>: "}"
   <(x)-x>: \
   <(x)-v>: "`"
   <(x)-backspace>: backspace
 
+
+
+# If the Karaml style config is too limiting or if a rule gets too comlex to be
+# worth it, you can append slightly modified JSON in the Karabiner JSON style
+# to this YAML map. Differences:
+# - Quotes are optional, but check the YAML docs for escaping rules
+# - Instead of separating rules with commas, as you would in JSON, use the YAML
+#   sequence syntax, which is a dash followed by a space, then the rule
 
 json:
   - {

@@ -2,19 +2,16 @@
 
 
 **karaml** (**_Kara_**biner in ya**_ml_**) lets you write and maintain a
-virtual layers-based Karabiner-Elements configuration in YAML.
+virtual layers-based Karabiner-Elements configuration in YAML. It uses Python
+to translate the yaml into Karabiner-compatible JSON.
 
-It is a yaml-based implementation of the philosophy of
-[mxstbr](https://github.com/mxstbr)'s Karabiner
-[config](https://github.com/mxstbr/karabiner) and of
-[yqrashawn](https://github.com/yqrashawn/)'s
-[Goku](https://github.com/yqrashawn/GokuRakuJoudo) tool, using Python to
-translate the yaml into Karabiner-compatible JSON.
-
-Thanks to [mxstbr](https://github.com/mxstbr) and
+karaml is based on the philosophy of [mxstbr](https://github.com/mxstbr)'s
+layer-centered Karabiner [config](https://github.com/mxstbr/karabiner), and my
+thanks goes to to [mxstbr](https://github.com/mxstbr) and
 [yqrashawn](https://github.com/yqrashawn/) for the inspiration for this
-project. Immense thanks to [tekezo](https://github.com/tekezo) for this amazing
-tool (consider [sponsoring/donating](https://github.com/sponsors/tekezo)).
+project. Immense thanks to [tekezo](https://github.com/tekezo) for
+Karabiner-Elements (consider
+[sponsoring/donating](https://github.com/sponsors/tekezo)).
 
 ```yaml
 # Default layer, does not require activation
@@ -75,22 +72,23 @@ json:
 ## ✨ Features
 
 - Complex modifications on a single line of yaml
-- Map complex events (app launches, shell commands, etc.), enable layers (set
-  variables), and require conditions with shorthand syntax
-- Events for when a key is tapped, held, and released in a sequential array
-  (rather than k/v pairs)
+  variables, and require conditions with shorthand syntax
+- Events for when a key is tapped, held, and released defined by position in an
+  array (rather than k/v pairs)
 - Simple schema for requiring mandatory or optional modifiers in a pseudo-Vim
   style
 - Multiple frontmost-app conditions in a single yaml map
 - Aliases for symbols, shifted keys, and complex names (e.g.
   `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
-- 'Special event' shorthands, e.g. app launchers, shell commands, etc.
+- 'Special event' shorthands, e.g. app launchers, shell commands,
+  notifications, and more
 - Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml
   can't or doesn't plan to handle can still be in one config
 - Automatically update your `karabiner.json` or write to the complex
-  modifications folder and import manually
+  modifications folder and import with the Karabiner GUI - no need to handle
+  any files other than your `.yaml` config
 - Checks and formatting hints for your `.yaml` file - karaml will try not to
-  let you upload a config that won't create a working modification, and tell
+  let you upload a config that doesn't create a working modification, and tell
   you why (no more hunting for typos in your key codes)
 
 
@@ -118,12 +116,22 @@ expressed in karaml.
 
 
 ## ⚡️ Quickstart
+
+If you're unfamiliar with YAML, take a look at this handy
+[guide](https://learnxinyminutes.com/docs/yaml/).
+
 After [installing](#-installation), take the [sample YAML
-configuration](./docs/sample_configuration.yaml) and alter it, or follow the
-[configuration guide](/docs/config_guide.md). See one of my configurations
-[here](./docs/al-ce_config.yaml). Then follow the [usage
-instructions](#-usage) below. If you're unfamiliar with YAML, take a look at
-this handy [guide](https://learnxinyminutes.com/docs/yaml/).
+configuration](./docs/sample_configuration.yaml) and use it as a template for
+your own. The sample config has comments to explain karaml syntax.
+
+For more detailed explanations, follow the [configuration
+guide](/docs/config_guide.md) and read the [YAML
+Configuration](#️-yaml-configuration) section of this document.
+
+For a cleaner, less commented on example, see one of my configurations
+[here](./docs/al-ce_config.yaml). Follow the [usage instructions](#-usage)
+below to convert your karaml config to Karabiner-JSON with the command-line
+tool (written in Python).
 
 ## ⚙️  YAML Configuration
 
@@ -182,7 +190,8 @@ the layer will be enabled when the 'from' key is held.
 ### Modifiers
 
 To add modifiers to a primary key, follow the format `<modifiers-primary_key>`.
-Join multiple modifiers with `+` and wrap optional modifiers in parens.
+Join multiple modifiers without any separation, but wrap optional modifiers in
+parens.
 
 Whether the optional set in parens comes first or last doesn't matter, e.g.
 `<(c)os-g>` and `<os(c)-g>` are both valid. But a single set of optional
@@ -222,10 +231,13 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | karaml alias | Karabiner key_code            |
 | ------------ | ----------------------------- |
 | enter        | return_or_enter               |
+| CR           | return_or_enter               |
+| ESC          | escape                        |
 | backspace    | delete_or_backspace           |
+| BS           | delete_or_backspace           |
 | delete       | delete_forward                |
 | space        | spacebar                      |
-| ' '          | spacebar                      |
+| ' ' (space)  | spacebar                      |
 | -            | hyphen                        |
 | underscore   | hyphen + shift                |
 | \_           | hyphen + shift                |
@@ -341,12 +353,14 @@ non-conflicting keys will all work as intended.
 ```
 
 
-Or use `string()` for multiple characters. See: [string special event
-function](#strings)
+Alternatively, for sending multiple singe characters, you can use `string()`.
+See: [string special event function](#strings)
 
 ### Special Event Functions
 
-Shorthands for common-use events. Mostly wrappers around the [to.shell_command](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/shell-command/) event.
+Shorthands for common-use events. Some are just
+[to.shell_command](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/shell-command/)
+events in disguise.
 
 
 #### App Launchers
@@ -391,8 +405,10 @@ commands that we could add!
 
 #### Input Sources
 
-`input(lang_regex)` `input({"language": "regex", "input_source_id": "regex",
-"input_mode_id": "regex" })`
+```
+input(lang_regex)
+input({"language": "regex", "input_source_id": "regex", "input_mode_id": "regex" })
+```
 
 Either pass a language regex as an argument to `input()` to select the first
 available input source that matches the regex, or pass a string representing a
@@ -402,10 +418,12 @@ JSON object with all the valid Karabiner fields as specified
 ```yaml
 /sys/:
   <o-k>+e: input(en)  # Set English input source
-  <o-k>+g: 'input({
+                      # Set a Greek keyboard based on source id
+  <o-k>+g: 'input({   
             "input_source_id": "com.apple.keylayout.GreekPolytonic",
             "language": "el" 
-            })'
+            })'       # note the use of single quotes around the rhs to escape
+                      # double quotes and commas
 ```
 
 #### Mouse Movement
@@ -435,6 +453,8 @@ object matching the Karabiner specs, just like with input sources.
 #### Notifications
 
 `notify(id, message)`
+
+Shorthand for [to.set_notification_message](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/set-notification-message/)
 
 The id is the reference for updating the notification with the message on
 subsequent calls.
@@ -488,7 +508,7 @@ You can use `string()`:
 
 ```yaml
 /base/:
-  <a-g>: string(git checkout)
+  <a-g>: string(git checkout )
 ```
 
 The string must contain valid key codes or valid single-character aliases.
@@ -539,9 +559,9 @@ The dictionary's keys must be in the form of either `if regex regex ...` or
 bundle identifier of the app you want to match (read the [Karabiner
 docs](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/conditions/frontmost-application/)
 for more info). karaml will yell at you if your conditional term isn't `if` or
-  `unless`. Everything that follows that's separated by a space will be
-  interpreted by karaml as a list (yaml supports lists in keys, but Python
-  doesn't, so use a string here).
+  `unless`. Every following substring separated by a space will be interpreted
+  by karaml as a list (yaml supports lists in keys, but Python doesn't, so use
+  a string here).
 
 The dictionary's values are your usual karaml map values. Each k/v pair
 represents a new map that includes the `frontmost_app_if/unless` conditional.
@@ -667,7 +687,7 @@ complex-modifications folder.
   - karaml makes a copy of the current `karabiner.json` file and adds that copy
     to `~/.config/karabiner/automatic_backups/` as
     `karabiner.backup.TIMESTAMP.json`, every time (thirty of my ~6000 line
-    Karabiner JSON bacskups add up to ~10MB, so check in every once in a while)
+    Karabiner JSON backups add up to ~10MB, so check in every once in a while)
   - karaml then searches the `profiles` list in `karabiner.json` for a profile
     name that matches the one in your config (or generates a new one if you
     didn't specify it - add one!). If it finds a match, it will replace that
@@ -699,9 +719,10 @@ karaml was designed around toggling layers or enabling modifiers when a key is
 held down, and letting the key have some other function when tapped. I found
 that, for my typing style, a 100ms `to_if_alone_timeout_milliseconds` setting,
 mapping the 'when tapped' function to `to_if_alone` and the 'when held'
-functions to a 'to' dictionary (instead of 'to_if_held_down') provided
-immediate switching between layers or enabling of modifier keys. This means
-sending the `to` event even when `to_if_alone` is sent, but so long as the
+functions to a `to` dictionary (instead of `to_if_held_down`) provided
+immediate switching between layers or enabling of modifier keys, since the `to`
+dictionary doesn't wait for the `to_if_held_down_threshold_milliseconds` timeout. This means
+sending the `to` event even when `to_if_alone` is sent , but so long as the
 event is 'harmless', or not 'chatty', i.e. it is a layer, a modifier, or a
 notfication, and so long as we set the `lazy` opt when necessary (e.g. for my
 mapping of `enter` → `control` when held), this doesn't cause any significant
@@ -710,13 +731,15 @@ side effects.
 When a 'chatty' event would have side-effects, or when sending an event on 'if
 held down' following the relevant parameters is an explicit goal (rather than
 just a way of distinguishing a tap from a hold), karaml can handle that by
-making the distinction between 'chatty/harmless' events and otherwise.
+making the distinction between 'chatty/harmless' events and otherwise. In these
+cases, karml ***will*** place the 'when-held' event in the `to_if_held_down`
+dictionary to prevent 'chatter' caused by events in the `to` dictionary.
 
 In short, karaml is opinionated about layers and modifiers, and is designed to
 act with zero delay given that most maps can be handled by reaching another
 layer via tap-to-toggle or hold-to-enable. With this in mind, it tries to
 reduce the need to manually specify 'companion' mappings for layer toggling,
-e.g. for an 'x sets y = 1 if variable y = 0' mapping, karaml will automtaically
+e.g. for an 'x sets y = 1 if variable y = 0' mapping, karaml will automatically
 generate a 'x sets y = 0 if variable y = 1' mapping, and for 'x sets y = 1 if x
 is held down', karaml will automatically generate 'x sets y = 0 if x is
 released'.
@@ -754,7 +777,7 @@ file with your karaml config in the current folder (or the relative/absolute
 path to that file).
 
 ```bash
-karaml my_karaml_config.YAML
+karaml my_karaml_config.yaml
 ```
 
 If your karaml maps aren't mapped correctly, the program will raise an
@@ -762,7 +785,7 @@ exception and try to give you some information about what went wrong. The error
 system needs improvement - working on it!
 
 
-## CLI prompt + modes
+### CLI prompt + modes
 
 Without any optional arguments, you will be prompted to make a configuration
 choice:
@@ -784,39 +807,41 @@ didn't want to risk a bug in the program destroying your config.
 
 
 `2.` writes a json file to your karabiner complex modifications folder which
-you can will appear in the Karabiner GUI. Then you can enable or disable layers
-individually (or enable them all at once). The file is named
-`karaml_complex_mods.json` by default, but you can change this in your karaml
-config with the `title` key, (and so, easily switch between rulsets).
+you can import with the Karabiner GUI. Then you can enable or disable layers
+individually, but you should them all at once to ensure your layer and mapping
+priority is setup as intended. The file is named `karaml_complex_mods.json` by
+default, but you can change this in your karaml config with the `title` key,
+(and by doing so, you can easily switch between rulesets).
 
 
 `3.` quits the program.
 
-### -k mode
+#### -k mode
 
-By passing the `-k` flag, you will bypass the prompt and karaml will update
-your karabiner.json file directly. 
+By passing the `-k` flag, you will bypass the usual CLI prompt and karaml will
+update your karabiner.json file directly (as always, creating a backup
+beforehand).
 
 ```bash
 karaml my_karaml_config.yaml -k
 ```
 
 
-### -c mode
+#### -c mode
 
-By passing the `-c` flag, you will not be prompted and karaml will update your
-complex modifications folder directly. If you're updating an old complex rule
-set, you'll have to remove the old complex modifications and re-enable the
-updated ones, as you would normally. No backup files will be created for
-complex modifications, but you will get a confirmation prompt to confirm the
-overwrite/update. If you do not provide a `title` map in your yaml config,
-karaml will default to writing/updating the 'Karaml rules' ruleset.
+By passing the `-c` flag, you will bypass the usual CLI prompt and karaml will
+update your complex modifications folder directly. If you're updating an old
+complex rule set, you'll have to remove the old complex modifications and
+re-enable the updated ones, as you would normally. No backup files will be
+created for complex modifications, but you will get a confirmation prompt to
+confirm the overwrite/update. If you do not provide a `title` map in your yaml
+config, karaml will default to writing/updating the 'Karaml rules' ruleset.
 
 ```bash
 karaml my_karaml_config.yaml -c
 ```
 
-### -d (debug) mode
+#### -d (debug) mode
 
 If there are malformed maps in your config, by default karaml prints you an
 error message and quits. By adding the `-d` flag, you can see the full stack
@@ -824,16 +849,17 @@ trace of the error. If you're making a map that should work, either because
 it's a feature you think should be implemented or because you found a bug,
 please add the stack trace in an issue!
 
-
-## 🌱 TODO
+## 🪲 Known Issues / Bugs / Limitations
+- Can't toggle layer in 'when-tapped' position if also set in 'when-held' position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
+- `from.simultaneous_options` not yet supported (this one will be tricky)
+- `to_delayed_action` not yet supported
+## 🌱 TODOs
 
 - Protect against double maps in the same layer (accidental overwrites)
 - More condition types (`device_if`, etc.)
-- `from.simultaneous_options`
-- `to_delayed_action`
-- `halt` option for `to_if_held_down` and `to_if_alone`
+- `halt` option for `to_if_held_down` and `to_if_alone` not supported
 - More helpful configuration error messages
-- psuedo-function for typing out strings e.g. `string(git)`
+- ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
 
 
 ## 🔭 Alternatives

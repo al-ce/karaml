@@ -24,10 +24,13 @@ parameters:
 
   escape: [null, mute, mute]  # Mute on hold, unmute on release
 
-  left_shift: [(, left_shift] # Space-Cadet shifts
+  # Space-Cadet shifts
+  left_shift: [(, left_shift] # Using `(` alias for <s-9>
+  # this is a YAML sequence equivalent to YAML array - use whatever looks cleaner
   right_shift:
-    - <s-0>
+    - <s-0>                   # No alias, 'explicit' mapping
     - right_shift
+
   <o-right_shift>: sticky(left_shift, toggle)
 
   <o-s>: var(sys_layer, 1)  # left_opt + s to turn /sys/ layer on
@@ -46,7 +49,7 @@ parameters:
 
   grave: [grave, <moc-left_shift>] # tap for grave, hold for hyper
 
-  # enter to enter when tapped, control when held,
+  # enter (any modifier) to enter when tapped, control when held,
   # with lazy opt and mapping-specific parameters
   <(x)-enter>:
     - enter
@@ -57,10 +60,10 @@ parameters:
 
   # Simultaneous keys and multiple 'to' events
   j+k: escape
-  d + i + w: <o-backspace> + <o+delete>  # 'Delete Inner Word'
+  d + i + w: <o-backspace> + <o-delete>  # 'Delete Inner Word'
   # g + h opens github on key-up, with simul threshold of 150ms
   g + h: [ null, null, open(https://github.com), [ null ], { s: 150} ]
-  <O-h>: string(hello world)
+  <o-h>: string(hello world)
 
   # Adding frontmost_app_if/unless conditions
   <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }

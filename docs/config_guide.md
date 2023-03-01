@@ -1,8 +1,9 @@
 ## 📚 Guide to writing a karaml config
 
 This will guide you through creating a karaml config with minimal explanation
-of the concepts. Consider looking at the sample configuration [here](./sample_configuration.yaml) or at the
-[end of this file](#sample-karaml-configuration) first as it might be enough to get you going.
+of the concepts. Consider looking at the sample configuration
+[here](./sample_configuration.yaml) first as it might be enough to get you
+going.
 
 ### Create a blank file
 
@@ -482,7 +483,7 @@ Karabiner
 [documentation](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/conditions/frontmost-application/)
 on this topic. Check out [regexone.com](https://regexone.com/) if you need a
 regex brushup, but it's likely tagging the app name as it appears in the
-Event-Viewer with a `\$` should suffice.
+Event-Viewer with a `$` should suffice.
 
 karaml will print an error message and quit before doing anything with
 your config if you try to pass anything other than `if` or `unless` as the
@@ -505,7 +506,8 @@ map with these differences:
 This will be interpreted like a regular Karabiner modification.
 If a rule gets too complex to be worth jumping through karaml hoops or there's
 a bug that hasn't been worked out yet, I didn't want that to be the reason you
-don't try karaml!
+don't stick with karaml, so this gives you access to fully-featured
+modifications for complicated cases.
 
 ```yaml
 json:
@@ -533,6 +535,30 @@ At the top of your config, you can add some **optional** yaml maps that will
 give your config a profile name, a complex-modifications rule-set title, and
 global parameters that will apply to your profile. All these can exist in a
 config regardless of how you use it. 
+
+```yaml
+# Profile Name: If one is not provided, one will be generated from the
+# current Unix timestamp
+profile_name:
+  Karaml Config
+
+# Optional: include title for ruleset (recommended)
+title:
+  KaramlConfig
+
+parameters:
+  {
+    "basic.to_if_alone_timeout_milliseconds": 100,
+    "basic.to_if_held_down_threshold_milliseconds": 101,
+    basic.to_delayed_action_delay_milliseconds: 150,
+    "basic.simultaneous_threshold_milliseconds": 75,
+    "mouse_motion_to_scroll.speed": 100,
+  }
+
+
+/base/:
+  # ...
+```
 
 If you don't set a profile name and choose the `1. Update karabiner.json`
 option in the CLI, karaml will upload your config with a unique name using the
