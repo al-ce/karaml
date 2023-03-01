@@ -113,50 +113,52 @@ def special_to_event_check(usr_map: str) -> namedtuple:
         return KeyStruct(event, command, None)
 
 
-def notification(params_as_str: str) -> dict:
-    id, text = params_as_str.split(",")
+def notification(id_and_message: str) -> dict:
+    id, text = id_and_message.split(",")
     return {"id": id.strip(), "text": text.strip()}
 
 
-def sticky_mod(params_as_str: str) -> dict:
-    modifier, value = params_as_str.split(",")
+def sticky_mod(sticky_mod_values: str) -> dict:
+    modifier, value = sticky_mod_values.split(",")
     validate_sticky_modifier(modifier.strip())
     validate_sticky_mod_value(value.strip())
     return {modifier.strip(): value.strip()}
 
 
-def set_variable(params_as_str: str) -> dict:
+def set_variable(condition_items: str) -> dict:
     # NOTE: We accept any int, but the layer system checks for 0 or 1.
     # So, we should either set a constraint here (check for 0 or 1) or
     # allow more values in the layer system, e.g. default to 1 for /nav/
     # but maybe check for value == 2 for /nav/2 ?
 
-    name, value = map(str.strip, params_as_str.split(","))
+    name, value = map(str.strip, condition_items.split(","))
     validate_var_value(name, value)
     var_dict = {"name": name, "value": int(value)}
     return var_dict
 
 
-def input_source(params_as_str: str) -> dict:
-    if params_as_str.startswith("{") and type(eval(params_as_str)) == dict:
-        return eval(params_as_str)
+def input_source(regex_or_dict: str) -> dict:
+    if regex_or_dict.startswith("{") and regex_or_dict.endswith("}") and \
+            type(eval(regex_or_dict)) == dict:
+        return eval(regex_or_dict)
 
-    return {"language": params_as_str.strip()}
+    return {"language": regex_or_dict.strip()}
 
 
-def mouse_key(params_as_str: str) -> dict:
-    if params_as_str.startswith("{") and type(eval(params_as_str)) == dict:
-        return eval(params_as_str)
+def mouse_key(mouse_key_funcs: str) -> dict:
+    if mouse_key_funcs.startswith("{") and mouse_key_funcs.endswith("}") and \
+            type(eval(mouse_key_funcs)) == dict:
+        return eval(mouse_key_funcs)
 
-    key, value = params_as_str.split(",")
+    key, value = mouse_key_funcs.split(",")
     return {key.strip(): float(value.strip())}
 
 
-def soft_func(params_as_str: str) -> dict:
+def soft_func(softfunc_args: str) -> dict:
     # Only accept well formed dict here
-    sf_dict = eval(params_as_str)
+    sf_dict = eval(softfunc_args)
     if type(sf_dict) != dict:
-        invalidSoftFunct(params_as_str)
+        invalidSoftFunct(softfunc_args)
     return sf_dict
 
 
@@ -190,7 +192,7 @@ def translate_event(event: str, command: str) -> tuple:
     return event, command
 
 
-@dataclass
+@ dataclass
 class TranslatedMap:
     """Translates a user-defined keymap into a list of namedtuples with the
     attributes `key_type`, `key_code`, and `modifiers`."""
