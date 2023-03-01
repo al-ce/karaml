@@ -326,8 +326,8 @@ def test_from_simultaneous_dict():
     # one event
     with pytest.raises(Exception) as single_event_test:
         from_simultaneous_dict(
-            [{"key_code": "j",
-              "modifiers": {"mandatory": ['left_shift']}}])
+            [{"key_code": "j", "modifiers": {"mandatory": ['left_shift']}}]
+        )
     assert single_event_test.type == Exception
 
 

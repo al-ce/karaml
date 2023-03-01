@@ -1,6 +1,7 @@
+from itertools import chain
 import pytest
 import re
-from string import ascii_uppercase, ascii_letters
+from string import ascii_uppercase, ascii_letters, digits
 
 import karaml.map_translator as mp
 import karaml.helpers as helpers
@@ -297,17 +298,14 @@ def test_resolve_alias():
 
 def test_is_valid_keycode():
 
-    typical_cases = [
-        k for k in KEY_CODE
-    ] + [
-        f"<{m}-{k}>" for m in MODIFIERS for k in KEY_CODE
-    ]+[
-        f"<{m}({o})-j>" for m in MODIFIERS for o in MODIFIERS
-    ] + [
-        "<coms(x)-j>", "<(x)coms-j>", "<F-F>", '"', "~", "<g-~>", "escape",
-        "<s-escape>"
+    typical_cases_list = [
+        [k for k in KEY_CODE],
+        [f"<{m}-{k}>" for m in MODIFIERS for k in KEY_CODE],
+        [f"<{m}({o})-j>" for m in MODIFIERS for o in MODIFIERS],
+        ["<coms(x)-j>", "<(x)coms-j>", "<F-F>", '"', "~", "<g-~>", "escape",
+         "<s-escape>"]
     ]
-
+    typical_cases = chain.from_iterable(typical_cases_list)
     dummy_usr_map = "The usr_map param is only passed through to give info in "
     "case of an Exception"
 
@@ -348,7 +346,7 @@ def test_key_code_translator():
     ]
 
     for sample in valid_usr_maps:
-        sampleTranslated = TranslatedMap(sample).key_code_translator(sample)
+        sampleTranslated = mp.key_code_translator(sample, sample)
         assert type(sampleTranslated) == KeyStruct
 
     # Combinations (j+k) should be split up before being passed to this func
@@ -360,7 +358,7 @@ def test_key_code_translator():
 
     for sample in invalid_usr_maps:
         with pytest.raises(SystemExit) as inv_usr_map_test:
-            TranslatedMap(sample).key_code_translator(sample)
+            mp.key_code_translator(sample, sample)
         assert inv_usr_map_test.type == SystemExit
 
 
@@ -368,8 +366,8 @@ def test_queue_translations():
     simple = TranslatedMap("j")
     simul = TranslatedMap("j+k")
 
-    assert len(simple.queue_translations(simple.map)) == 1
-    assert len(simul.queue_translations(simul.map)) == 2
+    assert len(mp.queue_translations(simple.map)) == 1
+    assert len(mp.queue_translations(simul.map)) == 2
 
 
 def test_get_multi_keys():
@@ -381,3 +379,32 @@ def test_get_multi_keys():
         elif '+' in case:
             assert type(multi_keys) == list
             assert len(multi_keys) >= 2
+
+
+def test_multichar_func():
+
+    def check_keystruct_matches_char(word: str):
+        string_event = f'string({word})'
+        keystruct_list = mp.multichar_func(string_event)
+        for i, keystruct in enumerate(keystruct_list):
+            if word[i] in ALIASES.keys():
+                assert keystruct.key_code == ALIASES[word[i]].key_code
+            else:
+                assert keystruct.key_code == word[i]
+    word_lists = [
+        [c for c in ascii_letters],
+        [d for d in digits],
+        [key_code.key_code
+         for alias, key_code in ALIASES.items()
+         if len(alias) == 1]
+    ]
+    combined = list(chain.from_iterable(word_lists))
+    for char in combined:
+        check_keystruct_matches_char(char)
+
+    some_phrase = "This string should include all letters, digits, and valid "
+    "single char aliases (which means it can't include line breaks) "
+    "1234567890 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "- _ = ()[]{}\\|;:'\"`~,<.>/?!@#$%^&*"
+
+    check_keystruct_matches_char(some_phrase)

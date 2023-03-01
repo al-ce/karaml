@@ -19,13 +19,11 @@ parameters:
   <(x)-caps_lock>: [escape, /nav/]  # ESC   | Nav Sublayer
   <(x)-end>: [grave, /symnum/]      # grave | SymNum Sublayer
 
-  <so-g>: [ g + i + t + space, null, null, [-repeat] ]
-
   <o-w>: <o-backspace>  # Delete Previous Word
   <o-f>: <o-delete>     # Delete Next Word
   <o-p>: <m-v>          # Paste
 
-  <(x)-enter>:
+  <(x)-enter>:          # Enter | Ctrl (any optional modifier) (lazy)
     - enter
     - left_control
     - null
@@ -33,6 +31,7 @@ parameters:
     # - { a: 100, s: 50, d: 500, h: 100 }
 
   \: [\, left_option, null, [+lazy]]
+
   # Various hypers
   backspace: [backspace, <mco-left_shift>]
   grave: [grave, <mco-left_shift>]
@@ -48,11 +47,14 @@ parameters:
   right_control: /nav/      # tap toggle nav layer
   <o-right_shift>: sticky(left_shift, toggle)
 
+  # Frontmost-app conditions
   <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
   <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
   <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
-  <a-g>: { if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
-           if CotEditor$: <g-l> # 'go to line' alternate shortcut
+
+                                # string() to send multiple single characters
+  <a-g>: { if Terminal$ iterm2$ kitty$: [string(git ), string(checkout )],
+           if CotEditor$: <g-l> # 'go to line' alternate shortcut 
          }
 
 /nav/:
@@ -220,9 +222,9 @@ parameters:
   d: "]"
   <s-d>: ">"
   <(x)-r>: "-"
-  <(x)-g>: <s-=> # +
+  <(x)-g>: plus
   <(x)-quote>: quote
-  <(x)-w>: <s-quote>
+  <(x)-w>: '"'
   <(x)-f>: "{"
   <(x)-p>: "}"
   <(x)-x>: \

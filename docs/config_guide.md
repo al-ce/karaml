@@ -186,11 +186,23 @@ the map.
 
 ```yaml
 j+k: escape
-<O-h>: h+e+l+l+o
 d + i + w: <o-backspace> + <o+delete>  # 'Delete Inner Word'
 ```
 
 You can omit or add spaces between keys - whatever looks best to you.
+
+For multiple single characters, you could do this:
+
+```yaml
+<a-g>: [g+i+t+space, g+i+t+space+c+o+m+m+i+t+space+-+m+space+"+"+left]
+```
+
+But you can also use the `string()` function to make it look cleaner (more on
+these 'special-event pseudo-functions' later):
+
+```yaml
+<a-g>: [string(git ), string(git commit -m "") + left]
+```
 
 ### Layers
 
@@ -324,7 +336,7 @@ keys/events.
   j: mute
 ```
 
-### Special Event Shorthands
+### Special Event Shorthands / Pseudo-Functions
 
 (All credit to [mxstbr](https://github.com/mxstbr) for the idea of this design, which impelled me to start
 this project)
@@ -332,13 +344,15 @@ this project)
 Karabiner supports different types of [to events](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/), which karaml (and other Karabiner-config tools) simplifies as much as
 possible by accepting a pseudo-function shorthand in the form `func_name(args)`
 
-They're pretty straightforward. Check out the descriptions the `README.md` for
-more info [here](https://github.com/al-ce/karaml/blob/main/README.md#special-event-functions).
+They're pretty straightforward. Check out the
+[descriptions](https://github.com/al-ce/karaml/blob/main/README.md#special-event-functions)
+the `README.md` for more info.
 
 ```yaml
 /base/:
   caps_lock: [escape, /nav/]
   <o-s>: var(sys_layer, 1)
+  <a-g>: [string(git ), string(git commit -m "") + left]
 
 /nav/:
   c: app(Kitty)
@@ -462,7 +476,7 @@ apps is in focus, but to `command + l` if CotEditor is.
 
 Since Python can't have mutable objects (like lists) as dictionary keys, we
 need to pass a long string of space-separated sub-strings as a dictionary key,
-with either `if` or `unless` as the first 'element', followed by regex that
+with either `if` or `unless` as the first sub-string, followed by regex that
 matches the application's bundle identifier as a dictionary value. Read the
 Karabiner
 [documentation](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/conditions/frontmost-application/)
@@ -472,7 +486,7 @@ Event-Viewer with a `\$` should suffice.
 
 karaml will print an error message and quit before doing anything with
 your config if you try to pass anything other than `if` or `unless` as the
-first 'element' of the condition.
+first sub-string of the condition.
 
 Notice that in the last mapping, we added multiple conditions. Since it's a
 dictionary(-like object) we can add as many as we like so long as they're
@@ -536,144 +550,4 @@ them different names, so naming them is recommended!
 
 ### Sample karaml configuration
 
-Thanks for following along! Here's all the concepts from the guide put
-together.
-
-```yaml
-# Profile Name: If one is not provided, one will be generated from the
-# current Unix timestamp
-profile_name:
-  Karaml Config
-
-
-# Optional: include title for ruleset (reccomended)
-title:
-  KaramlConfig
-
-parameters:
-  {
-    "basic.to_if_alone_timeout_milliseconds": 100,
-    "basic.to_if_held_down_threshold_milliseconds": 101,
-    basic.to_delayed_action_delay_milliseconds: 150,
-    "basic.simultaneous_threshold_milliseconds": 75,
-    "mouse_motion_to_scroll.speed": 100,
-  }
-
-
-/base/:
-  caps_lock: [escape, /nav/]  # tap: escape, hold: /nav/
-  <oc-n>: /nav/               # left_opt + left_control + n toggles /nav/
-
-  escape: [null, mute, mute]  # Mute on hold, unmute on release
-
-  left_shift: [(, left_shift] # Space-Cadet shifts
-  right_shift:
-    - <s-0>
-    - right_shift
-  <o-right_shift>: sticky(left_shift, toggle)
-
-  <o-s>: var(sys_layer, 1)  # left_opt + s to turn /sys/ layer on
-
-  <o-s> + n: /sys/ + /nav/  # Toggle /sys/ and /nav/
-
-  <c-w>: <o-backspace>      # left_control + w to left_option + backspace
-  <o-q>: escape             # left_option + q to escape
-  <O-q>: <m-q>              # right_option + q to left_command + q
-  <r-h>: backspace          # control (either side) + h to backspace
-
-  <o-c>: <ms-c>             # left_option + c to left_command + left_shift + c
-
-  <C-right_shift>: <gar-shift>    # from: right_control + right_shift
-                                  # to: command + option + control + shift (hyper)
-
-  grave: [grave, <moc-left_shift] # tap for grave, hold for hyper
-
-  # enter to enter when tapped, control when held,
-  # with lazy opt and mapping-specific parameters
-  <(x)-enter>:
-    - enter
-    - left_control
-    - null
-    - [+lazy] # - [ null ] or null to omit options
-    - { a: 100, s: 50, d: 500, h: 100 }
-
-  # Simultaneous keys and multiple 'to' events
-  j+k: escape
-  <O-h>: h+e+l+l+o
-  d + i + w: <o-backspace> + <o+delete>  # 'Delete Inner Word'
-  g + h: [ null, null, open(https://github.com), [ null ], { s: 150} ]
-
-/nav/:
-  <(x)-h>: left               # vim navigation with any optional mods
-  <(x)-j>: down
-  <(x)-k>: up
-  <(x)-l>: right
-
-  # App launchers
-  c: app(Kitty)
-  f: app(Firefox)
-
-  g: open(https://github.com)   # open github.com in default browser
-
-  # Tap for Safari, hold for /sys/ layer w/ notification
-  s:
-    - app(Safari)
-    - /sys/ + notify(sysNotification,"System Layer Enabled")
-    - notify(sysNotification,)  # Disable notification on release
-
-
-  m: /mouse/                    # Toggle /mouse/ layer
-
-/sys/:
-  <o-s>: var(sys_layer, 0)      # Turn /sys/ layer off
-
-  j: volume_increment
-  k: volume_decrement
-  # Shell commands
-  f: shell(open ~)
-  v: shell(open -b com.apple.ScreenSaver.Engine)
-
-  <o-h>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
-
-  # Change language inputs
-  <o-e>: input(en)
-  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
-
-# Require multiple layers
-/sys/ + /nav/:
-  m: mute
-
-/mouse/:
-  spacebar: button1
-  <s-spacebar>: button2
-  h: mouse(x, -2000)
-  j: mouse(y, 2000)
-  k: mouse(y, -2000)
-  l: mouse(x, 2000)
-  <c-h>: mouse(horizontal_wheel, 100)
-  <c-j>: mouse(vertical_wheel, 180)
-  <c-k>: mouse(vertical_wheel, -180)
-  <c-l>: mouse(horizontal_wheel, -100)
-  s: mouse(speed_multiplier, 2.5)
-
-  <c-1>: 'softFunc("set_mouse_cursor_position": { "x": 0, "y": 0, "screen": 0 } })'
-
-
-json:
-  - {
-      description: "Right Control to > if tapped, control if held",
-      from: { key_code: right_control },
-      to: { key_code: right_control, lazy: true },
-      to_if_alone: { key_code: period, modifiers: [right_control] },
-      type: basic,
-    }
-  - {
-      "description": "Left Control to < if tapped, control if held",
-      "from": { "key_code": "left_control" },
-      "to": { "key_code": "left_control", "lazy": true },
-      "to_if_alone": { "key_code": "comma", "modifiers": ["left_control"] },
-      "type": "basic",
-    }
-
-```
-
+See a sample configuration [here](./sample_configuration.yaml)

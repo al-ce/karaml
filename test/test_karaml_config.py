@@ -1,6 +1,6 @@
 import re
 import pytest
-from karaml.karaml_config import get_app_conditions_dict, get_karamlized_key
+from karaml.karaml_config import get_app_conditions_dict
 
 from testing_assets import (
     MIN_CONFIG_SAMPLE, FULL_CONFIG_SAMPLE, AUTO_TOGGLE_CONFIG_SAMPLE,

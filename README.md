@@ -16,43 +16,6 @@ Thanks to [mxstbr](https://github.com/mxstbr) and
 project. Immense thanks to [tekezo](https://github.com/tekezo) for this amazing
 tool (consider [sponsoring/donating](https://github.com/sponsors/tekezo)).
 
-<!--toc:start-->
-- [✨ Features](#features)
-- [❓ Why this project](#why-this-project)
-  - [Why YAML?](#why-yaml)
-- [⚡️ Quickstart](#️-quickstart)
-- [⚙️  YAML Configuration](#️-yaml-configuration)
-  - [Basic Mapping and Layer Structure](#basic-mapping-and-layer-structure)
-  - [Enabling Layers](#enabling-layers)
-  - [Modifiers](#modifiers)
-  - [Key-Code Aliases](#key-code-aliases)
-  - [Special Event Functions](#special-event-functions)
-    - [App Launchers](#app-launchers)
-    - [Open Browser Link](#open-browser-link)
-    - [Shell Commands](#shell-commands)
-    - [Input Sources](#input-sources)
-    - [Mouse Movement](#mouse-movement)
-    - [Notifications](#notifications)
-    - [Sticky Modifiers](#sticky-modifiers)
-    - [Software Functions](#software-functions)
-    - [Variables](#variables)
-  - [Frontmost-App Conditions](#frontmost-app-conditions)
-  - [Global parameters](#global-parameters)
-  - [Profile Name and Complex-Modification Title](#profile-name-and-complex-modification-title)
-  - [JSON Extension Map](#json-extension-map)
-- [🐍️ Python backend for handling your files](#🐍️-python-backend-for-handling-your-files)
-- [🎨 About the Design](#🎨-about-the-design)
-- [🔩 Requirements](#🔩-requirements)
-- [📦 Installation](#📦-installation)
-- [🚀 Usage](#🚀-usage)
-- [CLI prompt + modes](#cli-prompt-modes)
-  - [-c mode](#c-mode)
-  - [-d (debug) mode](#d-debug-mode)
-- [🌱 TODO](#🌱-todo)
-- [🔭 Alternatives](#🔭-alternatives)
-<!--toc:end-->
-
-
 ```yaml
 # Default layer, does not require activation
 /base/:
@@ -73,6 +36,8 @@ tool (consider [sponsoring/donating](https://github.com/sponsors/tekezo)).
   <a-o>: <m-right> + return
   <a-O>: up + <m-right> + return
 
+  <a-h>: string(hello world) # Send multiple chars without concatenating with +
+
   # backspace/left on tap, MacOS/Kitty hints on hold/release, depending on frontmost app
   <c-h>: {
       unless Terminal$ kitty$: [backspace, 'notify(idh, My MacOS Shortcut Hints)', 'notify(idh,)'],
@@ -81,12 +46,12 @@ tool (consider [sponsoring/donating](https://github.com/sponsors/tekezo)).
 
 # condition 'nav_layer' must be true for the following maps
 /nav/:
-  <(x)-h>: left              # vim navigation with any optional mods
+  <(x)-h>: left               # vim navigation with any optional mods
   <(x)-j>: down
   <(x)-k>: up
   <(x)-l>: right
-  s: [app(Safari), /sys/]    # Launch Safari on tap, /sys/ layer when held
-  g: open(https://github.com)
+  s: [app(Safari), /sys/]     # Launch Safari on tap, /sys/ layer when held
+  g: open(https://github.com) # Open link in default browser
 
 # etc.
 /sys/:
@@ -119,6 +84,7 @@ json:
 - Multiple frontmost-app conditions in a single yaml map
 - Aliases for symbols, shifted keys, and complex names (e.g.
   `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
+- 'Special event' shorthands, e.g. app launchers, shell commands, etc.
 - Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml
   can't or doesn't plan to handle can still be in one config
 - Automatically update your `karabiner.json` or write to the complex
@@ -138,7 +104,7 @@ quotes, brackets, and commas, and repetitive conditional logic.
 and easy to adjust format in YAML. This means making some trade-offs in
 completeness of features, but I try to come close with the goal of balancing
 features and configuration simplicity. To prevent the need for maintaining
-multiple configurations and to prevent a convoluted system, karaml also
+multiple configurations if karaml falls short of your needs, karaml also
 supports an 'appendix' table for any Karabiner-compatible JSON that can't be
 expressed in karaml.
 
@@ -152,11 +118,11 @@ expressed in karaml.
 
 
 ## ⚡️ Quickstart
-After [installing](#📦-installation), take the [sample YAML
+After [installing](#-installation), take the [sample YAML
 configuration](./docs/sample_configuration.yaml) and alter it, or follow the
 [configuration guide](/docs/config_guide.md). See one of my configurations
 [here](./docs/al-ce_config.yaml). Then follow the [usage
-instructions](#🚀-usage) below. If you're unfamiliar with YAML, take a look at
+instructions](#-usage) below. If you're unfamiliar with YAML, take a look at
 this handy [guide](https://learnxinyminutes.com/docs/yaml/).
 
 ## ⚙️  YAML Configuration
@@ -192,6 +158,8 @@ sequence.
 
 As shown above, you can add as many or as few items to the array as you like.
 
+
+
 ### Enabling Layers
 
 In the 'to' part of the map, enable layers with `/layer_name/`. In the first
@@ -210,7 +178,6 @@ the layer will be enabled when the 'from' key is held.
   k: up
   l: right
 ```
-
 
 ### Modifiers
 
@@ -249,10 +216,8 @@ Examples:
 
 You can follow the explicit mapping for any key (e.g. `<s-1>` → `!`), or use
 these available aliases. Be mindful in your YAML config that some characters
-need to be escaped or wrapped in quotes to be recognied as strings.
+need to be escaped or wrapped in quotes to be recognized as strings.
 
-<details>
-<summary>Key-Code Aliases</summary>
 
 | karaml alias | Karabiner key_code            |
 | ------------ | ----------------------------- |
@@ -260,10 +225,12 @@ need to be escaped or wrapped in quotes to be recognied as strings.
 | backspace    | delete_or_backspace           |
 | delete       | delete_forward                |
 | space        | spacebar                      |
+| ' '          | spacebar                      |
 | -            | hyphen                        |
 | underscore   | hyphen + shift                |
 | \_           | hyphen + shift                |
 | =            | equal_sign                    |
+| plus         | equal_sign + shift            |
 | (            | 9 + shift                     |
 | )            | 0 + shift                     |
 | [            | open_bracket                  |
@@ -285,6 +252,14 @@ need to be escaped or wrapped in quotes to be recognied as strings.
 | >            | period + shift                |
 | /            | slash                         |
 | ?            | slash + shift                 |
+| !            | 1 + shift                     |
+| @            | 2 + shift                     |
+| #            | 3 + shift                     |
+| $            | 4 + shift                     |
+| %            | 5 + shift                     |
+| ^            | 6 + shift                     |
+| &            | 7 + shift                     |
+| *            | 8 + shift                     |
 | up           | up_arrow                      |
 | down         | down_arrow                    |
 | left         | left_arrow                    |
@@ -310,15 +285,69 @@ need to be escaped or wrapped in quotes to be recognied as strings.
 | kp0          | keypad_0                      |
 | kpnum        | keypad_num_lock               |
 
-</details>
+*MISSING ALIASES*:
+
+- `+`, since it's used to join multiple key codes and I need
+to figure out a way around that. Use `plus` in the meantime
+- `kp+` for the same reason, so use `kpplus` as an alternate
+
+
+
+### Simultaneous from-keys, multiple to-events, requiring multiple layers
+
+To get simultaneous from events or multiple to events, i.e. in Karabiner-JSON:
+```json
+  {
+    "from": {
+      "simultaneous": [
+            { "key_code": "j" },
+            { "key_code": "k" }
+        ]
+    },
+    "to": [
+          { "key_code": "h" },
+          { "key_code": "l" },
+      ],
+  }
+
+```
+Join valid key codes or aliases in any part of the YAML map with a `+`. This is
+'whitespace agnostic', so `j+k`, `j + k`, and `j+k + l` etc. are all valid.
+
+```yaml
+/base/:
+  j+k: h+l
+  <c-j>+k: [escape, '/nav/ + notify(idn, Nav Layer on!)', 'notify(idn)']
+
+```
+
+This also applies to joining layers if you want to enable two layers at once.
+Note that whichever layer comes later in the config will take priority if
+there are conflicting keys. In the following example, the `s` of the `/sys/`
+layer will take priority over the `s` of the `/fn/` layer, and the
+non-conflicting keys will all work as intended.
+
+```yaml
+/base/:
+  <a-caps_lock>: [null, /fn/ + /sys/]  
+/fn/:
+  a: f1
+  s: f2
+  d: f3
+/sys/:
+  e: volume_down
+  r: volume_up
+  s: app(System Preferences)
+```
+
+
+Or use `string()` for multiple characters. See: [string special event
+function](#strings)
 
 ### Special Event Functions
 
 Shorthands for common-use events. Mostly wrappers around the [to.shell_command](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/shell-command/) event.
 
-<details>
-
-<summary>Special Event Functions</summary>
 
 #### App Launchers
 
@@ -418,6 +447,19 @@ subsequent calls.
     - notify(sysNotification,)
 ```
 
+#### Software Functions
+
+`softFunc( {"function name": nested_dict} )`
+
+Takes a string representing a JSON object with all the valid Karabiner fields
+as specified
+[here](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/soft-function/).
+
+```yaml
+/mouse/:
+  'p+1': 'softFunc("set_mouse_cursor_position": {"x": 0, "y": 0, "screen": 0 })'
+```
+
 #### Sticky Modifiers
 
 `sticky(modifier, toggle)`
@@ -431,18 +473,35 @@ turn it off ('on | off | toggle')
   <o-right_shift>: sticky(left_shift, toggle)
 ```
 
-#### Software Functions
+#### Strings
 
-`softFunc( {"function name": nested_dict} )`
+`string(a string of valid key codes or aliases)`
 
-Takes a string representing a JSON object with all the valid Karabiner fields
-as specified
-[here](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/soft-function/).
+Instead of mapping a key to type out a string of characters using the `+` joninig method, e.g. `git
+checkout` like so:
+```yaml
+/base/:
+<a-g>: g+i+t+space+c+h+e+c+k+o+u+t
+```
+
+You can use `string()`:
 
 ```yaml
-/mouse/:
-  'p+1': 'softFunc("set_mouse_cursor_position": {"x": 0, "y": 0, "screen": 0 })'
+/base/:
+  <a-g>: string(git checkout)
 ```
+
+The string must contain valid key codes or valid single-character aliases.
+So, `[`, `?`, a blank space for `spacebar`, etc. will get interpreted
+as expected, but `spacebar`, `kp-`, `left` etc. will get interpreted as a
+string of chars, not their alias counterparts.
+
+You can use a combination if you want to send non-single character events:
+```yaml
+/base/:
+  <a-g>: string(git checkout main) + enter
+```
+
 
 #### Variables
 
@@ -460,7 +519,6 @@ function allows more granular control.
                            # toggle-off mapping. Don't get stuck in another layer!
 ```
 
-</details>
 
 ### Frontmost-App Conditions
 
@@ -672,7 +730,7 @@ YAML but with less commas and little to no quotation marks.
 
 ## 🔩 Requirements
 
-- Python >= 3.7
+- Python >= 3.10
 
 This program was written while using Karabiner-Elements 14.11.0 and MacOS
 12.5.1
@@ -696,7 +754,7 @@ file with your karaml config in the current folder (or the relative/absolute
 path to that file).
 
 ```bash
-$ karaml my_karaml_config.YAML
+karaml my_karaml_config.YAML
 ```
 
 If your karaml maps aren't mapped correctly, the program will raise an
@@ -708,12 +766,13 @@ system needs improvement - working on it!
 
 Without any optional arguments, you will be prompted to make a configuration
 choice:
-```bash
-$ karaml my_karaml_config.yaml Reading from: my_karaml_config.yaml...
+```
+$ karaml my_karaml_config.yaml 
+Reading from: my_karaml_config.yaml...
 
 1. Update karabiner.json with my_karaml_config.yaml
-2. Update complex modifications folder with my_karamlconfig_.yaml. Writes to:
-karaml_complex_mods.json
+2. Update complex modifications folder with my_karamlconfig_.yaml.
+Writes to: karaml_complex_mods.json
 3. Quit
 ```
 

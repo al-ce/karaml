@@ -15,24 +15,33 @@ parameters:
 
 /base/:
 
+  # frontmost-app conditions
   j+k: {
       unless firefox$ kitty$: [escape, 'notify(idh, Hello!!)', 'notify(idh,)'],
       if firefox$ kitty$: [pgdn, 'notify(idk, Goodbye!)', 'notify(idk,)']
       }
+  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
 
-  # j+k: {
-  #       if kitty$: [escape, 'notify(idk, Hello Kitty)']
-  #      }
+  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <m-right> + enter }
+  <a-o>: { unless Terminal$ iterm2$ kitty$: <m-right> + enter }
+  <a-g>: { if Terminal$ iterm2$ kitty$: [g+i+t+space, c+h+e+c+k+o+u+t+space]}
+
+  # send multiple (valid) chars
+  <c-s>: string(hello)
+  # including single character aliases
+  <c-0>: string({}[]<> _=-\|;:'"`~,./HELLO 1234 )
+
 
   <(x)-end>: [grave, /symnum/] # grave | SymNum Sublayer
   <(x)-caps_lock>: [escape, /nav/] # ESC | Nav Sublayer
 
-  # <o-s> + n: /sys/ + /nav/
-  # <o-s>: var(sys_layer, 1)
-  # <(x)o-l>+s: n+o+p+e
-  # <(oscm)-8>: [y+e+p, null, null, [-repeat] ]   # All optional mods go in the same set of parens
   <so-g>: [ g + i + t + space, null, null, [-repeat] ]
 
+  "!": string(exclamation point!)
+  "'": string(single quote)
+  '"': 'string(double quote and commas ",,,,,)'
+  <a-s>+!+&: 'string(1234567890 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ - _ = ()[]{}\\|;: "`~,<.>/?!@#$%^&*)'
+  <c-plus>: string(plus sign) + plus # can't alias the plus sign right now
 
 
   <o-w>: <o-backspace> # Delete Previous Word
@@ -54,8 +63,6 @@ parameters:
   # (see JSON extension at the bottom of this file)
   left_shift: ["<", left_shift]
   right_shift: [">", right_shift]
-  # left_shift: ["<s-,>", left_shift]
-  # right_shift: [<s-.>, right_shift]
 
 
   # You can add or omit spaces between concatenated keys - your choice!
@@ -63,8 +70,8 @@ parameters:
 
   right_control: /nav/      # tap toggle nav layer
 
-  # right_control: [null, /nav/]  # to: null when tapped, nav layer when held,
-  #                               #     and no keysend when tapped
+  right_command: [null, /nav/]  # to: null when tapped, nav layer when held,
+                                #     and no keysend when tapped
 
   <o-right_shift>: sticky(left_shift, toggle)
 
@@ -75,8 +82,8 @@ parameters:
 
 /nav/:
 
-  # <o-z>: /some_layer/+/some_other_layer/       # Proof of concept for multiple
-  # z: [null, /some_layer/+/some_other_layer/]   # layer toggling
+  <o-z>: /some_layer/+/some_other_layer/       # Proof of concept for multiple
+  z: [null, /some_layer/+/some_other_layer/]   # multi-layer toggling
 
   <o-quote>: /mouse/
 

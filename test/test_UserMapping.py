@@ -1,5 +1,5 @@
 from karaml.helpers import make_list
-from karaml.key_karamlizer import UserMapping, KaramlizedKey
+from karaml.key_karamlizer import UserMapping
 
 
 def make_test_maps():

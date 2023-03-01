@@ -57,20 +57,21 @@ parameters:
 
   # Simultaneous keys and multiple 'to' events
   j+k: escape
-  <O-h>: h+e+l+l+o
   d + i + w: <o-backspace> + <o+delete>  # 'Delete Inner Word'
   # g + h opens github on key-up, with simul threshold of 150ms
   g + h: [ null, null, open(https://github.com), [ null ], { s: 150} ]
+  <O-h>: string(hello world)
 
   # Adding frontmost_app_if/unless conditions
   <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
-  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
-  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
   <a-g>: {
-    if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
+    if Terminal$ iterm2$ kitty$: [string(git ), string(checkout )],
     if CotEditor$: <g-l> # 'go to line' alternate shortcut
       }
 
+  # Escaping special characters (check YAML documentation)
+  "!": {if iCal$: button2 }
+  "'": {if firefox$: home }
 
 /nav/:
   <(x)-h>: left                 # vim navigation with any optional mods
