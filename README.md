@@ -2,8 +2,9 @@
 
 
 **karaml** (**_Kara_**biner in ya**_ml_**) lets you write and maintain a
-virtual layers-based Karabiner-Elements configuration in YAML. It uses Python
-to translate the yaml into Karabiner-compatible JSON.
+virtual layers-based [Karabiner-Elements](https://karabiner-elements.pqrs.org/)
+configuration in YAML. It uses Python to translate the yaml into
+Karabiner-compatible JSON.
 
 karaml is based on the philosophy of [mxstbr](https://github.com/mxstbr)'s
 layer-centered Karabiner [config](https://github.com/mxstbr/karabiner), and my
