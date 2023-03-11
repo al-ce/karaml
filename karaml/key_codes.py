@@ -8,7 +8,7 @@ from collections import namedtuple
 Alias = namedtuple("Alias", ["key_code", "modifiers"])
 
 
-alias_modifiers = ["left_shift"]
+alias_modifiers = ["shift"]
 ALIASES = {
     "enter": Alias("return_or_enter", None),
     "CR": Alias("return_or_enter", None),
