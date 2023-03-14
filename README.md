@@ -468,6 +468,10 @@ subsequent calls.
     - notify(sysNotification,)
 ```
 
+To disable a notification, set its string to nothing, just like in
+the `karabiner.json` file. So, insert a comma after the message id but don't
+insert an actual message.
+
 #### Software Functions
 
 `softFunc( {"function name": nested_dict} )`
@@ -505,7 +509,7 @@ checkout` like so:
 <a-g>: g+i+t+space+c+h+e+c+k+o+u+t
 ```
 
-You can use `string()`:
+You can use `string()` (though the above method is valid):
 
 ```yaml
 /base/:
@@ -514,8 +518,8 @@ You can use `string()`:
 
 The string must contain valid key codes or valid single-character aliases.
 So, `[`, `?`, a blank space for `spacebar`, etc. will get interpreted
-as expected, but `spacebar`, `kp-`, `left` etc. will get interpreted as a
-string of chars, not their alias counterparts.
+as characters, and `spacebar`, `kp-`, `left` etc. will get interpreted as a
+literal string of chars, not their alias counterparts.
 
 You can use a combination if you want to send non-single character events:
 ```yaml
@@ -577,8 +581,9 @@ to the original 'from' key. Mind your regex and your capitalization!
   <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
   <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
   <a-g>: {
-    if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
-    if CotEditor$: <g-l> # 'go to line' alternate shortcut
+    # types 'git ' when tapped, 'checkout' when held if any of these apps are focused
+    if Terminal$ iterm2$ kitty$: [string(git ), string(checkout)],
+    if CotEditor$: <g-l> # 'go to line' alternate shortcut if CotEditor is focused
       }
 
 ```
@@ -637,14 +642,11 @@ quotes are optional unless needed for escaping characters, elements of the
 `json` map are separated as sequence item (a properly indented dash `-`
 followed by a space), and no commas are used to separate those items.
 
-***WARNING!***: karaml 'inspects' your regular yaml-flavored configuration for
+***WARNING!***: in the layer mappings, karaml 'inspects' your configuration for
 proper formatting - not just whether you wrote it in a syntax karaml can
 intrepret, but also whether you used valid key codes, valid modifiers, etc.
-karaml also formats the modification's dictionary for you so you don't have to
-keep track of what level of bracket nesting you're in, whether you should have
-used `[]` or `{}`, added or forgot a comma, etc. Currently, karaml doesn't
-support these 'health checks' for the JSON extension map, so karaml will just
-append whatever you put in there to the rule-set.
+Currently, karaml doesn't support these 'health checks' for the JSON extension map,
+so karaml will just append whatever you put in there to the rule-set.
 
 ```yaml
 /base/:

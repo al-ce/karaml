@@ -187,7 +187,7 @@ the map.
 
 ```yaml
 j+k: escape
-d + i + w: <o-backspace> + <o+delete>  # 'Delete Inner Word'
+d + i + w: <o-backspace> + <o-delete>  # 'Delete Inner Word'
 ```
 
 You can omit or add spaces between keys - whatever looks best to you.
@@ -195,6 +195,7 @@ You can omit or add spaces between keys - whatever looks best to you.
 For multiple single characters, you could do this:
 
 ```yaml
+# Opt+g sends keystrokes 
 <a-g>: [g+i+t+space, g+i+t+space+c+o+m+m+i+t+space+-+m+space+"+"+left]
 ```
 
@@ -255,8 +256,6 @@ ways to get around these automations.
 #### Configuring Layers
 
 Let's set some maps that will only trigger if the layer is enabled.
-For the rest of this section, I'm going to assume we use the 'enabled when
-held' method.
 
 ```yaml
 /nav/:
@@ -276,7 +275,7 @@ layer. Think of it as if all the mappings from the layer beneath are still
 active until they are overridden.
 
 Which brings us to an important point: how you order your layers (and maps
-within those layers) matters in karaml (and Karabiner).
+within those layers) matters in karaml (because it matters in Karabiner).
 Let's say you have the following configuration:
 
 ```yaml
@@ -301,13 +300,11 @@ Let's say you have the following configuration:
 arrow keys 
   - Since pressing `j+k` in the `/nav/` layer is equivalent to pressing
     `down+up`, that won't trigger `escape` - though that mapping is still
-    active since we haven't overridden it yet!
+    active since we haven't overridden it yet! But we can't activate it in the
+    `/nav/` layer since our `j` and `k` keys are remapped now.
 - If the `/nav/` AND `/sys/` layers are enabled, `j` and `k` will be volume down/up,
   overriding any mappings from layers that came before. It doesn't matter if we
   enabled `/sys/` from the base or `/nav/` layer.
-
-(This is actually a Karabiner feature, though the way we visualize it in karaml
-is inverted)
 
 
 #### Requiring/enabling multiple layers
@@ -336,6 +333,7 @@ keys/events.
   # The following keys are active only if BOTH /sys/ and /nav/ layers are active
   j: mute
 ```
+
 
 ### Special Event Shorthands / Pseudo-Functions
 
@@ -462,7 +460,7 @@ depending on the frontmost app, all without having to switch layers.
   <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
   <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
   <a-g>: {
-    if Terminal$ iterm2$ kitty$: [g+i+t, c+h+e+c+k+o+u+t],
+    if Terminal$ iterm2$ kitty$: [string(git ), string(checkout)],
     if CotEditor$: <g-l> # 'go to line' alternate shortcut
       }
 
@@ -472,11 +470,11 @@ Above, `left_control + u` is remapped to `command + delete or backspace`
 unless (if-not) the frontmost app is either Terminal, iTerm2, or Kitty (note
 the difference in capitalization, per the bundle identifier that was shown to
 me in the Karabiner [Event-Viewer](https://karabiner-elements.pqrs.org/docs/manual/operation/eventviewer/)).
-`option + g` is remapped to typing out `git checkout` if one of the terminal
-apps is in focus, but to `command + l` if CotEditor is.
+`option + g` is remapped to typing out `git ` when tapped, `checkout` when held
+if one of the terminal apps is in focus, but to `command + l` if CotEditor is in focus.
 
 Since Python can't have mutable objects (like lists) as dictionary keys, we
-need to pass a long string of space-separated sub-strings as a dictionary key,
+need to pass a long string of space-separated sub-strings as the key,
 with either `if` or `unless` as the first sub-string, followed by regex that
 matches the application's bundle identifier as a dictionary value. Read the
 Karabiner
