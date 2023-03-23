@@ -2,7 +2,7 @@
 
 
 **karaml** (**_Kara_**biner in ya**_ml_**) lets you write and maintain a
-virtual layers-based [Karabiner-Elements](https://karabiner-elements.pqrs.org/)
+virtual layers-based [Karabiner-Elements](https://karabiner-elements.pqrs.org/) keyboard customization
 configuration in YAML. It uses Python to translate the yaml into
 Karabiner-compatible JSON.
 
@@ -72,13 +72,12 @@ json:
 
 ## ✨ Features
 
-- Complex modifications on a single line of yaml
-  variables, and require conditions with shorthand syntax
+- Complex modifications on a single line of yaml so you can create and update keymaps quickly
 - Events for when a key is tapped, held, and released defined by position in an
   array (rather than k/v pairs)
 - Simple schema for requiring mandatory or optional modifiers in a pseudo-Vim
   style
-- Multiple frontmost-app conditions in a single yaml map
+- Multiple frontmost-app conditional remaps in a single yaml map
 - Aliases for symbols, shifted keys, and complex names (e.g.
   `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
 - 'Special event' shorthands, e.g. app launchers, shell commands,
@@ -90,7 +89,7 @@ json:
   any files other than your `.yaml` config
 - Checks and formatting hints for your `.yaml` file - karaml will try not to
   let you upload a config that doesn't create a working modification, and tell
-  you why (no more hunting for typos in your key codes)
+  you why (no more hunting for typos or missing/extraneous commas in a large JSON object)
 
 
 ## ❓ Why this project
