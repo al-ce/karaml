@@ -108,12 +108,12 @@ parameters:
 
 
   # Watch your commas!! Wrap them in quotes
-  # s: [app(Safari), '/sys/ + notify(sys, System Layer Enabled)', 'notify(sys, )']
+  # s: [app(Safari), '/sys/ + notify(sys, System Layer Enabled)', 'notify(sys, null )']
 
   s:  # Open Safari | Sys layer when held (does not wait for if_held_down threshold)
     - app(Safari)
     - /sys/ + notify(sysNotification,"System Layer Enabled")
-    - notify(sysNotification,)
+    - notify(sysNotification)
 
   <o-g>: open(https://github.com/al-ce)
 
@@ -127,17 +127,26 @@ parameters:
   kp-: app(Calca)
 
 /git/:
-  <c-g>: var(git_layer, 0) + notify(idgit,)  # Turn off Git layer
+
+    # Three ways to turn off a notification:
+    # - notifyOff(idgit)  # use notifyOff() with the id of the notification
+    # - notify(idgit, null)  # pass null as the second argument to notify()
+    # - notify(idgit)  # omit the second argument to notify()
+
+  # Turn off Git layer
+  <c-g>: var(git_layer, 0) + notifyOff(idgit)
+  # <c-g>: var(git_layer, 0) + notify(idgit)
+  # <c-g>: var(git_layer, 0) + notify(idgit, null)
 
   # Various git commands, turn off git layer after executed
-  m: string(git checkout main) + CR + var(git_layer, 0) + notify(idgit,)
-  l: string(git log) + CR + var(git_layer, 0) + notify(idgit,)
-  s: string(git status) + CR + var(git_layer, 0) + notify(idgit,)
-  S: string(git stash pop) + CR + var(git_layer, 0) + notify(idgit,)
-  a: string(git add .) + CR + var(git_layer, 0) + notify(idgit,)
-  c: string(git commit -m ")+ var(git_layer, 0) + notify(idgit,)
-  p: string(git pull) + CR + var(git_layer, 0) + notify(idgit,)
-  P: string(git push) + CR + var(git_layer, 0) + notify(idgit,)
+  m: string(git checkout main) + CR + var(git_layer, 0) + notify(idgit)
+  l: string(git log) + CR + var(git_layer, 0) + notify(idgit)
+  s: string(git status) + CR + var(git_layer, 0) + notify(idgit)
+  S: string(git stash pop) + CR + var(git_layer, 0) + notify(idgit)
+  a: string(git add .) + CR + var(git_layer, 0) + notify(idgit)
+  c: string(git commit -m ")+ var(git_layer, 0) + notify(idgit)
+  p: string(git pull) + CR + var(git_layer, 0) + notify(idgit)
+  P: string(git push) + CR + var(git_layer, 0) + notify(idgit)
   <: string(cd ..) + CR
 
 /win/:
@@ -169,9 +178,9 @@ parameters:
   <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
   # <o-s>: var(sys_layer, 0)
 
-  <o-e>: input(en)  # Set English input source
-                    # Set Greek input source
-  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+  # Set English / Greek input source with AppleScript style notification
+  <o-e>: shnotify(English, ==KEYBOARD==) + input(en)
+  <o-g>: 'shnotify(GreekPolytoniic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
 
   <c-e>: <cm-[>    # Emoji Picker
 
@@ -193,7 +202,7 @@ parameters:
   y: app(togglemenubar) # Show and Hide Menubar
 
   # Notification displays when held
-  <o-i>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
+  <o-i>: ["notify(idHello, Hello!)", null, "notify(idHello)"]
 
 
 

@@ -343,9 +343,9 @@ this project)
 Karabiner supports different types of [to events](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/), which karaml (and other Karabiner-config tools) simplifies as much as
 possible by accepting a pseudo-function shorthand in the form `func_name(args)`
 
-They're pretty straightforward. Check out the
-[descriptions](https://github.com/al-ce/karaml/blob/main/README.md#special-event-functions)
-the `README.md` for more info.
+Check out the [descriptions](https://github.com/al-ce/karaml/blob/main/README.md#special-event-functions)
+in the `README.md` for more info. Most are straightforward, but you might want
+to read up on `notify()`, `shnotify()`, and `var()`
 
 ```yaml
 /base/:
@@ -372,8 +372,9 @@ the `README.md` for more info.
   v: shell(open -b com.apple.ScreenSaver.Engine)
   <o-h>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
 
-  <o-e>: input(en)  
-  <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+  <o-e>: shnotify(English, ==KEYBOARD==) + input(en)
+  <o-g>: 'shnotify(GreekPolytoniic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+
 
 /mouse/:
   spacebar: button1

@@ -378,6 +378,7 @@ PSEUDO_FUNCS = [
     "input",
     "mouse",
     "notify",
+    "notifyOff",
     "open",
     "sfunc",
     "shell",

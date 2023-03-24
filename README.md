@@ -38,8 +38,10 @@ Karabiner-Elements (consider
 
   # backspace/left on tap, MacOS/Kitty hints on hold/release, depending on frontmost app
   <c-h>: {
-      unless Terminal$ kitty$: [backspace, 'notify(idh, My MacOS Shortcut Hints)', 'notify(idh,)'],
-      if Terminal$ kitty$: [left, 'notify(idk, My Kitty Shortcut Hints!)', 'notify(idk,)']
+      # Notification with Karabiner-Style popup
+      unless Terminal$ kitty$: [backspace, 'notify(idh, My MacOS Shortcut Hints)', 'notifyOff(idh)'],
+      # Notification with AppleScript popup
+      if Terminal$ kitty$: [left, 'shnotify(My Kitty Shortcuts, ==Kitty==)']
       }
 
 # condition 'nav_layer' must be true for the following maps
@@ -329,7 +331,7 @@ Join valid key codes or aliases in any part of the YAML map with a `+`. This is
 ```yaml
 /base/:
   j+k: h+l
-  <c-j>+k: [escape, '/nav/ + notify(idn, Nav Layer on!)', 'notify(idn)']
+  <c-j>+k: [escape, '/nav/ + notify(idn, Nav Layer on!)', 'notifyOff(idn)']
 
 ```
 
@@ -450,9 +452,10 @@ object matching the Karabiner specs, just like with input sources.
   s: mouse(speed_multiplier, 2.5)
 ```
 
-#### Notifications
+#### Notifications (Karabiner Style)
 
 `notify(id, message)`
+`notifyOff(id)`
 
 Shorthand for [to.set_notification_message](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/set-notification-message/)
 
@@ -464,12 +467,72 @@ subsequent calls.
   s:
     - app(System Preferences)
     - /sys/ + notify(sysNotification,"System Layer Enabled")
-    - notify(sysNotification,)
+    - notifyOff(sysNotification)
 ```
 
-To disable a notification, set its string to nothing, just like in
-the `karabiner.json` file. So, insert a comma after the message id but don't
-insert an actual message.
+There are a few ways to disable a notification. The easiest to use and remember
+is to pass the notification id as the only arg to `notifyOff()`.
+
+```yaml
+notifyOff(id)
+```
+
+Otherwise, you can pass an empty string or `null` as the message arg to `notify()`.
+
+```yaml
+notify(id, null)
+notify(id, "")
+```
+
+
+#### Notifications (AppleScript Style)
+
+`shnotify(msg, title, subtitle, sound)`
+`shnotify({"msg": "message", "title": "title", "subtitle": "subtitle", "sound": "sound"})`
+
+
+Displays a notification using AppleScript by running a shell command in the
+format:
+
+```bash
+osascript -e 'display notification "message" with title "title" subtitle "subtitle" sound name "sound"'
+```
+
+See the scriping documentation [here](https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/DisplayNotifications.html).
+
+There are two ways to pass arguments to `shnotify()`. The first is to pass
+positional arguments in the order of message, title, subtitle, and sound.
+
+```yaml
+/sys/:
+  <o-1>: shnotify(text)  # message only
+  <o-2>: shnotify(text, title)  # message and title
+  <o-3>: shnotify(text, title, subtitle)  # message, title, and subtitle
+  <o-4>: shnotify(text, title, subtitle, sound)  # message, title, subtitle, sound
+  <o-5>: shnotify(text, null, null, sound)  # message and sound only
+```
+
+The second is to pass a string representing a JSON object with all the valid
+AppleScript notification fields.
+
+```yaml
+/sys/:
+  <o-6>: 'shnotify({
+    "msg": "text",
+    "title": "title",
+    "subtitle": "subtitle",
+    "sound": "sound"
+    })'
+  # With a dict, you can omit any fields you don't want to use
+  <o-7>: 'shnotify({"msg": "text", "sound": "sound"})'
+```
+
+See the [sample configuration](#sample-configuration) for an example with
+keyboard input source switching.
+
+Sound names can be found at `/System/Library/Sounds/`
+For more advanced notifications, try [terminal-notifier](https://github.com/julienXX/terminal-notifier) or [alerter](https://github.com/vjeantet/alerter) and pass the command as a `shell()` command.
+
 
 #### Software Functions
 

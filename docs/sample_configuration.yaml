@@ -92,7 +92,11 @@ parameters:
   s:
     - app(Safari)
     - /sys/ + notify(sysNotification,"System Layer Enabled")
-    - notify(sysNotification,)  # Disable notification on release
+
+    # Three ways to disable notification:
+    - notifyOff(sysNotification)      # notifyOff() with notification id as arg
+    # - notify(sysNotification, null  # notify() with null id as first, null as  second arg
+    # - notify(sysNotification)       # notify() with notification id as first arg
 
 
   m: /mouse/                    # Toggle /mouse/ layer
@@ -107,7 +111,7 @@ parameters:
   v: shell(open -b com.apple.ScreenSaver.Engine)
 
   # Notification changes when pressed, when released
-  <o-h>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
+  <o-h>: ["notify(idHello, Hello!)", null, "notify(idHello)"]
 
   # For delay opt, ints in the opt-list in the fourth position
   <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
@@ -117,6 +121,39 @@ parameters:
   <o-e>: input(en)
   # More specific dictionary
   <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+
+
+  # Change language inputs with AppleScript style notification using shnotify()
+  # shnotify() args can be passed as positional args or as a dict
+  # 1. shnotify(message, title, subtitle, sound)
+  # 2. shnotify({ "msg": "message", "title": "title", "subtitle": "subtitle", "sound": "sound" })
+
+  # Positional args with msg and title
+  <o-e>: shnotify(English, ==KEYBOARD==) + input(en)
+  <o-g>: 'shnotify(GreekPolytonic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+
+  # Positional args with message only
+  <O-e>: 'shnotify(ABC Extended) + input({"input_source_id": "com.apple.keylayout.USExtended"})'
+
+  # If using positional args, skip arguments with 'null'
+  <o-a>:
+    'shnotify(Arabic, ==KEYBOARD==, null, glass)
+    + input({ "input_source_id": "com.apple.keylayout.Arabic-AZERTY" })'
+  # Dict as only arg
+  <O-a>: 'shnotify({
+      "msg": "Arabic",
+      "title": "==KEYBOARD==",
+      "subtitle": "AZERTY",
+      "sound": "glass"
+    })
+    + input({
+      "language": "ar",
+      "input_source_id": "com.apple.keylayout.Arabic-AZERTY"
+    })'
+
+  <o-r>: 'shnotify(Russian, null, null, frog) + input(ru)'
+  <O-r>: 'shnotify({"msg": "Russian", "sound": "frog"}) + input(ru)'
+
 
 # Require multiple layers
 /sys/ + /nav/:

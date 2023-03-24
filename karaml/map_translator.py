@@ -91,12 +91,14 @@ def translate_event(event: str, command: str) -> tuple:
             event, command = "mouse_key", mouse_key(command)
         case "notify":
             event, command = "set_notification_message", notification(command)
+        case "notifyOff":
+            event, command = "set_notification_message", notification_off(command)
         case "open":
             event, command = "shell_command", f"open {command}"
         case "shell":
             event = "shell_command"
         case "shnotify":
-            event, command = "shell_command", shell_notification(command)
+            event, command = "shell_command", shnotify(command)
         case "softFunc":
             event = "software_function"
         case "sticky":
@@ -104,11 +106,6 @@ def translate_event(event: str, command: str) -> tuple:
         case "var":
             event, command = "set_variable", set_variable(command)
     return event, command
-
-
-def shell_notification(notification: str) -> dict:
-    title, msg = map(str.strip, notification.split(","))
-    return f"osascript -e 'display notification \"{msg}\" with title \"{title}\"'"  # noqa
 
 
 def input_source(regex_or_dict: str) -> dict:
@@ -129,8 +126,75 @@ def mouse_key(mouse_key_funcs: str) -> dict:
 
 
 def notification(id_and_message: str) -> dict:
-    id, text = id_and_message.split(",")
-    return {"id": id.strip(), "text": text.strip()}
+    # id, text = id_and_message.split(",")
+    # return {"id": id.strip(), "text": text.strip()}
+    default = {"id": "", "text": ""}
+    params = list(map(str.strip, id_and_message.split(",")))
+
+    if len(params) == 1 or params[1].lower() == "null":
+        default["text"] = ""
+        default["id"] = params[0]
+    elif len(params) == 2:
+        default["id"] = params[0]
+        default["text"] = params[1]
+    return default
+
+
+def notification_off(id: str) -> dict:
+    """Alternate syntax for turning off a notification. A user might prefer
+    this to passing no msg arg or 'null' as the message arg to notify()."""
+    return {"id": id.strip(), "text": ""}
+
+
+def shnotify_dict(n_dict: dict) -> str:
+
+    cmd = f"osascript -e 'display notification \"{n_dict['msg']}\""
+
+    if n_dict.get("title"):
+        cmd += f" with title \"{n_dict['title']}\""
+    if n_dict.get("subtitle"):
+        cmd += f" subtitle \"{n_dict['subtitle']}\""
+    if n_dict.get("sound"):
+        cmd += f" sound name \"{n_dict['sound']}\""
+
+    return cmd + "'"  # close the osascript command
+
+
+def shnotify(notification: str) -> str:
+
+    try:
+        n_dict = eval(notification)
+        # User might pass a dict as a string, e.g. "shnotify('{msg: 'hello'})"
+        if type(n_dict) == dict:
+            return shnotify_dict(n_dict)
+    except (SyntaxError, NameError):
+        pass
+
+    default = {
+        "msg": "",
+        "title": "",
+        "subtitle": "",
+        "sound": "",
+    }
+
+    params = list(map(str.strip, notification.split(",")))
+
+    for i, key in enumerate(default.keys()):
+        if i < len(params) and params[i].lower() != "null":
+            default[key] = params[i]
+
+    cmd = f"osascript -e 'display notification \"{default['msg']}\""
+
+    if default["title"]:
+        cmd += f" with title \"{default['title']}\""
+
+    if default["subtitle"]:
+        cmd += f" subtitle \"{default['subtitle']}\""
+
+    if default["sound"]:
+        cmd += f" sound name \"{default['sound']}\""
+
+    return cmd + "'"  # close the osascript command
 
 
 def soft_func(softfunc_args: str) -> dict:
