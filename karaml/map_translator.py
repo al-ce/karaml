@@ -66,7 +66,7 @@ def is_layer(string: str) -> namedtuple:
 
 def special_to_event_check(usr_map: str) -> namedtuple:
     for event_alias in PSEUDO_FUNCS:
-        query = search(f"{event_alias}\\((.+)\\)", usr_map)
+        query = search(f"^{event_alias}\\((.+)\\)$", usr_map)
         if not query:
             continue
 
