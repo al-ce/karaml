@@ -4,7 +4,8 @@ from re import findall, search
 
 from karaml.helpers import (
     get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
-    validate_sticky_mod_value, validate_sticky_modifier, validate_var_value
+    validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
+    validate_shnotify_dict,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS
@@ -147,7 +148,7 @@ def notification_off(id: str) -> dict:
 
 
 def shnotify_dict(n_dict: dict) -> str:
-
+    validate_shnotify_dict(n_dict)
     cmd = f"osascript -e 'display notification \"{n_dict['msg']}\""
 
     if n_dict.get("title"):

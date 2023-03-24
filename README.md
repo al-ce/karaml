@@ -488,6 +488,7 @@ notify(id, "")
 #### Notifications (AppleScript Style)
 
 `shnotify(msg, title, subtitle, sound)`
+
 `shnotify({"msg": "message", "title": "title", "subtitle": "subtitle", "sound": "sound"})`
 
 
@@ -918,11 +919,12 @@ please add the stack trace in an issue!
 - Can't toggle layer in 'when-tapped' position if also set in 'when-held' position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
+- `halt` option for `to_if_held_down` and `to_if_alone` not yet supported
+
 ## 🌱 TODOs
 
 - Protect against double maps in the same layer (accidental overwrites)
 - More condition types (`device_if`, etc.)
-- `halt` option for `to_if_held_down` and `to_if_alone` not supported
 - More helpful configuration error messages
 - ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
 

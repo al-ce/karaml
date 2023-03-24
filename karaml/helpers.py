@@ -5,7 +5,7 @@ from karaml.exceptions import (
     invalidConditionName, invalidConditionValue, invalidFlag,
     invalidStickyModifier, invalidLayerName, invalidModifier,
     invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
-    invalidParamValues, invalidStickyModValue
+    invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
 )
 from karaml.key_codes import MODIFIERS, STICKY_MODS
 
@@ -76,6 +76,13 @@ def validate_condition_dict(condition_dict: dict):
         invalidConditionValue(name, value)
     if not search("^[a-zA-Z_]+$", name):
         invalidConditionName(name)
+
+
+def validate_shnotify_dict(notification_dict: dict):
+    valid = ["msg", "title", "subtitle", "sound"]
+    for k in notification_dict:
+        if k not in valid:
+            invalidSHNotifyDict(notification_dict, k)
 
 
 def validate_layer(string: str):

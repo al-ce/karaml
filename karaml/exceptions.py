@@ -61,6 +61,18 @@ def invalidToOpt(string: str):
         f"Valid opts: 'lazy', 'repeat', got {string[1:]}: {string}")
 
 
+def invalidSHNotifyDict(string: str, key: str):
+    configError(
+        f"Invalid key for shnotify() dict:\n  {string}\n"
+        "Valid keys include:\n"
+        "- title\n"
+        "- subtitle\n"
+        "- message\n"
+        "- sound\n\n"
+        f"Invalid key: {key}"
+    )
+
+
 def invalidModifier(string: str, mods: str):
     configError(
         f"Invalid modifier: {string}\nIn mod string: {mods}\n"
