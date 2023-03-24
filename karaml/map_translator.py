@@ -75,7 +75,6 @@ def special_to_event_check(usr_map: str) -> namedtuple:
 
 
 def translate_event(event: str, command: str) -> tuple:
-
     # We don't actually validate the command/argument for 'open()' or
     # 'shell()'_is (e.g. is it a valid link or command, etc.) & trust the user
 
@@ -83,6 +82,7 @@ def translate_event(event: str, command: str) -> tuple:
     # etc. For now, it's the user's responsibility
 
     match event:
+        # NOTE: need to update PSEUDO_FUNCS if adding new events here
         case "app":
             event, command = "shell_command", f"open -a '{command}'.app"
         case "input":
@@ -95,6 +95,8 @@ def translate_event(event: str, command: str) -> tuple:
             event, command = "shell_command", f"open {command}"
         case "shell":
             event = "shell_command"
+        case "shnotify":
+            event, command = "shell_command", shell_notification(command)
         case "softFunc":
             event = "software_function"
         case "sticky":
@@ -102,6 +104,11 @@ def translate_event(event: str, command: str) -> tuple:
         case "var":
             event, command = "set_variable", set_variable(command)
     return event, command
+
+
+def shell_notification(notification: str) -> dict:
+    title, msg = map(str.strip, notification.split(","))
+    return f"osascript -e 'display notification \"{msg}\" with title \"{title}\"'"  # noqa
 
 
 def input_source(regex_or_dict: str) -> dict:

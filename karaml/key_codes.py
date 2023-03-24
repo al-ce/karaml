@@ -381,6 +381,7 @@ PSEUDO_FUNCS = [
     "open",
     "sfunc",
     "shell",
+    "shnotify",
     "sticky",
     "var",
 ]
