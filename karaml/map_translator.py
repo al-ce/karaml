@@ -149,6 +149,8 @@ def notification_off(id: str) -> dict:
 
 def shnotify_dict(n_dict: dict) -> str:
     validate_shnotify_dict(n_dict)
+    if not n_dict.get("msg"):
+        n_dict["msg"] = ""
     cmd = f"osascript -e 'display notification \"{n_dict['msg']}\""
 
     if n_dict.get("title"):
