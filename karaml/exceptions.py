@@ -27,7 +27,7 @@ def invalidConditionName(name: str):
     )
 
 
-def invalidFrontmostAppCondition(condition: str, map_rhs):
+def invalidFrontmostAppCondition(condition: str, map_rhs: dict):
     configError(
         "Invalid condition for frontmost_application\n"
         "Key must be either 'if' or 'unless'\n"
@@ -95,7 +95,7 @@ def invalidTotalParensInMods(mod_string: str, opt_mod_matches: list):
     )
 
 
-def invalidParamKeys(param_dict: dict, key):
+def invalidParamKeys(param_dict: dict, key: str):
     configError(
         f"Invalid parameter dict: `{key}`"
         "Valid keys include:\n"
@@ -111,7 +111,7 @@ def invalidParamKeys(param_dict: dict, key):
     )
 
 
-def invalidParamValues(param_dict: dict, value):
+def invalidParamValues(param_dict: dict, value: int):
     configError(
         "Invalid parameter dict. All values must be integers.\n"
         "From the param dict:\n"

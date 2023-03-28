@@ -2,9 +2,10 @@ from datetime import datetime
 from json import dumps, loads
 from pathlib import Path
 from shutil import copyfile
+from karaml.karaml_config import KaramlConfig
 
 
-def backup_karabiner_json(karabiner_path):
+def backup_karabiner_json(karabiner_path: Path) -> bool:
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     backup_dir = karabiner_path / "automatic_backups"
     backup_dir.mkdir(parents=True, exist_ok=True)
@@ -29,15 +30,15 @@ def basic_rules_dict(karaml_config) -> dict:
             "rules": karaml_config.layers}
 
 
-def match_profile_name(profiles: dict, profile_name: str):
+def match_profile_name(profiles: dict, profile_name: str) -> dict:
     for profile in profiles:
         if profile["name"] != profile_name:
             continue
         return profile
-    return None
+    return {}
 
 
-def new_profile_dict(karaml_config, profile_name: str):
+def new_profile_dict(karaml_config, profile_name: str) -> dict:
     with open("profile_template.json", "r") as f:
         profile_template = f.read()
 
@@ -47,7 +48,7 @@ def new_profile_dict(karaml_config, profile_name: str):
     return template
 
 
-def set_profile_name(karaml_config):
+def set_profile_name(karaml_config: KaramlConfig) -> tuple[str, bool]:
     profile_name = karaml_config.profile_name
     # To avoid accidental overwrite of previous profile, we use the current
     # time as as a unique identifier if no profile name is provided
@@ -62,7 +63,7 @@ def set_profile_name(karaml_config):
     return profile_name, is_set
 
 
-def update_complex_mods(profile_dict: dict, karaml_config):
+def update_complex_mods(profile_dict: dict, karaml_config) -> dict:
     karaml_dict = basic_rules_dict(karaml_config)
     complex_mods = profile_dict["complex_modifications"]
     complex_mods.update(karaml_dict)
@@ -71,7 +72,7 @@ def update_complex_mods(profile_dict: dict, karaml_config):
     return profile_dict
 
 
-def update_karabiner_json(karaml_config):
+def update_karabiner_json(karaml_config: KaramlConfig):
 
     print("\nUpdating karabiner.json...\n")
 

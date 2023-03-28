@@ -62,8 +62,8 @@ def test_get_params():
 
 
 def test_get_json_rules_list():
-    min_json = MIN_CONFIG_SAMPLE.json
-    full_json = FULL_CONFIG_SAMPLE.json
+    min_json = MIN_CONFIG_SAMPLE.json_rules_list
+    full_json = FULL_CONFIG_SAMPLE.json_rules_list
 
     assert not min_json
     assert type(full_json) == list

@@ -10,15 +10,15 @@ from karaml.exceptions import (
 from karaml.key_codes import MODIFIERS, STICKY_MODS
 
 
-def dict_eval(string: str):
+def dict_eval(string: str) -> dict:
     try:
         ast_dict = ast.literal_eval(string)
         return eval(string) if isinstance(ast_dict, dict) else None
     except (ValueError, SyntaxError):
-        return False
+        return ""
 
 
-def flag_check(string: str):
+def flag_check(string: str) -> bool:
     flags = {"+": True, "-": False}
     if (flag := string[0]) in flags:
         return flags[flag]
@@ -30,11 +30,11 @@ def get_multi_keys(string: str) -> list:
         return [s.strip() for s in string.split("+")]
 
 
-def is_layer(string: str):
+def is_layer(string: str) -> bool:
     return search("^/(\\w+)/$", string)
 
 
-def is_dict(obj):
+def is_dict(obj) -> bool:
     return isinstance(obj, dict)
 
 
@@ -67,7 +67,7 @@ def translate_params(params: dict) -> dict:
             invalidParamKeys(params, k)
         if type(v) != int:
             invalidParamValues(params, v)
-    return {"parameters": translated} if translated else None
+    return {"parameters": translated} if translated else {}
 
 
 def validate_condition_dict(condition_dict: dict):
@@ -85,11 +85,11 @@ def validate_shnotify_dict(notification_dict: dict):
             invalidSHNotifyDict(notification_dict, k)
 
 
-def validate_layer(string: str):
+def validate_layer(string: str) -> str:
     return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
 
 
-def validate_mod_aliases(mods: str):
+def validate_mod_aliases(mods: str) -> str:
     mods = mods.replace("(", "").replace(")", "")
     for char in mods:
         if char not in MODIFIERS.keys():

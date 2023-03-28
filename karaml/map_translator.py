@@ -47,7 +47,7 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
     invalidKey("key code", usr_map, usr_key)
 
 
-def multichar_func(usr_key: str):
+def multichar_func(usr_key: str) -> list:
     """If a user mapping matches the regex 'string\\((.*)\\)', e.g.
     string(hello), return a list of KeyStructs with each character in parens as
     its key_code, given that all chars are valid key_codes or aliases."""
@@ -297,7 +297,7 @@ def resolve_alias(
     return KeyStruct("key_code", alias_key, updated_usr_mods_dict)
 
 
-def update_alias_modifiers(modifiers_dict: dict, alias_mods: list):
+def update_alias_modifiers(modifiers_dict: dict, alias_mods: list) -> dict:
     if not alias_mods:
         return modifiers_dict
     elif not modifiers_dict:

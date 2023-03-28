@@ -288,7 +288,7 @@ def test_resolve_alias():
 
         if aliased_map in shift_requiring_aliases:
             assert valid_alias.modifiers == {
-                "mandatory": ["left_control", "left_shift"],
+                "mandatory": ["left_control", "shift"],
                 "optional": ["fn"]
             }
             pass
