@@ -21,20 +21,27 @@ class KaramlConfig:
         self.json = self.get_json_rules_list(self.yaml_data)
         self.layers = self.gen_layers(self.yaml_data)
 
-    def load_karaml_config(self, from_file):
+        self.config_stats()
         with open(from_file) as f:
             yaml_data = yaml.safe_load(f)
         return yaml_data
 
-    def config_stats(self):
+    def config_stats(self) -> dict:
+        """
+        Prints a summary of the loaded layers and rules in the config file
+        to stdout. Layers are determined by the number of top-level keys
+        in the config that match the pattern /layer_name/ (e.g. /layer1/).
+        All other top-level keys are ignored.
+        """
+
         rule_count = 0
         for layer_name, layer_maps in self.yaml_data.items():
-            # account for multiple layer conditions (e.g. /layer1/ + /layer2/)
+            # Account for multiple layer conditions (e.g. /layer1/ + /layer2/)
             if layer_name.startswith("/") and layer_name.endswith("/"):
                 rule_count += len(layer_maps)
         total_layers = len(self.layers)
         print(f"Loaded {rule_count} rules in {len(self.layers)} layers "
-              "from {self.from_file}\n")
+              f"from {self.from_file}\n")
         return {"total_rules": rule_count, "total_layers": total_layers}
 
     def get_profile_name(self, d: dict):
