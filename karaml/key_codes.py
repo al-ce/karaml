@@ -10,6 +10,9 @@ Alias = namedtuple("Alias", ["key_code", "modifiers"])
 
 alias_modifiers = ["shift"]
 ALIASES = {
+    "hyper": Alias("right_shift", ["right_command", "right_control", "right_option"]),
+    "ultra": Alias("right_shift", ["right_command", "right_control", "right_option", "fn"]),
+    "super": Alias("right_shift", ["right_command", "right_control"]),
     "enter": Alias("return_or_enter", None),
     "cr": Alias("return_or_enter", None),
     "CR": Alias("return_or_enter", None),

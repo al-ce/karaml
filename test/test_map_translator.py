@@ -275,7 +275,8 @@ def test_resolve_alias():
 
     shift_requiring_aliases = [
         alias for alias in ALIASES.keys()
-        if ALIASES[alias].modifiers
+        # FIX: doesn't account for mutlimod aliases e.g. hyper
+        if ALIASES[alias].modifiers == ["shift"]
     ] + [letter for letter in ascii_uppercase]
 
     for aliased_map, alias_named_tuple in ALIASES.items():

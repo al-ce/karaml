@@ -299,7 +299,20 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | kp0          | keypad_0                      |
 | kpnum        | keypad_num_lock               |
 
-*MISSING ALIASES*:
+#### Mutli-Modifier aliases:
+
+| karaml alias | Karabiner key_code            |
+| ------------ | ----------------------------- |
+| hyper        | right_shift + right_option + right_command + right_control |
+| ultra        | right_shift + right_option + right_command + right_control + fn |
+| super        | right_shift + right_command + right_control |
+
+
+Feel free to suggest other aliases/better names. In the future, I would like to
+add a way to define your own aliases in the config file.
+
+
+#### *MISSING ALIASES*:
 
 - `+`, since it's used to join multiple key codes and I need
 to figure out a way around that. Use `plus` in the meantime
@@ -917,6 +930,13 @@ please add the stack trace in an issue!
 
 ## 🪲 Known Issues / Bugs / Limitations
 - Can't toggle layer in 'when-tapped' position if also set in 'when-held' position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
+- "side-ambivalent" modifier codes like `shift`, `command`, etc. are valid as
+  modifiers, as expected. They are not valid as *primary* key codes however
+  (that would be like trying to map both shift keys at once). karaml doesn't
+  raise an error if a user tries to use them as such, though it should, since
+  it will be an invalid Karabiner map. Need to decide how to handle this.
+  See issues.
+
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
 - `halt` option for `to_if_held_down` and `to_if_alone` not yet supported
@@ -926,6 +946,8 @@ please add the stack trace in an issue!
 - Protect against double maps in the same layer (accidental overwrites)
 - More condition types (`device_if`, etc.)
 - More helpful configuration error messages
+- Define your own aliases
+- Define your own functions
 - ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
 
 

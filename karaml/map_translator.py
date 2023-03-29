@@ -48,9 +48,11 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
 
 
 def multichar_func(usr_key: str) -> list:
-    """If a user mapping matches the regex 'string\\((.*)\\)', e.g.
+    """
+    If a user mapping matches the regex 'string\\((.*)\\)', e.g.
     string(hello), return a list of KeyStructs with each character in parens as
-    its key_code, given that all chars are valid key_codes or aliases."""
+    its key_code, given that all chars are valid key_codes or aliases.
+    """
 
     multichar = search("string\\((.*)\\)", usr_key)
     if not multichar:
