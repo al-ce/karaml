@@ -6,9 +6,17 @@ from karaml.karaml_config import KaramlConfig
 
 
 def backup_karabiner_json(karabiner_path: Path) -> bool:
+    """
+    Backs up karabiner.json to automatic_backups folder.
+    Returns True if backup was successful, False otherwise.
+    """
+
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     backup_dir = karabiner_path / "automatic_backups"
     backup_dir.mkdir(parents=True, exist_ok=True)
+    backup_dir_size = get_backup_folder_size(backup_dir)
+    report_backup_folder_size(backup_dir, backup_dir_size)
+
     karabiner_json = karabiner_path / "karabiner.json"
     backup_file = backup_dir / f"karabiner.backup.{current_time}.json"
     try:
@@ -25,12 +33,38 @@ def backup_karabiner_json(karabiner_path: Path) -> bool:
         return False
 
 
+def get_backup_folder_size(backup_dir: Path) -> int:
+    """
+    Returns the size of the backup folder in bytes.
+    """
+    size = 0
+    for file in backup_dir.iterdir():
+        if file.is_file():
+            size += file.stat().st_size
+    return size
+
+
+def report_backup_folder_size(backup_dir: Path, size: int):
+    """
+    Reports the size of the backup folder in MB. Warns the user if the
+    size is over 100 MB.
+    """
+    if size > 100000000:
+        print("WARNING! Backup folder size is over 100 MB.")
+    rounded_size = round(size / 1000000, 2)
+    print(f"Backup folder size: {rounded_size} MB\n")
+
+
 def basic_rules_dict(karaml_config) -> dict:
     return {"title": karaml_config.title,
             "rules": karaml_config.layers}
 
 
 def match_profile_name(profiles: dict, profile_name: str) -> dict:
+    """
+    Returns the profile with the specified name if it exists in the list of
+    Karabiner-Elements profiles. Otherwise, returns an empty dict.
+    """
     for profile in profiles:
         if profile["name"] != profile_name:
             continue
@@ -73,18 +107,27 @@ def update_complex_mods(profile_dict: dict, karaml_config) -> dict:
 
 
 def update_karabiner_json(karaml_config: KaramlConfig):
+    """
+    Updates karabiner.json with the karaml config. If no profile name is
+    specified, a new profile is created with the current time as a unique
+    identifier. If a profile name is specified, the profile with that name
+    is updated. If no profile with that name is found, a new profile is
+    created with the specified name.
+    """
 
     print("\nUpdating karabiner.json...\n")
 
     karabiner_path = Path("~/.config/karabiner").expanduser()
     if not backup_karabiner_json(karabiner_path):
         return
+
     with open(karabiner_path / "karabiner.json", "r") as f:
         karabiner_config = f.read()
     karabiner_dict = loads(karabiner_config)
     profiles = karabiner_dict["profiles"]
     profile_name, is_set = set_profile_name(karaml_config)
     found_profile = match_profile_name(profiles, profile_name)
+
     if is_set and found_profile:
         update_complex_mods(found_profile, karaml_config)
         update_detail = ""
@@ -102,6 +145,10 @@ def update_karabiner_json(karaml_config: KaramlConfig):
 
 
 def write_complex_mods_json(karaml_config, to_file: str):
+    """
+    Writes the karaml config to a complex modifications json file. This
+    file can be imported into Karabiner-Elements using the GUI.
+    """
     if not to_file or not karaml_config:
         print("No destination file or karaml config provided. Aborting.")
         return
