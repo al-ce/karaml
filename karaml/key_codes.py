@@ -69,6 +69,7 @@ ALIASES = {
     "pgup": Alias("page_up", None),
     "pgdn": Alias("page_down", None),
     "kp-": Alias("keypad_hyphen", None),
+    "kpminus": Alias("keypad_hyphen", None),
     "kpplus": Alias("keypad_plus", None),
     "kp*": Alias("keypad_asterisk", None),
     "kp/": Alias("keypad_slash", None),
