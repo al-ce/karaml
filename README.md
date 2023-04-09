@@ -937,7 +937,7 @@ please add the stack trace in an issue!
 
 ## 🌱 TODOs
 
-- Protect against double maps in the same layer (accidental overwrites)
+- ~~Protect against double maps in the same layer (accidental overwrites)~~ user will be warned but not prohibited, see [5a66a39](https://github.com/al-ce/karaml/commit/5a66a39a75271cf27a88bf20f01df690b0688c12)
 - More condition types (`device_if`, etc.)
 - More helpful configuration error messages
 - Define your own aliases
