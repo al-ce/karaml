@@ -930,16 +930,10 @@ please add the stack trace in an issue!
 
 ## 🪲 Known Issues / Bugs / Limitations
 - Can't toggle layer in 'when-tapped' position if also set in 'when-held' position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
-- "side-ambivalent" modifier codes like `shift`, `command`, etc. are valid as
-  modifiers, as expected. They are not valid as *primary* key codes however
-  (that would be like trying to map both shift keys at once). karaml doesn't
-  raise an error if a user tries to use them as such, though it should, since
-  it will be an invalid Karabiner map. Need to decide how to handle this.
-  See issues.
-
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
 - `halt` option for `to_if_held_down` and `to_if_alone` not yet supported
+- Can't add multiple shell-based pseudo-funcs in one mapping (see this [issue](https://github.com/al-ce/karaml/issues/3))
 
 ## 🌱 TODOs
 
