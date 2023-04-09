@@ -3,9 +3,19 @@ from dataclasses import dataclass
 from typing import Union
 import yaml
 
-from karaml.helpers import translate_params
+from karaml.helpers import translate_params, UniqueKeyLoader
 from karaml.exceptions import invalidFrontmostAppCondition
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
+
+
+def extract_keys(mapping_node):
+    print("Value:")
+    if not isinstance(mapping_node, yaml.nodes.MappingNode):
+        print("    ", mapping_node.value)
+        return mapping_node
+    for key_node, _ in mapping_node.value:
+        key = key_node.value
+        print("    ", key)
 
 
 @dataclass
@@ -29,7 +39,7 @@ class KaramlConfig:
         by the PyYAML library.
         """
         with open(from_file) as f:
-            yaml_data: dict = yaml.safe_load(f)
+            yaml_data: dict = yaml.load(f, Loader=UniqueKeyLoader)
         return yaml_data
 
     def config_stats(self) -> dict:

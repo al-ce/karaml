@@ -1,4 +1,6 @@
 import ast
+import yaml
+from yaml import SafeLoader
 from re import search
 
 from karaml.exceptions import (
@@ -8,6 +10,80 @@ from karaml.exceptions import (
     invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
 )
 from karaml.key_codes import MODIFIERS, STICKY_MODS
+
+
+def extract_yaml_node_value(mapping_node):
+    """
+    Gets the value of a YAML node representing either a single complex
+    modification or a layer of complex modifications. This is used to
+    print the key or layer that is being overwritten when a duplicate YAML key
+    is found in the YAML file.
+    If the node is a single complex modification, the value is the
+    'to' event/s of the complex modification.
+    If the node is a layer, the value is the list of all the 'from' events
+    of the complex modifications in the layer.
+    """
+    print("Value:")
+    if not isinstance(mapping_node, yaml.nodes.MappingNode):
+        print("    ", mapping_node.value)
+        return mapping_node
+    for key_node, _ in mapping_node.value:
+        key = key_node.value
+        print("    ", key)
+
+
+class UniqueKeyLoader(SafeLoader):
+    """
+    This class inherits from the SafeLoader class of the PyYAML library.
+    It overrides the compose_mapping_node method to check for duplicate
+    keys in the YAML file.
+    """
+
+    def check_duplicate_keys(self, node):
+        """
+        Checks for duplicate keys in the YAML file. If a duplicate key is
+        found, the key and the value of the key are printed to the console, and
+        the warn_duplicate_key function is called to confirm that the user
+        wants to overwrite the key.
+        """
+        keys = set()
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=False)
+            if key in keys:
+                print(f"Duplicate key found in YAML\n{key_node.start_mark}")
+                print(f"\nKey: {key}")
+                value_node = extract_yaml_node_value(value_node)
+                warn_duplicate_key()
+            keys.add(key)
+
+    def compose_mapping_node(self, anchor):
+        """
+        Overloads the compose_mapping_node method of the SafeLoader class to
+        check for duplicate keys in the YAML file.
+        """
+        node = super().compose_mapping_node(anchor)
+        self.check_duplicate_keys(node)
+        return node
+
+
+def warn_duplicate_key():
+    """
+    Confirms that the user wants to overwrite a key that is already
+    defined in the map. This is to prevent accidental overwrites.
+    Continue to overwrite the key if the user confirms, else exit.
+    """
+    continue_check = input("""
+This is a duplicate key in the same layer or a duplicate layer name.
+This will overwrite the previous key or layer.
+
+Do you want to continue? (y/n): """).lower()
+
+    while continue_check not in ["y", "n"]:
+        continue_check = input("Please enter 'y' or 'n': ").lower()
+    if continue_check == "n":
+        print("Exiting...")
+        exit()
+    print()
 
 
 def dict_eval(string: str) -> dict:
