@@ -74,17 +74,28 @@ def combine_shell_commands(keystruct: KeyStruct, shell_cmd: str) -> str:
 
 
 def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
-    # usr_key and usr_map are the same unless it is a simul key mapping, e.g.
-    # for 'j+k', usr_map is `j+k' and usr_key are 'j' or 'k' on separate calls
-    # usr_map is passed for configError printing purposes
+    """
+    Given a user mapping, return a KeyStruct with the key_type, key_code, and
+    modifiers for the mapping.
+    A KeyStruct represents a single event, like a key press, a psuedo function,
+    i.e one of the wrappers karaml provieds for common commands like executing
+    a shell command, opening an app, etc., or a layer change, which is
+    equivalent to setting a variable in Karabiner-Elements.
+    If the mapping does not match any of these, then it is an invalid key code
+    and an exception is raised.
 
-    if layer := is_layer(usr_key):
+    usr_key and usr_map are the same unless usr_key is a simul key mapping,
+    e.g. for 'j+k', usr_map is `j+k' and usr_key are 'j' or 'k' on separate
+    calls usr_map is passed for configError printing purposes
+    """
+
+    if layer := translate_if_layer(usr_key):
         return layer
 
-    if to_event := special_to_event_check(usr_key):
+    if to_event := translate_if_pseudo_func(usr_key):
         return to_event
 
-    if keystruct := is_valid_keycode(usr_key, usr_map):
+    if keystruct := translate_if_valid_keycode(usr_key, usr_map):
         return keystruct
 
     invalidKey("key code", usr_map, usr_key)
@@ -100,29 +111,49 @@ def multichar_func(usr_key: str) -> list:
     multichar = search("string\\((.*)\\)", usr_key)
     if not multichar:
         return
-    return [is_valid_keycode(char, usr_key) for char in multichar.group(1)]
+    return [
+        translate_if_valid_keycode(char, usr_key)
+        for char in multichar.group(1)
+    ]
 
 
-def is_layer(string: str) -> namedtuple:
+def translate_if_layer(string: str) -> namedtuple:
+    """
+    Return a KeyStruct with the key_type 'layer' and the layer name as the
+    key_code if the string matches the regex '^/(\\w+)/$', e.g. '/layer1/'.
+    Otherwise, return None.
+    """
     layer = search("^/(\\w+)/$", string)
     if not layer:
         return
     return KeyStruct("layer", layer.group(1), None)
 
 
-def special_to_event_check(usr_map: str) -> namedtuple:
+def translate_if_pseudo_func(usr_map: str) -> KeyStruct:
+    """
+    Return a KeyStruct with the key_type and key_code for a pseudo function
+    if the user mapping matches the regex for a pseudo function, e.g.
+    'shell(open .)' or 'app(Terminal)'. Otherwise, return None.
+    """
     for event_alias in PSEUDO_FUNCS:
         query = search(f"^{event_alias}\\((.+)\\)$", usr_map)
         if not query:
             continue
 
-        event, command = translate_event(event_alias, query.group(1))
+        event, command = translate_pseudo_func(event_alias, query.group(1))
         return KeyStruct(event, command, None)
 
 
-def translate_event(event: str, cmd: str) -> tuple:
-    # We don't actually validate the command/argument for 'open()' or
-    # 'shell()'_is (e.g. is it a valid link or command, etc.) & trust the user
+def translate_pseudo_func(event: str, cmd: str) -> tuple[str, str]:
+    """
+    Takes a pseudo function event and command and returns a tuple with the
+    event and command strings that will be used to create a KeyStruct.
+    e.g. 'shell(open .)' -> ('shell_command', 'open .') for the KeyStruct
+
+    KeyStruct('shell_command', 'open .', None)
+    """
+    # We don't actually check if the command/argument for 'open()' or
+    # 'shell()' are valid links, commands, etc.) & trust the user
 
     # TODO: add validation for select_input_source, mouse_key, soft_func,
     # etc. For now, it's the user's responsibility
@@ -155,6 +186,17 @@ def translate_event(event: str, cmd: str) -> tuple:
 
 
 def input_source(regex_or_dict: str) -> dict:
+    """
+    Returns a dictionary for the select_input_source event.
+    If the user mapping is a dictionary, tranform the string into a dictionary,
+    return the dictionary and trust that the user passed a valid dictionary for
+    this event.
+    If the user mapping is a string, e.g. 'English', return a dictionary with
+    the key 'language' and the value of the string, e.g.
+    {'language': 'English'}. The former is appropriate for complex mappings,
+    e.g. where a distinction between polytonic and monotonic Greek is needed,
+    the latter for simple switching between languages.
+    """
     if regex_or_dict.startswith("{") and regex_or_dict.endswith("}") and \
             type(eval(regex_or_dict)) == dict:
         return eval(regex_or_dict)
@@ -163,6 +205,14 @@ def input_source(regex_or_dict: str) -> dict:
 
 
 def mouse_key(mouse_key_funcs: str) -> dict:
+    """
+    Returns a dictionary for the mouse_key event.
+    If the user mapping is a dictionary, tranform the string into a dictionary,
+    return the dictionary and trust that the user passed a valid dictionary for
+    this event.
+    If the user mapping is a string, e.g. 'x, 200', return a dictionary with
+    the key 'x' and the value of the string, e.g. {'x': 200}.
+    """
     if mouse_key_funcs.startswith("{") and mouse_key_funcs.endswith("}") and \
             type(eval(mouse_key_funcs)) == dict:
         return eval(mouse_key_funcs)
@@ -272,7 +322,7 @@ def set_variable(condition_items: str) -> dict:
     return var_dict
 
 
-def is_valid_keycode(usr_key: str, usr_map: str) -> KeyStruct:
+def translate_if_valid_keycode(usr_key: str, usr_map: str) -> KeyStruct:
     for ref_list in KEY_CODE_REF_LISTS:
         key_code_type, ref = ref_list.key_type, ref_list.ref
         primary_key, modifiers = parse_primary_key_and_mods(usr_key, usr_map)
