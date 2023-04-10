@@ -933,7 +933,7 @@ please add the stack trace in an issue!
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
 - `halt` option for `to_if_held_down` and `to_if_alone` not yet supported
-- Can't add multiple shell-based pseudo-funcs in one mapping (see this [issue](https://github.com/al-ce/karaml/issues/3))
+- ~~Can't add multiple shell-based pseudo-funcs in one mapping (see this [issue](https://github.com/al-ce/karaml/issues/3))~~
 
 ## 🌱 TODOs
 
