@@ -323,7 +323,8 @@ def test_is_valid_keycode():
 
     poninting_button_cases = ["button1", "<c-button1>", "<coms(x)-button1>"]
     for usr_key in poninting_button_cases:
-        valid_pointing_button = mp.translate_if_valid_keycode(usr_key, dummy_usr_map)
+        valid_pointing_button = mp.translate_if_valid_keycode(
+            usr_key, dummy_usr_map)
         assert type(valid_pointing_button) == KeyStruct
         assert valid_pointing_button.key_code == "button1"
         assert valid_pointing_button.key_type == "pointing_button"
@@ -333,7 +334,8 @@ def test_is_valid_keycode():
                           "<coms(x)-al_terminal_lock_or_screensaver>"]
 
     for usr_key in consumer_key_cases:
-        valid_consumer_key = mp.translate_if_valid_keycode(usr_key, dummy_usr_map)
+        valid_consumer_key = mp.translate_if_valid_keycode(
+            usr_key, dummy_usr_map)
         assert type(valid_consumer_key) == KeyStruct
         assert valid_consumer_key.key_code == "al_terminal_lock_or_screensaver"
         assert valid_consumer_key.key_type == "consumer_key_code"
@@ -409,3 +411,47 @@ def test_multichar_func():
     "- _ = ()[]{}\\|;:'\"`~,<.>/?!@#$%^&*"
 
     check_keystruct_matches_char(some_phrase)
+
+
+def test_multiple_shell_cmds():
+    """
+    Test whether multiple shell commands in a single mapping, e.g.
+
+    <gahr-8>: shell(open ~/.config/) + shell(open ~/Applications/)
+
+    are concatenated into a single shell command, e.g.
+
+    "to": [
+        {
+            "shell_command": "open ~/.config/ && open ~/Applications/"
+        }
+    ],
+    """
+
+    usr_key = "shell(open ~/.config/) + shell(open ~/Applications/) + <c-escape>"
+
+    translations = mp.queue_translations(usr_key)
+
+    # The two shell commands should be concatenated into a single shell command
+    # held in one KeyStruct, so the length of the list should be 2
+    assert len(translations) == 2
+
+    # The first item in the list should be a KeyStruct with the escape key_type
+    # The last item in the list should be a KeyStruct with the shell_command
+    # key_type attribute (since we're appending the unified shell command last
+    # after going through all the events in the mapping)
+    escape_mapping = translations[0]
+    assert escape_mapping.key_type == "key_code"
+    assert escape_mapping.key_code == "escape"
+    shell_cmd = translations[-1]
+    assert shell_cmd.key_type == "shell_command"
+
+    # The shell command should be a string with the two shell commands
+    # concatenated with an && operator and surrounding whitespace
+    assert shell_cmd.key_code == "open ~/.config/ && open ~/Applications/"
+
+    # The escape KeyStruct should have a "modifiers" attribute with the
+    # "mandatory" key set to ["left_control"]
+    assert escape_mapping.modifiers["mandatory"] == ["left_control"]
+    # The shell command KeyStruct's modifiers attribute should be empty
+    assert shell_cmd.modifiers is None, f"Expected None, got {shell_cmd.modifiers}"
