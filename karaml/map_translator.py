@@ -15,6 +15,21 @@ ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
 
 
 def queue_translations(usr_key: str) -> list:
+    """
+    Given a user mapping, return a list of KeyStructs for each key in the
+    mapping that holds the key_type, key_code, and modifiers for each key.
+    If the user mapping is a multi-key mapping, e.g. 'j+k', then return a list
+    of KeyStructs for each key in the mapping. If the user mapping is a
+    multi-character mapping, e.g. 'string(hello)', then return a list of
+    KeyStructs for each character in the mapping.
+
+    If the user mapping contains at least one shell based event, e.g.
+    shell(open .) + app(Terminal), then combine all shell based events into one
+    KeyStruct instead of appending each one to the list. This is because as of
+    KE 13.7.0, multiple to.shell_command events are not supported for to
+    prevent slow shell commands from blocking the event queue, but we want to
+    let the user separate them if they want to.
+    """
     multi_keys = get_multi_keys(usr_key)
     if not multi_keys:
         if multichar_pf := multichar_func(usr_key):
@@ -22,12 +37,40 @@ def queue_translations(usr_key: str) -> list:
         return [key_code_translator(usr_key, usr_key)]
 
     translations = []
-    for k in multi_keys:
-        if multichar_pf := multichar_func(k):
+    shell_cmd = ""
+    for key in multi_keys:
+        if multichar_pf := multichar_func(key):
             translations += multichar_pf
             continue
-        translations.append(key_code_translator(k, usr_key))
+
+        translated = key_code_translator(key, usr_key)
+
+        if translated.key_type == "shell_command":
+            shell_cmd = combine_shell_commands(translated, shell_cmd)
+            continue
+
+        translations.append(translated)
+
+    if shell_cmd:
+        translations.append(KeyStruct("shell_command", shell_cmd, None))
+
     return translations
+
+
+def combine_shell_commands(keystruct: KeyStruct, shell_cmd: str) -> str:
+    """
+    Takes a KeyStruct with a shell based event and a combined shell command
+    string and returns the updated combined shell command string, using '&&'
+    to separate each shell command.
+
+    These KeyStruct objects are no longer needed after this function is
+    called, so they are not appended to the translations list. Instead, a new
+    KeyStruct is created with the combined shell command string and appended
+    to the translations list.
+    """
+    if not shell_cmd:
+        return keystruct.key_code
+    return shell_cmd + f" && {keystruct.key_code}"
 
 
 def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
@@ -77,7 +120,7 @@ def special_to_event_check(usr_map: str) -> namedtuple:
         return KeyStruct(event, command, None)
 
 
-def translate_event(event: str, command: str) -> tuple:
+def translate_event(event: str, cmd: str) -> tuple:
     # We don't actually validate the command/argument for 'open()' or
     # 'shell()'_is (e.g. is it a valid link or command, etc.) & trust the user
 
@@ -87,28 +130,28 @@ def translate_event(event: str, command: str) -> tuple:
     match event:
         # NOTE: need to update PSEUDO_FUNCS if adding new events here
         case "app":
-            event, command = "shell_command", f"open -a '{command}'.app"
+            event, cmd = "shell_command", f"open -a '{cmd}'.app"
         case "input":
-            event, command = "select_input_source", input_source(command)
+            event, cmd = "select_input_source", input_source(cmd)
         case "mouse":
-            event, command = "mouse_key", mouse_key(command)
+            event, cmd = "mouse_key", mouse_key(cmd)
         case "notify":
-            event, command = "set_notification_message", notification(command)
+            event, cmd = "set_notification_message", notification(cmd)
         case "notifyOff":
-            event, command = "set_notification_message", notification_off(command)
+            event, cmd = "set_notification_message", notification_off(cmd)
         case "open":
-            event, command = "shell_command", f"open {command}"
+            event, cmd = "shell_command", f"open {cmd}"
         case "shell":
             event = "shell_command"
         case "shnotify":
-            event, command = "shell_command", shnotify(command)
+            event, cmd = "shell_command", shnotify(cmd)
         case "softFunc":
             event = "software_function"
         case "sticky":
-            event, command = "sticky_modifier", sticky_mod(command)
+            event, cmd = "sticky_modifier", sticky_mod(cmd)
         case "var":
-            event, command = "set_variable", set_variable(command)
-    return event, command
+            event, cmd = "set_variable", set_variable(cmd)
+    return event, cmd
 
 
 def input_source(regex_or_dict: str) -> dict:
