@@ -389,9 +389,16 @@ def get_modifiers(usr_mods: str, usr_map: str) -> dict:
 
 
 def parse_chars_in_parens(string: str) -> tuple:
+    """
+    Parse a string to check for characters in parens and not in parens.
+    Returns a tuple of two lists, the first containing characters not in
+    parens, representing mandatory modifiers, and the second containing
+    characters in parens, representing optional modifiers.
+    """
     in_parens: list = findall(r"\((.*?)\)", string)
     validate_optional_mod_sets(string, in_parens)
-    not_in_parens: list = findall(r"[\w+]+(?![^()]*\))", string)
+    not_in_parens: list = findall(r"[\w+⌘⌥⌃⇧⎋⇥]+(?![^()]*\))", string)
+
     in_parens = list(in_parens[0]) if in_parens else None
     not_in_parens = list(not_in_parens[0]) if not_in_parens else None
     return not_in_parens, in_parens

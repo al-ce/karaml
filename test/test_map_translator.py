@@ -344,7 +344,7 @@ def test_is_valid_keycode():
          "<s-escape>"]
     ]
     typical_cases = chain.from_iterable(typical_cases_list)
-    dummy_usr_map = "The usr_map param is only passed through to give info in "
+    dummy_usr_map = "<< this is a dummy user map for testing >>"
     "case of an Exception"
 
     for usr_key in typical_cases:

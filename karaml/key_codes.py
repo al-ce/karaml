@@ -18,6 +18,8 @@ ALIASES = {
     "CR": Alias("return_or_enter", None),
     "esc": Alias("escape", None),
     "ESC": Alias("escape", None),
+    "⎋": Alias("escape", None),
+    "⇥": Alias("tab", None),
     "backspace": Alias("delete_or_backspace", None),
     "bs": Alias("delete_or_backspace", None),
     "BS": Alias("delete_or_backspace", None),
@@ -109,6 +111,7 @@ MODIFIERS = {
     "x": "any",
     "X": "any",
 
+
     # HACK: g and a are sensible aliases but r and h are stretches
     "G": "command",
     "R": "control",
@@ -117,7 +120,13 @@ MODIFIERS = {
     "g": "command",
     "r": "control",
     "a": "option",
-    "h": "shift"
+    "h": "shift",
+
+    # Unicode symbols for modifiers
+    "⌘": "command",
+    "⌥": "option",
+    "⌃": "control",
+    "⇧": "shift",
 }
 
 KEY_CODE = [
