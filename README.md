@@ -465,6 +465,22 @@ object matching the Karabiner specs, just like with input sources.
   s: mouse(speed_multiplier, 2.5)
 ```
 
+#### Set Mouse Cursor Position
+
+`mousePos(x, y, screen)`
+
+Wraps around the [to.software_function.set_mouse_cursor_position](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/software_function/set_mouse_cursor_position/)
+event. The `x` and `y` arguments are mandatory, the `screen` argument is
+optional, and all three must be integers. The `screen` argument is the screen
+number, starting from 0. If you don't specify a screen, the cursor will be
+moved to the same screen as the current mouse position.
+
+```yaml
+/mouse/:
+  '0': mousePos(0, 0)
+  '<o-2>': mousePos(500, 500, 1)
+```
+
 #### Notifications (Karabiner Style)
 
 `notify(id, message)`
