@@ -27,9 +27,9 @@ def queue_translations(usr_key: str) -> list:
     If the user mapping contains at least one shell based event, e.g.
     shell(open .) + app(Terminal), then combine all shell based events into one
     KeyStruct instead of appending each one to the list. This is because as of
-    KE 13.7.0, multiple to.shell_command events are not supported for to
-    prevent slow shell commands from blocking the event queue, but we want to
-    let the user separate them if they want to.
+    KE 13.7.0, multiple to.shell_command events are not supported to prevent
+    slow shell commands from blocking the event queue, but we want to let the
+    user separate them if they want to.
     """
     multi_keys = get_multi_keys(usr_key)
     if not multi_keys:
@@ -397,7 +397,7 @@ def parse_chars_in_parens(string: str) -> tuple:
     """
     in_parens: list = findall(r"\((.*?)\)", string)
     validate_optional_mod_sets(string, in_parens)
-    not_in_parens: list = findall(r"[\w+⌘⌥⌃⇧⎋⇥]+(?![^()]*\))", string)
+    not_in_parens: list = findall(r"[\w+⌘⌥⌃⇧]+(?![^()]*\))", string)
 
     in_parens = list(in_parens[0]) if in_parens else None
     not_in_parens = list(not_in_parens[0]) if not_in_parens else None
