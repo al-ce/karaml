@@ -40,6 +40,20 @@ def invalidKey(key_type: str, map: str, key: str):
     configError(f"Invalid user-defined {key_type} in map {map}: {key}")
 
 
+def invalidDictFormatInString(string: str, note: str):
+    """
+    User intended to pass a dict as an arg to a pseudo-function, but the dict
+    is not well formed.
+    """
+
+    configError(
+        f"Invalid dict format in string:\n\n{string}\n\n"
+        "Dicts must be well formed, with a colon separating the key and value,\n" \
+        "and a comma separating each key-value pair.\n" \
+        f"{note}\n"
+    )
+
+
 def invalidToModType(usr_to_map: str):
     configError(f"'optional' not allowed for 'to.modifiers': {usr_to_map}")
 

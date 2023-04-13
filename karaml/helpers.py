@@ -8,7 +8,7 @@ from karaml.exceptions import (
     invalidStickyModifier, invalidLayerName, invalidModifier,
     invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
     invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
-    invalidMousePosArgs,
+    invalidMousePosArgs, invalidDictFormatInString
 )
 from karaml.key_codes import MODIFIERS, STICKY_MODS
 
@@ -192,6 +192,67 @@ def validate_condition_dict(condition_dict: dict):
         invalidConditionValue(name, value)
     if not search("^[a-zA-Z_]+$", name):
         invalidConditionName(name)
+
+
+def check_and_validate_str_as_dict(string: str) -> bool:
+    """
+    This function checks whether a string is intending to be in the form of a
+    dict, and if it is, confirms that it is well-formed.
+    This is used for pseudo-funcs like shnotify, mouse, input_source, etc.
+    The string goes through a series of checks:
+
+    1. The string must be enclosed in curly braces. This indicates that the
+        user intends this arg to be evaluated as a dict.
+        If this check doesn't pass, return False, indicating to the caller
+        function that this arg is not intended to be a dict.
+    2. The curly braces must enclose a valid set of key value pairs.
+        This means that each comma-separated pair must be separated by a colon
+        and that the keys must be strings. Hence the user needs to wrap the
+        key in quotes.
+    3. As a final dumb check, the string must evaluate to a dict without
+        raising an error that this validation function isn't accounting for.
+
+    If the last checks fail, the function will raise an error.
+    Otherwise, it will return True.
+    """
+
+    if not string.startswith("{") or not string.endswith("}"):
+        return False
+
+    kv_pairs = [
+        pair.strip()
+        for pair in string[1:-1].split(",")
+        # Remove any empty strings that result from trailing commas
+        if pair.strip()
+    ]
+
+    for pair in kv_pairs:
+        k, v = pair.split(":")
+        k = k.strip()
+
+        # The key might be a dict, so rerun this function on it
+        # If it does not raise any errors, we can check the rest of the keys
+        # in the main dictionary
+        if k[0] == "{" and k[-1] == "}":
+            check_and_validate_str_as_dict(k)
+        elif k[0] not in ("'", '"') or k[-1] not in ("'", '"'):
+            msg = f"Key '{k}' in dict '{string}' must be wrapped in quotes."
+            invalidDictFormatInString(string, msg)
+    try:
+        if type(eval(string)) != dict:
+            msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
+                    " be a dict, but it failed to evaluate.\nPlease check" \
+                    " your syntax."
+            invalidDictFormatInString(string, msg)
+    except:  # noqa: E722
+        # bad practice, but we will raise a useful Exception in this sequence
+        # of function calls, and I'd rather warn the user with a generic
+        # message than a misleading one
+        msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
+                " be a dict, but it failed to evaluate.\nPlease check" \
+                " your syntax."
+        invalidDictFormatInString(string, msg)
+    return True
 
 
 def validate_shnotify_dict(notification_dict: dict):

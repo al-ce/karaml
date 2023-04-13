@@ -6,6 +6,7 @@ from karaml.helpers import (
     get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
     validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
     validate_shnotify_dict, validate_mouse_pos_args,
+    check_and_validate_str_as_dict
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS
@@ -200,10 +201,9 @@ def input_source(regex_or_dict: str) -> dict:
     e.g. where a distinction between polytonic and monotonic Greek is needed,
     the latter for simple switching between languages.
     """
-    if regex_or_dict.startswith("{") and regex_or_dict.endswith("}") and \
-            type(eval(regex_or_dict)) == dict:
-        return eval(regex_or_dict)
 
+    if check_and_validate_str_as_dict(regex_or_dict):
+        return eval(regex_or_dict)
     return {"language": regex_or_dict.strip()}
 
 
@@ -216,8 +216,8 @@ def mouse_key(mouse_key_funcs: str) -> dict:
     If the user mapping is a string, e.g. 'x, 200', return a dictionary with
     the key 'x' and the value of the string, e.g. {'x': 200}.
     """
-    if mouse_key_funcs.startswith("{") and mouse_key_funcs.endswith("}") and \
-            type(eval(mouse_key_funcs)) == dict:
+
+    if check_and_validate_str_as_dict(mouse_key_funcs):
         return eval(mouse_key_funcs)
 
     key, value = mouse_key_funcs.split(",")
@@ -286,13 +286,8 @@ def shnotify_dict(n_dict: dict) -> str:
 
 def shnotify(notification: str) -> str:
 
-    try:
-        n_dict = eval(notification)
-        # User might pass a dict as a string, e.g. "shnotify('{msg: 'hello'})"
-        if type(n_dict) == dict:
-            return shnotify_dict(n_dict)
-    except (SyntaxError, NameError):
-        pass
+    if check_and_validate_str_as_dict(notification):
+        return shnotify_dict(eval(notification))
 
     default = {
         "msg": "",
@@ -322,6 +317,9 @@ def shnotify(notification: str) -> str:
 
 
 def soft_func(softfunc_args: str) -> dict:
+    # TODO: This is easy to break, consider implementing
+    # check_and_validate_str_as_dict() for this
+
     # Only accept well formed dict here
     sf_dict = eval(softfunc_args)
     if type(sf_dict) != dict:
