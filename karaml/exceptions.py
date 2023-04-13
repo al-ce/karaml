@@ -84,6 +84,13 @@ def invalidModifier(string: str, mods: str):
     )
 
 
+def invalidMousePosArgs(mouse_pos_args: str, msg: str):
+    configError(
+        f"Invalid mouse position arguments: {mouse_pos_args}\n"
+        f"{msg}"
+    )
+
+
 def invalidTotalParensInMods(mod_string: str, opt_mod_matches: list):
     configError(
         f"Invalid optional modifier mapping: {mod_string}\n"

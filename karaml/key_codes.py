@@ -388,6 +388,7 @@ PSEUDO_FUNCS = [
     "app",
     "input",
     "mouse",
+    "mousePos",
     "notify",
     "notifyOff",
     "open",

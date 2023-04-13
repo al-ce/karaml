@@ -5,7 +5,7 @@ from re import findall, search
 from karaml.helpers import (
     get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
     validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
-    validate_shnotify_dict,
+    validate_shnotify_dict, validate_mouse_pos_args,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS
@@ -166,6 +166,9 @@ def translate_pseudo_func(event: str, cmd: str) -> tuple[str, str]:
             event, cmd = "select_input_source", input_source(cmd)
         case "mouse":
             event, cmd = "mouse_key", mouse_key(cmd)
+        case "mousePos":
+            event, cmd = "software_function", \
+                        {"set_mouse_cursor_position": mouse_pos(cmd)}
         case "notify":
             event, cmd = "set_notification_message", notification(cmd)
         case "notifyOff":
@@ -219,6 +222,29 @@ def mouse_key(mouse_key_funcs: str) -> dict:
 
     key, value = mouse_key_funcs.split(",")
     return {key.strip(): float(value.strip())}
+
+
+def mouse_pos(mouse_pos_args: str) -> dict:
+    """
+    Takes the arguments for the mousePos() pseudo function and returns a
+    dictionary for the software_function event for set_mouse_cursor_position.
+
+    The pseudo function is 'mousePos(x, y, screen)' where x and y are integers
+    and screen is an optional integer. The function returns a dictionary with
+    the keys 'x', 'y', and 'screen' if the screen is specified.
+
+    Example:
+    mouse_pos(200, 300, 1) --> {'x': 200, 'y': 300, 'screen': 1}
+    """
+
+    validate_mouse_pos_args(mouse_pos_args)
+    formatted_args = [int(arg.strip()) for arg in mouse_pos_args.split(",")]
+    x, y, *screen = formatted_args
+
+    mouse_pos_dict = {"x": x, "y": y}
+    if screen:
+        mouse_pos_dict["screen"] = int(screen[0])
+    return mouse_pos_dict
 
 
 def notification(id_and_message: str) -> dict:

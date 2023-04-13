@@ -8,6 +8,7 @@ from karaml.exceptions import (
     invalidStickyModifier, invalidLayerName, invalidModifier,
     invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
     invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
+    invalidMousePosArgs,
 )
 from karaml.key_codes import MODIFIERS, STICKY_MODS
 
@@ -233,6 +234,21 @@ def validate_mod_aliases(mods: str) -> str:
         if char not in MODIFIERS.keys():
             invalidModifier(char, mods)
     return mods
+
+
+def validate_mouse_pos_args(mouse_pos_args: str) -> int:
+    """
+    Validates the arguments for the mousePos() pseudo function.
+    There must be at least two arguments and at most three arguments, and all
+    must be integers. The first two arguments are the x and y coordinates of
+    the mouse cursor, and the third argument is the screen number.
+    """
+
+    args = [arg.strip() for arg in mouse_pos_args.split(",")]
+    if len(args) not in (2, 3) or not all(arg.isdigit() for arg in args):
+        msg = "mousePos() takes 2 or 3 arguments, and all must be ints"
+        invalidMousePosArgs(mouse_pos_args, msg)
+    return 0
 
 
 def validate_to_opts(string: str) -> str:

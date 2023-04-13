@@ -217,9 +217,46 @@ def test_translate_event():
         }
     )
 
+    assert mp.translate_pseudo_func("mousePos", "1, 2") == (
+        "software_function",
+        {"set_mouse_cursor_position": {"x": 1, "y": 2}}
+    )
+    assert mp.translate_pseudo_func("mousePos", "1, 2, 3") == (
+        "software_function",
+        {"set_mouse_cursor_position": {"x": 1, "y": 2, "screen": 3}}
+    )
+
+    with pytest.raises(SystemExit) as inv_mouse_pos_test:
+        # Invalid mousePos arguments: min 2
+        mp.translate_pseudo_func("mousePos", "1")
+    assert inv_mouse_pos_test.type == SystemExit
+
+    with pytest.raises(SystemExit) as inv_mouse_pos_test:
+        # Invalid mousePos arguments: max 3
+        mp.translate_pseudo_func("mousePos", "1, 2, 3, 4")
+    assert inv_mouse_pos_test.type == SystemExit
+
+    with pytest.raises(SystemExit) as inv_mouse_pos_test:
+        # Invalid mousePos arguments: integers only
+        mp.translate_pseudo_func("mousePos", "one, two")
+    assert inv_mouse_pos_test.type == SystemExit
+
+
     # Test for proper whitespace-stripping
     assert mp.translate_pseudo_func("notify", " some_id ,some_message") == (
         "set_notification_message", {"id": "some_id", "text": "some_message"}
+    )
+
+    assert mp.translate_pseudo_func("notifyOff", "some_id") == (
+        "set_notification_message", {"id": "some_id", "text": ""}
+    )
+
+    assert mp.translate_pseudo_func(
+        "shnotify",
+        "message, some title, a subtitle, frog sound"
+    ) == (
+        "shell_command",
+        "osascript -e 'display notification \"message\" with title \"some title\" subtitle \"a subtitle\" sound name \"frog sound\"'"
     )
 
     assert mp.translate_pseudo_func("softFunc", "some_arg") == (
@@ -455,3 +492,46 @@ def test_multiple_shell_cmds():
     assert escape_mapping.modifiers["mandatory"] == ["left_control"]
     # The shell command KeyStruct's modifiers attribute should be empty
     assert shell_cmd.modifiers is None, f"Expected None, got {shell_cmd.modifiers}"
+
+
+def test_mouse_pos():
+    """
+    Test the mouse_pos() func that interprets the mousePos() pseudo func in the
+    yaml config.
+    """
+
+    # Test that  malformed mousePos() pseudo func args raise a SystemExit
+    # Tests that floats are not accepted
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        mp.mouse_pos("1.0,2")
+    assert pytest_wrapped_e.type == SystemExit
+
+    # Test that the system exits if there are too few or too many args
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        mp.mouse_pos("1")
+    assert pytest_wrapped_e.type == SystemExit
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        mp.mouse_pos("1,2,3,4")
+    assert pytest_wrapped_e.type == SystemExit
+
+    # Test that the function raises an exception if the args are not all
+    # integers
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        mp.mouse_pos("1,2,three")
+    assert pytest_wrapped_e.type == SystemExit
+
+    # Test well-formed mousePos() pseudo func args
+
+    # Test that a two-arg string returns a two-key dict of x and y in the
+    # correct order
+    assert mp.mouse_pos("1,2") == {"x": 1, "y": 2}
+
+    # Test that a three-arg string returns a three-key dict of x, y, and
+    # screen in the correct order
+    assert mp.mouse_pos("1,2,3") == {"x": 1, "y": 2, "screen": 3}
+
+    # Tests that a two-arg string with whitespace returns a two-key dict of x
+    # and y in the correct order
+    assert mp.mouse_pos(" 3 , 4 ") == {"x": 3, "y": 4}
+
