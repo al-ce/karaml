@@ -27,19 +27,26 @@ def test_TranslatedMap():
 
 
 def test_is_modded_key():
-    valid = "<mods-primary>"
-    invalid_modified = [
+    valid_modified_keys = [
+        "<mods-primary>",
         "mods-primary",
+        "mods|primary",
+        "mods | primary",
+        "m o d s | primary",
+    ]
+    invalid_modified = [
+        "mods:primary",
         "<modsprimary>",
-        "<mods-primary",
-        "mods-primary>",
+        "mods |",
+        "| primary",
     ]
 
-    valid_ModifiedKey: ModifiedKey = mp.is_modded_key(valid)
-    assert valid_ModifiedKey
-    assert type(valid_ModifiedKey) == ModifiedKey
-    assert valid_ModifiedKey.modifiers == "mods"
-    assert valid_ModifiedKey.key == "primary"
+    for valid in valid_modified_keys:
+        valid_ModifiedKey: ModifiedKey = mp.is_modded_key(valid)
+        assert valid_ModifiedKey
+        assert type(valid_ModifiedKey) == ModifiedKey
+        assert valid_ModifiedKey.modifiers == "mods"
+        assert valid_ModifiedKey.key == "primary"
 
     for inv_mod in invalid_modified:
         assert not mp.is_modded_key(inv_mod)

@@ -11,6 +11,7 @@ Alias = namedtuple("Alias", ["key_code", "modifiers"])
 alias_modifiers = ["shift"]
 ALIASES = {
     "hyper": Alias("right_shift", ["right_command", "right_control", "right_option"]),
+    "☆": Alias("shift", ["command", "control", "option"]),
     "ultra": Alias("right_shift", ["right_command", "right_control", "right_option", "fn"]),
     "super": Alias("right_shift", ["right_option", "right_control"]),
     "enter": Alias("return_or_enter", None),
@@ -121,12 +122,23 @@ MODIFIERS = {
     "r": "control",
     "a": "option",
     "h": "shift",
+}
 
-    # Unicode symbols for modifiers
-    "⌘": "command",
-    "⌥": "option",
-    "⌃": "control",
-    "⇧": "shift",
+
+UNICODE_MODS = {
+    "⌘": "g",
+    "⌥": "a",
+    "⌃": "r",
+    "⇧": "h",
+    "‹⌘": "m",
+    "⌘›": "M",
+    "‹⌥": "o",
+    "⌥›": "O",
+    "‹⌃": "c",
+    "⌃›": "C",
+    "‹⇧": "s",
+    "⇧›": "S",
+    "☆": "garh",
 }
 
 KEY_CODE = [

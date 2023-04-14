@@ -9,7 +9,9 @@ from karaml.helpers import (
     check_and_validate_str_as_dict,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
-from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS
+from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS,
+                              UNICODE_MODS,
+                              )
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
@@ -361,10 +363,42 @@ def translate_if_valid_keycode(usr_key: str, usr_map: str) -> KeyStruct:
 
 
 def parse_primary_key_and_mods(usr_key: str, usr_map) -> tuple[str, dict]:
-    if modded_key := is_modded_key(usr_key):
-        modifiers: dict = get_modifiers(modded_key.modifiers, usr_map)
-        return modded_key.key, modifiers
-    return usr_key, {}
+    modded_key = is_modded_key(usr_key)
+    if not modded_key:
+        return usr_key, {}
+
+    # The modifiers should either be ascii or unicode, but not a mix
+    if bool(set(UNICODE_MODS.keys()) & set(modded_key.modifiers)):
+        modifiers_string: str = translate_unicode_mods(modded_key.modifiers)
+    else:
+        modifiers_string: str = modded_key.modifiers
+    modifiers: dict = get_modifiers(modifiers_string, usr_map)
+    return modded_key.key, modifiers
+
+
+def translate_unicode_mods(modifiers: str) -> str:
+    """
+    Translate unicode modifiers to their corresponding ascii modifier aliases
+    and return the translated string.
+
+    Unlike the ascii modifiers, whose side is determined by whether they are
+    lower or upper case, unicode modifiers' side are determined by whether they
+    are prefixed or suffixed by a unicode 'arrow' character. This function
+    handles the three cases: prefix, suffix, and neither.
+    """
+    translated_mods = ""
+    for i, char in enumerate(modifiers):
+        if char in ["‹", "›", " "]:
+            continue
+        if i > 0 and modifiers[i-1] == "‹":
+            translated_char = UNICODE_MODS["‹" + char]
+        elif i < len(modifiers) - 1 and modifiers[i + 1] == "›":
+            translated_char = UNICODE_MODS[char + "›"]
+        else:
+            translated_char = UNICODE_MODS[char]
+        translated_mods += translated_char
+
+    return translated_mods
 
 
 def is_modded_key(mapping: str) -> ModifiedKey:
@@ -383,7 +417,6 @@ def is_modded_key(mapping: str) -> ModifiedKey:
         modifiers = modifiers.replace(" ", "")
         key = key.strip()
         return ModifiedKey(modifiers, key)
-
 
 
 def get_modifiers(usr_mods: str, usr_map: str) -> dict:
@@ -409,7 +442,7 @@ def parse_chars_in_parens(string: str) -> tuple:
     """
     in_parens: list = findall(r"\((.*?)\)", string)
     validate_optional_mod_sets(string, in_parens)
-    not_in_parens: list = findall(r"[\w+⌘⌥⌃⇧]+(?![^()]*\))", string)
+    not_in_parens: list = findall(r"[\w+]+(?![^()]*\))", string)
 
     in_parens = list(in_parens[0]) if in_parens else None
     not_in_parens = list(not_in_parens[0]) if not_in_parens else None
