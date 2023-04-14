@@ -375,8 +375,28 @@ See: [string special event function](#strings)
 
 Shorthands for common-use events. Some are just
 [to.shell_command](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/shell-command/)
-events in disguise.
+events in disguise. You can use these as if they were to.events, e.g.:
 
+```yaml
+/base/:
+  <o-g>: open(https://github.com)
+```
+
+| Function | Description |
+| -------- | ----------- |
+| [app](#app-launchers) | Launch an app from the Applications folder |
+| [open](#open-browser-link) | Open a url in your default browser |
+| [shell](#shell-commands) | Run a shell command |
+| [input](#input-sources) | Switch input source |
+| [mouse](#mouse-movement) | Move the mouse cursor in the x or y directions |
+| [mousePos](#set-mouse-cursor-position) | Move the mouse cursor to a specific position |
+| [notify](#notifications-applescript-style) | Trigger a Karabiner-Elements notification |
+| [notifyOff](#notifications-applescript-style) | Turn off a Karabiner-Elements notification |
+| [shnotify](#notifications-applescript-style) | Trigger a notification in macOS's Notification Center |
+| [softFunc](#software-functions) | Karabiner-Elements software function |
+| [sticky](#sticky-modifiers) | Set a sticky modifier |
+| [string](#strings) | Send a sequence of characters |
+| [var](#variables) | Set a value for a variable/condition |
 
 #### App Launchers
 
