@@ -6,7 +6,7 @@ from karaml.helpers import (
     get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
     validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
     validate_shnotify_dict, validate_mouse_pos_args,
-    check_and_validate_str_as_dict
+    check_and_validate_str_as_dict,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS
@@ -169,7 +169,7 @@ def translate_pseudo_func(event: str, cmd: str) -> tuple[str, str]:
             event, cmd = "mouse_key", mouse_key(cmd)
         case "mousePos":
             event, cmd = "software_function", \
-                        {"set_mouse_cursor_position": mouse_pos(cmd)}
+                {"set_mouse_cursor_position": mouse_pos(cmd)}
         case "notify":
             event, cmd = "set_notification_message", notification(cmd)
         case "notifyOff":
@@ -367,11 +367,23 @@ def parse_primary_key_and_mods(usr_key: str, usr_map) -> tuple[str, dict]:
     return usr_key, {}
 
 
-def is_modded_key(string: str) -> ModifiedKey:
-    expr = "<(.+)-(.+)>"
+def is_modded_key(mapping: str) -> ModifiedKey:
+    """
+    Check if a mapping matches a valid syntax for a modified key. If so,
+    return a ModifiedKey object with the key and modifiers. Otherwise,
+    return None.
 
-    if query := search(expr, string):
-        return ModifiedKey(*query.groups())
+    A valid syntax must have a delimiter betwwen modifiers and the key (either
+    a hyphen or a pipe). The modifiers may be enclosed in angle brackets.
+    """
+
+    expression = r"<?([^|>-]+)[|-]([^>]+)>?"
+    if query := search(expression, mapping):
+        modifiers, key = query.groups()
+        modifiers = modifiers.replace(" ", "")
+        key = key.strip()
+        return ModifiedKey(modifiers, key)
+
 
 
 def get_modifiers(usr_mods: str, usr_map: str) -> dict:

@@ -111,8 +111,8 @@ def invalidTotalParensInMods(mod_string: str, opt_mod_matches: list):
         f"For opt mods: {opt_mod_matches}\n"
         "Too many sets of parens for optional mods. Use a single set.\n"
         "Put the optional mods entirely to the left or right.\n"
-        "e.g. <c(oms)> or <c(oms)>\n"
-        "NOT: <c(o)(m)s> or <(o)(m)s> or <c(om)s> etc."
+        "e.g. c(oms) or (c)oms or <c(oms)> or <(c)oms>\n"
+        "NOT: c(o)(m)s or (o)(m)s or <c(om)s> etc."
     )
 
 
