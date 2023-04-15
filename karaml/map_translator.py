@@ -388,9 +388,11 @@ def translate_unicode_mods(modifiers: str) -> str:
     """
     translated_mods = ""
     for i, char in enumerate(modifiers):
-        if char in ["‹", "›", " "]:
+        if char in ("(", ")"):
+            translated_char = char
+        elif char in ["‹", "›", " "]:
             continue
-        if i > 0 and modifiers[i-1] == "‹":
+        elif i > 0 and modifiers[i-1] == "‹":
             translated_char = UNICODE_MODS["‹" + char]
         elif i < len(modifiers) - 1 and modifiers[i + 1] == "›":
             translated_char = UNICODE_MODS[char + "›"]
