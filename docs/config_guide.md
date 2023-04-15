@@ -179,6 +179,27 @@ one side and the optional modifiers to the other.
 <(oc)ms-enter>: <mocs-enter>  # (same as above)
 ```
 
+#### Alternate syntaxes
+
+Since the original release of karaml, alternate syntaxes are supported for
+mappings with modifiers.
+
+- Angle brackets (`<` and `>`) are now optional
+- Whitespace between modifiers is supported for readability
+- The `|` character can be used to separate the modifiers and the primary keys
+- Use unicode characters for modifier keys
+
+```yaml
+/base/:
+  c-w: o-backspace # left_control + w to left_option + backspace
+  c m o s - g: open(https://github.com) # hyper + g to open github
+  cm | o: /open/  # left_control + left_command + o toggles /open/ layer
+  ⌃ ⌥ ⇧ ⌘  | s: string(git status)  # hyper + s sends a string 'git status'
+  ‹⇧ ⌃› | h + i: shnotify(hi)       # left_shift + right_control + h + i
+                                     # triggers a macos notification 'hi'
+```
+
+See the `README` for more details on the alternate syntaxes.
 
 ### Simultaneous 'from' keys and multiple 'to' keys
 

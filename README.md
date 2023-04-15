@@ -1,6 +1,5 @@
 # karaml 🍮
 
-
 **karaml** (**_Kara_**biner in ya**_ml_**) lets you write and maintain a
 virtual layers-based [Karabiner-Elements](https://karabiner-elements.pqrs.org/) keyboard customization
 configuration in YAML. It uses Python to translate the yaml into
@@ -18,17 +17,17 @@ Karabiner-Elements (consider
 # Default layer, does not require activation
 /base/:
   caps_lock: [escape, /nav/] # Escape when tapped, /nav/ layer when held
-  <oc-n>: /nav/              # Tap Left Opt + Left Ctrl + n to toggle /nav/
-  <O-w>: <o-backspace>       # Right Opt + w to Left Opt + Backspace
+  <oc-n>: /nav/ # Tap Left Opt + Left Ctrl + n to toggle /nav/
+  <O-w>: <o-backspace> # Right Opt + w to Left Opt + Backspace
 
   # Enter when tapped, Left Control when held, lazy flag, any optional modifiers
   <(x)-enter>:
     - enter
     - left_control
-    - null                   # No event when released
+    - null # No event when released
     - [+lazy]
 
-  j+k: [escape, button1]     # j+k to escape when tapped, left click when held
+  j+k: [escape, button1] # j+k to escape when tapped, left click when held
 
   # option (either side) + o/O to create new line below/above
   <a-o>: <m-right> + return
@@ -39,23 +38,34 @@ Karabiner-Elements (consider
   # backspace/left on tap, MacOS/Kitty hints on hold/release, depending on frontmost app
   <c-h>: {
       # Notification with Karabiner-Style popup
-      unless Terminal$ kitty$: [backspace, 'notify(idh, My MacOS Shortcut Hints)', 'notifyOff(idh)'],
+      unless Terminal$ kitty$:
+        [backspace, "notify(idh, My MacOS Shortcut Hints)", "notifyOff(idh)"],
       # Notification with AppleScript popup
-      if Terminal$ kitty$: [left, 'shnotify(My Kitty Shortcuts, ==Kitty==)']
-      }
+      if Terminal$ kitty$: [left, "shnotify(My Kitty Shortcuts, ==Kitty==)"],
+    }
+
+  # Other syntax for modifiers is also supported
+  ms-a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
+  m s | c: app(CotEditor) # left_command + left_shift + to launch CotEditor
+
+  # Use unicode symbols for modifiers insead of letters
+  ⌘ ⇧ | g: string(lazygit) # command + shift + g to send string 'lazygit'
+
+  ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
+  ☆      | o: /open/ # hyper + o to toggle /open/ layer
 
 # condition 'nav_layer' must be true for the following maps
 /nav/:
-  <(x)-h>: left               # vim navigation with any optional mods
+  <(x)-h>: left # vim navigation with any optional mods
   <(x)-j>: down
   <(x)-k>: up
   <(x)-l>: right
-  s: [app(Safari), /sys/]     # Launch Safari on tap, /sys/ layer when held
+  s: [app(Safari), /sys/] # Launch Safari on tap, /sys/ layer when held
   g: open(https://github.com) # Open link in default browser
 
 # etc.
 /sys/:
-  <o-m>: [mute, null, mute]  # Mute if held/key down, unmute if released/key up
+  <o-m>: [mute, null, mute] # Mute if held/key down, unmute if released/key up
   k: play_or_pause
   "}": fastforward
   u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
@@ -63,14 +73,13 @@ Karabiner-Elements (consider
 # JSON integration
 json:
   - {
-      description: 'Right Shift to ) if tapped, Shift if held',
+      description: "Right Shift to ) if tapped, Shift if held",
       from: { key_code: right_shift },
       to: { key_code: right_shift, lazy: true },
       to_if_alone: { key_code: 9, modifiers: [shift] },
       type: basic,
     }
 ```
-
 
 ## ✨ Features
 
@@ -92,7 +101,6 @@ json:
 - Checks and formatting hints for your `.yaml` file - karaml will try not to
   let you upload a config that doesn't create a working modification, and tell
   you why (no more hunting for typos or missing/extraneous commas in a large JSON object)
-
 
 ## ❓ Why this project
 
@@ -116,13 +124,12 @@ expressed in karaml.
 - A superset of JSON which allows us to fall back to JSON if wanted/needed
 - Lets you leave comments for descriptions or notes to yourself!
 
-
 ## ⚡️ Quickstart
 
 If you're unfamiliar with YAML, take a look at this handy
 [guide](https://learnxinyminutes.com/docs/yaml/).
 
-After [installing](#-installation), take the [sample YAML
+After [installing](#installation), take the [sample YAML
 configuration](./docs/sample_configuration.yaml) and use it as a template for
 your own. The sample config has comments to explain karaml syntax.
 
@@ -135,9 +142,10 @@ For a cleaner, less commented on example, see one of my configurations
 below to convert your karaml config to Karabiner-JSON with the command-line
 tool (written in Python).
 
-## ⚙️  YAML Configuration
+## ⚙️ YAML Configuration
 
 ### Basic Mapping and Layer Structure
+
 All keys belong to a layer. At minimum, a map requires a `from: to` structure
 and must be in a layer:
 
@@ -147,6 +155,7 @@ and must be in a layer:
 ```
 
 This is equivalent to:
+
 ```json
 {
   "from": { "key_code": "from_key" },
@@ -162,13 +171,11 @@ To add additional events or options to your maps, put them in a YAML array or
 sequence.
 
 ```yaml
-/layer_name/:   # All mappings below require the 'layer_name' layer enabled
-  from_key(s): [when_tapped, when_held, when_released, [to_opts], {params}]
+/layer_name/: # All mappings below require the 'layer_name' layer enabled
+  from_key(s): [when_tapped, when_held, when_released, [to_opts], { params }]
 ```
 
 As shown above, you can add as many or as few items to the array as you like.
-
-
 
 ### Enabling Layers
 
@@ -178,8 +185,8 @@ the layer will be enabled when the 'from' key is held.
 
 ```yaml
 /base/:
-  <oc-n>: /nav/               # enabled/disabled on tap
-  caps_lock: [escape, /nav/]  # enabled when held
+  <oc-n>: /nav/ # enabled/disabled on tap
+  caps_lock: [escape, /nav/] # enabled when held
 
 # The maps indented in this layer will only work when the layer is enabled
 /nav/:
@@ -195,33 +202,104 @@ To add modifiers to a primary key, follow the format `<modifiers-primary_key>`.
 Join multiple modifiers without any separation, but wrap optional modifiers in
 parens.
 
+To add modifiers to a primary key, there are a few available formats. The
+general format is to have modifiers followed by a delimiter followed by
+primary keys. Multiple modifiers can have whitespace between them if they
+help readability, or they can be joined without any whitespace. Optional
+modifiers are indicaped by wrapping them in parens.
+
+All of these are valid formats. The original format was `<modifiers-primary_key>`,
+but others have been added to give the user a choice in whatever format they
+find most readable.
+
+The following are all examples of the mapping for `left_control` +
+`left_shift` + `a` to open the Terminal app:
+
+```yaml
+/base/:
+  <cs-a>: app(Terminal)
+  cs-a: app(Terminal)
+  c s - a: app(Terminal)
+  c s | a: app(Terminal)
+  'c s | a': app(Terminal)
+```
+
+The guides and the remainder of the `README` (mostly) use the
+`<modifiers-primary_key>` format.
+
 Whether the optional set in parens comes first or last doesn't matter, e.g.
 `<(c)os-g>` and `<os(c)-g>` are both valid. But a single set of optional
-modifiers in parens must be to the right or left of *all* mandatory modifiers
+modifiers in parens must be to the right or left of _all_ mandatory modifiers
 (if there are any mandatory modifiers).
 
-Left side modifiers are lowercase, right side modifiers are uppercase.
+Single letters are one way of specifying modifiers. Left side modifiers use
+lowercase, right side modifiers use uppercase.
 
+| karaml alias | key_code       | --- | karaml alias | key_code        |
+| ------------ | -------------- | --- | ------------ | --------------- |
+| `c`          | `left_control` | --- | `C`          | `right_control` |
+| `s`          | `left_shift`   | --- | `S`          | `right_shift`   |
+| `o`          | `left_option`  | --- | `O`          | `right_option`  |
+| `m`          | `left_command` | --- | `M`          | `right_command` |
+| `r`          | `control`      | --- | `R`          | `control`       |
+| `h`          | `shift`        | --- | `H`          | `shift`         |
+| `a`          | `option`       | --- | `A`          | `option`        |
+| `g`          | `command`      | --- | `G`          | `command`       |
+| `f`          | `fn`           | --- | `F`          | `fn`            |
+| `l`          | `caps_lock`    | --- | `L`          | `caps_lock`     |
+| `x`          | `any`          | --- | `X`          | `any`           |
 
-| key_code     | karaml | --- | key_code | karaml |
-| ------------ | ------ | --- | --------- | ------ |
-| `left_control` | `c`  | --- | `right_control` | `C`  |
-| `left_shift`   | `s`  | --- | `right_shift`   | `S`  |
-| `left_option`  | `o`  | --- | `right_option`  | `O`  |
-| `left_command` | `m`  | --- | `right_command` | `M`  |
-| `control`      | `r`  | --- | `control`       | `R`  |
-| `shift`        | `h`  | --- | `shift`         | `H`  |
-| `option`       | `a`  | --- | `option`        | `A`  |
-| `command`      | `g`  | --- | `command`       | `G`  |
 
 Examples:
-- `<c-h>` → `left_ctrl` + `h` 
+
+- `<c-h>` → `left_ctrl` + `h`
 - `<(x)-h` → `h` (with any optional modifiers)
 - `<mOC(s)-h>` → `left_cmd` + `right_opt` + `right_ctrl` + `left_shift` (optional) + `h`
-- `<(s)mOC-h>` →   (same as above) 
+- `<(s)mOC-h>` → (same as above)
 - `<g(arh)-h>` → `cmd` (mandatory) + `option` + `control` + `shift` (optional) + `h`
-- `<(arh)g-h>`   (same as above)
+- `<(arh)g-h>` (same as above)
 
+The mnemonics for the less-obvious modifiers are:
+
+- `m`: `M`ac
+- `r`: cont`R`ol
+- `h`: s`H`ift
+- `a`: `A`lt
+- `g`: `G`ui
+
+An alternative system for modifiers uses unicode symbols: ⌘ ⌥ ⌃ ⇧
+The unicode symbols `‹` and `›` denote left and right side modifiers.
+
+| unicode symbol | key_code       |
+| -------------- | -------------- |
+| `⌘`            | `command` |
+| `⌥`            | `option` |
+| `⌃`            | `control` |
+| `⇧`            | `shift` |
+| `‹⌘`            | `left_command` |
+| `‹⌥`            | `left_option` |
+| `‹⌃`            | `left_control` |
+| `‹⇧`            | `left_shift` |
+| `⌘›`            | `right_command` |
+| `⌥›`            | `right_option` |
+| `⌃›`            | `right_control` |
+| `⇧›`            | `right_shift` |
+
+Examples:
+
+- `⌘   ⇧  | g` → `command` + `shift` + `g`
+- `⌘  (⇧) | g` → `command` + `shift` (optional) + `g`
+- `‹⌃     | h` → `left_ctrl` + `h`
+- ` ⌃› ‹⌥ | h` → `left_opt` + `right_ctrl` + `h`
+
+Of course you can use another valid syntax for the unicode characters as well,
+e.g. `<⌘⇧-g>` or `<⌘⇧|g>`. The above syntax is suggested for readability.
+
+If you need an easy way to type these unicode characters, you can use a
+text-expander or snippet tool like Typinator, the built in expanders in Raycast
+or Alfred, TextExpander, etc.
+
+Or, see this suggestion in this Karabiner [issue](https://github.com/pqrs-org/Karabiner-Elements/issues/2949#issuecomment-1318516074).
 
 ### Key-Code Aliases
 
@@ -229,123 +307,112 @@ You can follow the explicit mapping for any key (e.g. `<s-1>` → `!`), or use
 these available aliases. Be mindful in your YAML config that some characters
 need to be escaped or wrapped in quotes to be recognized as strings.
 
-
 | karaml alias | Karabiner key_code            |
 | ------------ | ----------------------------- |
-| enter        | return_or_enter               |
-| CR           | return_or_enter               |
-| ESC          | escape                        |
-| backspace    | delete_or_backspace           |
-| BS           | delete_or_backspace           |
-| delete       | delete_forward                |
-| space        | spacebar                      |
-| ' ' (space)  | spacebar                      |
-| -            | hyphen                        |
-| underscore   | hyphen + shift                |
-| \_           | hyphen + shift                |
-| =            | equal_sign                    |
-| plus         | equal_sign + shift            |
-| (            | 9 + shift                     |
-| )            | 0 + shift                     |
-| [            | open_bracket                  |
-| {            | open_bracket + shift          |
-| ]            | close_bracket                 |
-| }            | close_bracket + shift         |
-| \\           | backslash                     |
-| \|           | backslash + shift             |
-| ;            | semicolon                     |
-| :            | semicolon + shift             |
-| '            | quote                         |
-| "            | quote + shift                 |
-| grave        | grave_accent_and_tilde        |
-| `            | grave_accent_and_tilde        |
-| ~            | grave_accent_and_tilde+ shift |
-| ,            | comma                         |
-| <            | comma + shift                 |
-| .            | period                        |
-| >            | period + shift                |
-| /            | slash                         |
-| ?            | slash + shift                 |
-| !            | 1 + shift                     |
-| @            | 2 + shift                     |
-| #            | 3 + shift                     |
-| $            | 4 + shift                     |
-| %            | 5 + shift                     |
-| ^            | 6 + shift                     |
-| &            | 7 + shift                     |
-| *            | 8 + shift                     |
-| up           | up_arrow                      |
-| down         | down_arrow                    |
-| left         | left_arrow                    |
-| right        | right_arrow                   |
-| pgup         | page_up                       |
-| pgdn         | page_down                     |
-| kp-          | keypad_hyphen                 |
-| kp\*         | keypad_asterisk               |
-| kp/          | keypad_slash                  |
-| kp=          | keypad_equal_sign             |
-| kp.          | keypad_period                 |
-| kp,          | keypad_comma                  |
-| kpenter      | keypad_enter                  |
-| kp1          | keypad_1                      |
-| kp2          | keypad_2                      |
-| kp3          | keypad_3                      |
-| kp4          | keypad_4                      |
-| kp5          | keypad_5                      |
-| kp6          | keypad_6                      |
-| kp7          | keypad_7                      |
-| kp8          | keypad_8                      |
-| kp9          | keypad_9                      |
-| kp0          | keypad_0                      |
-| kpnum        | keypad_num_lock               |
+| `enter`        | `return_or_enter`               |
+| `CR`           | `return_or_enter`               |
+| `ESC`          | `escape`                        |
+| `backspace`    | `delete_or_backspace`           |
+| `BS`           | `delete_or_backspace`           |
+| `delete`       | `delete_forward`                |
+| `space`        | `spacebar`                      |
+| ` ` (a space)  | `spacebar`                      |
+| `-`            | `hyphen`                        |
+| `underscore`   | `hyphen` + `shift`                |
+| `_`           | `hyphen` + `shift`                |
+| `=`            | `equal_sign`                    |
+| `plus`         | `equal_sign` + `shift`            |
+| `(`            | `9` + `shift`                     |
+| `)`            | `0` + `shift`                     |
+| `[`            | `open_bracket`                  |
+| `{`            | `open_bracket` + `shift`          |
+| `]`            | `close_bracket`                 |
+| `}`            | `close_bracket` + `shift`         |
+| `\`           | `backslash`                     |
+| `|`          | `backslash` + `shift`             |
+| `;`            | `semicolon`                     |
+| `:`            | `semicolon` + `shift`             |
+| `'`            | `quote`                         |
+| `"`            | `quote` + `shift`                 |
+| `grave`        | `grave_accent_and_tilde`        |
+| `            | `grave_accent_and_tilde`        |
+| `~`            | `grave_accent_and_tilde` + `shift` |
+| `,`            | `comma`                         |
+| `<`            | `comma` + `shift`                 |
+| `.`            | `period`                        |
+| `>`            | `period` + `shift`                |
+| `/`            | `slash`                         |
+| `?`            | `slash` + `shift`                 |
+| `!`            | `1` + `shift`                     |
+| `@`            | `2` + `shift`                     |
+| `#`            | `3` + `shift`                     |
+| `$`            | `4` + `shift`                     |
+| `%`            | `5` + `shift`                     |
+| `^`            | `6` + `shift`                     |
+| `&`            | `7` + `shift`                     |
+| `*`           | `8` + `shift`                     |
+| `up`           | `up_arrow`                      |
+| `down`         | `down_arrow`                    |
+| `left`         | `left_arrow`                    |
+| `right`        | `right_arrow`                   |
+| `pgup`         | `page_up`                       |
+| `pgdn`         | `page_down`                     |
+| `kp-`          | `keypad_hyphen`                 |
+| `kp*`         | `keypad_asterisk`               |
+| `kp/`          | `keypad_slash`                  |
+| `kp=`          | `keypad_equal_sign`             |
+| `kp.`          | `keypad_period`                 |
+| `kp,`          | `keypad_comma`                  |
+| `kpenter`      | `keypad_enter`                  |
+| `kp1`          | `keypad_1`                      |
+| `kp2`          | `keypad_2`                      |
+| `kp3`          | `keypad_3`                      |
+| `kp4`          | `keypad_4`                      |
+| `kp5`          | `keypad_5`                      |
+| `kp6`          | `keypad_6`                      |
+| `kp7`          | `keypad_7`                      |
+| `kp8`          | `keypad_8`                      |
+| `kp9`          | `keypad_9`                      |
+| `kp0`          | `keypad_0`                      |
+| `kpnum`        | `keypad_num_lock`               |
 
 #### Mutli-Modifier aliases:
 
-| karaml alias | Karabiner key_code            |
-| ------------ | ----------------------------- |
-| hyper        | right_shift + right_option + right_command + right_control |
-| ultra        | right_shift + right_option + right_command + right_control + fn |
-| super        | right_shift + right_command + right_control |
-
+| karaml alias | Karabiner key_code                                              |
+| ------------ | --------------------------------------------------------------- |
+| `hyper`        | `right_shift` + `right_option` + `right_command` + `right_control`      |
+| `ultra`        | `right_shift` + `right_option` + `right_command` + `right_control` + `fn` |
+| `super`        | `right_shift` + `right_command` + `right_control`                     |
 
 Feel free to suggest other aliases/better names. In the future, I would like to
 add a way to define your own aliases in the config file.
 
-
-#### *MISSING ALIASES*:
+#### _MISSING ALIASES_:
 
 - `+`, since it's used to join multiple key codes and I need
-to figure out a way around that. Use `plus` in the meantime
+  to figure out a way around that. Use `plus` in the meantime
 - `kp+` for the same reason, so use `kpplus` as an alternate
-
-
 
 ### Simultaneous from-keys, multiple to-events, requiring multiple layers
 
 To get simultaneous from events or multiple to events, i.e. in Karabiner-JSON:
-```json
-  {
-    "from": {
-      "simultaneous": [
-            { "key_code": "j" },
-            { "key_code": "k" }
-        ]
-    },
-    "to": [
-          { "key_code": "h" },
-          { "key_code": "l" },
-      ],
-  }
 
+```json
+{
+  "from": {
+    "simultaneous": [{ "key_code": "j" }, { "key_code": "k" }]
+  },
+  "to": [{ "key_code": "h" }, { "key_code": "l" }]
+}
 ```
+
 Join valid key codes or aliases in any part of the YAML map with a `+`. This is
 'whitespace agnostic', so `j+k`, `j + k`, and `j+k + l` etc. are all valid.
 
 ```yaml
 /base/:
   j+k: h+l
-  <c-j>+k: [escape, '/nav/ + notify(idn, Nav Layer on!)', 'notifyOff(idn)']
-
+  <c-j>+k: [escape, "/nav/ + notify(idn, Nav Layer on!)", "notifyOff(idn)"]
 ```
 
 This also applies to joining layers if you want to enable two layers at once.
@@ -356,7 +423,7 @@ non-conflicting keys will all work as intended.
 
 ```yaml
 /base/:
-  <a-caps_lock>: [null, /fn/ + /sys/]  
+  <a-caps_lock>: [null, /fn/ + /sys/]
 /fn/:
   a: f1
   s: f2
@@ -366,7 +433,6 @@ non-conflicting keys will all work as intended.
   r: volume_up
   s: app(System Preferences)
 ```
-
 
 Alternatively, for sending multiple singe characters, you can use `string()`.
 See: [string special event function](#strings)
@@ -382,21 +448,21 @@ events in disguise. You can use these as if they were to.events, e.g.:
   <o-g>: open(https://github.com)
 ```
 
-| Function | Description |
-| -------- | ----------- |
-| [app](#app-launchers) | Launch an app from the Applications folder |
-| [open](#open-browser-link) | Open a url in your default browser |
-| [shell](#shell-commands) | Run a shell command |
-| [input](#input-sources) | Switch input source |
-| [mouse](#mouse-movement) | Move the mouse cursor in the x or y directions |
-| [mousePos](#set-mouse-cursor-position) | Move the mouse cursor to a specific position |
-| [notify](#notifications-applescript-style) | Trigger a Karabiner-Elements notification |
-| [notifyOff](#notifications-applescript-style) | Turn off a Karabiner-Elements notification |
-| [shnotify](#notifications-applescript-style) | Trigger a notification in macOS's Notification Center |
-| [softFunc](#software-functions) | Karabiner-Elements software function |
-| [sticky](#sticky-modifiers) | Set a sticky modifier |
-| [string](#strings) | Send a sequence of characters |
-| [var](#variables) | Set a value for a variable/condition |
+| Function                                      | Description                                           |
+| --------------------------------------------- | ----------------------------------------------------- |
+| [app](#app-launchers)                         | Launch an app from the Applications folder            |
+| [open](#open-browser-link)                    | Open a url in your default browser                    |
+| [shell](#shell-commands)                      | Run a shell command                                   |
+| [input](#input-sources)                       | Switch input source                                   |
+| [mouse](#mouse-movement)                      | Move the mouse cursor in the x or y directions        |
+| [mousePos](#set-mouse-cursor-position)        | Move the mouse cursor to a specific position          |
+| [notify](#notifications-applescript-style)    | Trigger a Karabiner-Elements notification             |
+| [notifyOff](#notifications-applescript-style) | Turn off a Karabiner-Elements notification            |
+| [shnotify](#notifications-applescript-style)  | Trigger a notification in macOS's Notification Center |
+| [softFunc](#software-functions)               | Karabiner-Elements software function                  |
+| [sticky](#sticky-modifiers)                   | Set a sticky modifier                                 |
+| [string](#strings)                            | Send a sequence of characters                         |
+| [var](#variables)                             | Set a value for a variable/condition                  |
 
 #### App Launchers
 
@@ -420,7 +486,6 @@ Open a url with your default browser.
 ```yaml
 /base/:
   <o-g>: open(https://github.com)
-
 ```
 
 #### Shell Commands
@@ -452,13 +517,15 @@ JSON object with all the valid Karabiner fields as specified
 
 ```yaml
 /sys/:
-  <o-k>+e: input(en)  # Set English input source
-                      # Set a Greek keyboard based on source id
-  <o-k>+g: 'input({   
-            "input_source_id": "com.apple.keylayout.GreekPolytonic",
-            "language": "el" 
-            })'       # note the use of single quotes around the rhs to escape
-                      # double quotes and commas
+  <o-k>+e:
+    input(en) # Set English input source
+    # Set a Greek keyboard based on source id
+  <o-k>+g:
+    'input({
+    "input_source_id": "com.apple.keylayout.GreekPolytonic",
+    "language": "el"
+    })' # note the use of single quotes around the rhs to escape
+    # double quotes and commas
 ```
 
 #### Mouse Movement
@@ -497,8 +564,8 @@ moved to the same screen as the current mouse position.
 
 ```yaml
 /mouse/:
-  '0': mousePos(0, 0)
-  '<o-2>': mousePos(500, 500, 1)
+  "0": mousePos(0, 0)
+  "<o-2>": mousePos(500, 500, 1)
 ```
 
 #### Notifications (Karabiner Style)
@@ -533,13 +600,11 @@ notify(id, null)
 notify(id, "")
 ```
 
-
 #### Notifications (AppleScript Style)
 
 `shnotify(msg, title, subtitle, sound)`
 
 `shnotify({"msg": "message", "title": "title", "subtitle": "subtitle", "sound": "sound"})`
-
 
 Displays a notification using AppleScript by running a shell command in the
 format:
@@ -555,11 +620,11 @@ positional arguments in the order of message, title, subtitle, and sound.
 
 ```yaml
 /sys/:
-  <o-1>: shnotify(text)  # message only
-  <o-2>: shnotify(text, title)  # message and title
-  <o-3>: shnotify(text, title, subtitle)  # message, title, and subtitle
-  <o-4>: shnotify(text, title, subtitle, sound)  # message, title, subtitle, sound
-  <o-5>: shnotify(text, null, null, sound)  # message and sound only
+  <o-1>: shnotify(text) # message only
+  <o-2>: shnotify(text, title) # message and title
+  <o-3>: shnotify(text, title, subtitle) # message, title, and subtitle
+  <o-4>: shnotify(text, title, subtitle, sound) # message, title, subtitle, sound
+  <o-5>: shnotify(text, null, null, sound) # message and sound only
 ```
 
 The second is to pass a string representing a JSON object with all the valid
@@ -583,7 +648,6 @@ keyboard input source switching.
 Sound names can be found at `/System/Library/Sounds/`
 For more advanced notifications, try [terminal-notifier](https://github.com/julienXX/terminal-notifier) or [alerter](https://github.com/vjeantet/alerter) and pass the command as a `shell()` command.
 
-
 #### Software Functions
 
 `softFunc( {"function name": nested_dict} )`
@@ -594,7 +658,7 @@ as specified
 
 ```yaml
 /mouse/:
-  'p+1': 'softFunc("set_mouse_cursor_position": {"x": 0, "y": 0, "screen": 0 })'
+  "p+1": 'softFunc("set_mouse_cursor_position": {"x": 0, "y": 0, "screen": 0 })'
 ```
 
 #### Sticky Modifiers
@@ -614,8 +678,8 @@ turn it off ('on | off | toggle')
 
 `string(a string of valid key codes or aliases)`
 
-Instead of mapping a key to type out a string of characters using the `+` joninig method, e.g. `git
-checkout` like so:
+Instead of mapping a key to type out a string of characters using the `+` joninig method, e.g. `git checkout` like so:
+
 ```yaml
 /base/:
 <a-g>: g+i+t+space+c+h+e+c+k+o+u+t
@@ -634,11 +698,11 @@ as characters, and `spacebar`, `kp-`, `left` etc. will get interpreted as a
 literal string of chars, not their alias counterparts.
 
 You can use a combination if you want to send non-single character events:
+
 ```yaml
 /base/:
   <a-g>: string(git checkout main) + enter
 ```
-
 
 #### Variables
 
@@ -652,10 +716,10 @@ function allows more granular control.
 
 ```yaml
 /base/:
-  <o-s>: var(sys_layer, 1) # This does not automatically create a corresponding
-                           # toggle-off mapping. Don't get stuck in another layer!
+  <o-s>:
+    var(sys_layer, 1) # This does not automatically create a corresponding
+    # toggle-off mapping. Don't get stuck in another layer!
 ```
-
 
 ### Frontmost-App Conditions
 
@@ -665,9 +729,10 @@ or list/sequence).
 
 ```yaml
 /layer/:
-  from-key: {
+  from-key:
+    {
       if regex regex ...: [when-tapped, when-held, etc.],
-      unless regex regex ...: [etc.]
+      unless regex regex ...: [etc.],
     }
 ```
 
@@ -676,9 +741,9 @@ The dictionary's keys must be in the form of either `if regex regex ...` or
 bundle identifier of the app you want to match (read the [Karabiner
 docs](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/conditions/frontmost-application/)
 for more info). karaml will yell at you if your conditional term isn't `if` or
-  `unless`. Every following substring separated by a space will be interpreted
-  by karaml as a list (yaml supports lists in keys, but Python doesn't, so use
-  a string here).
+`unless`. Every following substring separated by a space will be interpreted
+by karaml as a list (yaml supports lists in keys, but Python doesn't, so use
+a string here).
 
 The dictionary's values are your usual karaml map values. Each k/v pair
 represents a new map that includes the `frontmost_app_if/unless` conditional.
@@ -686,20 +751,17 @@ represents a new map that includes the `frontmost_app_if/unless` conditional.
 You can create as many unique keys as you want here, all of which will be tied
 to the original 'from' key. Mind your regex and your capitalization!
 
-
 ```yaml
 /base/:
   <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
   <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
   <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
   <a-g>: {
-    # types 'git ' when tapped, 'checkout' when held if any of these apps are focused
-    if Terminal$ iterm2$ kitty$: [string(git ), string(checkout)],
-    if CotEditor$: <g-l> # 'go to line' alternate shortcut if CotEditor is focused
-      }
-
+      # types 'git ' when tapped, 'checkout' when held if any of these apps are focused
+      if Terminal$ iterm2$ kitty$: [string(git ), string(checkout)],
+      if CotEditor$: <g-l>, # 'go to line' alternate shortcut if CotEditor is focused
+    }
 ```
-
 
 ### Global parameters
 
@@ -717,7 +779,6 @@ parameters:
     "mouse_motion_to_scroll.speed": 100,
   }
 
-
 /base/:
   # ...
 ```
@@ -733,13 +794,9 @@ generate default placeholders before it writes the file.
 ```yaml
 # If a profile name is not provided, one will be generated from the
 # current Unix timestamp
-profile_name:
-  Karaml Config
+profile_name: Karaml Config
 
-
-title:
-  KaramlRules
-
+title: KaramlRules
 ```
 
 ### JSON Extension Map
@@ -754,7 +811,7 @@ quotes are optional unless needed for escaping characters, elements of the
 `json` map are separated as sequence item (a properly indented dash `-`
 followed by a space), and no commas are used to separate those items.
 
-***WARNING!***: in the layer mappings, karaml 'inspects' your configuration for
+**_WARNING!_**: in the layer mappings, karaml 'inspects' your configuration for
 proper formatting - not just whether you wrote it in a syntax karaml can
 intrepret, but also whether you used valid key codes, valid modifiers, etc.
 Currently, karaml doesn't support these 'health checks' for the JSON extension map,
@@ -769,8 +826,8 @@ so karaml will just append whatever you put in there to the rule-set.
 
 json:
   - {
-    # No need for quotes since there are no chars that need escaping
-    description: Right Control to > if tapped and control if held,
+      # No need for quotes since there are no chars that need escaping
+      description: Right Control to > if tapped and control if held,
       from: { key_code: right_control },
       to: { key_code: right_control, lazy: true },
       to_if_alone: { key_code: period, modifiers: [right_control] },
@@ -847,7 +904,7 @@ When a 'chatty' event would have side-effects, or when sending an event on 'if
 held down' following the relevant parameters is an explicit goal (rather than
 just a way of distinguishing a tap from a hold), karaml can handle that by
 making the distinction between 'chatty/harmless' events and otherwise. In these
-cases, karml ***will*** place the 'when-held' event in the `to_if_held_down`
+cases, karml **_will_** place the 'when-held' event in the `to_if_held_down`
 dictionary to prevent 'chatter' caused by events in the `to` dictionary.
 
 In short, karaml is opinionated about layers and modifiers, and is designed to
@@ -864,7 +921,6 @@ karaml style, but as a fallback, a `json:` map can be added to the config to
 integrate a regular Karabiner JSON config (with minor YAML modifications). In
 fact, you could just use karaml as a way to write a regular Karabiner config in
 YAML but with less commas and little to no quotation marks.
-
 
 ## 🔩 Requirements
 
@@ -899,13 +955,13 @@ If your karaml maps aren't mapped correctly, the program will raise an
 exception and try to give you some information about what went wrong. The error
 system needs improvement - working on it!
 
-
 ### CLI prompt + modes
 
 Without any optional arguments, you will be prompted to make a configuration
 choice:
+
 ```
-$ karaml my_karaml_config.yaml 
+$ karaml my_karaml_config.yaml
 Reading from: my_karaml_config.yaml...
 
 1. Update karabiner.json with my_karaml_config.yaml
@@ -920,14 +976,12 @@ Before every update, karaml makes a backup copy of your previous
 `karabiner.json` in the `automatic_backups` folder. This can add up! But I
 didn't want to risk a bug in the program destroying your config.
 
-
 `2.` writes a json file to your karabiner complex modifications folder which
 you can import with the Karabiner GUI. Then you can enable or disable layers
 individually, but you should them all at once to ensure your layer and mapping
 priority is setup as intended. The file is named `karaml_complex_mods.json` by
 default, but you can change this in your karaml config with the `title` key,
 (and by doing so, you can easily switch between rulesets).
-
 
 `3.` quits the program.
 
@@ -940,7 +994,6 @@ beforehand).
 ```bash
 karaml my_karaml_config.yaml -k
 ```
-
 
 #### -c mode
 
@@ -965,6 +1018,7 @@ it's a feature you think should be implemented or because you found a bug,
 please add the stack trace in an issue!
 
 ## 🪲 Known Issues / Bugs / Limitations
+
 - Can't toggle layer in 'when-tapped' position if also set in 'when-held' position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
@@ -979,7 +1033,6 @@ please add the stack trace in an issue!
 - Define your own aliases
 - Define your own functions
 - ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
-
 
 ## 🔭 Alternatives
 
