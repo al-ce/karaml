@@ -50,7 +50,6 @@ Karabiner-Elements (consider
 
   # Use unicode symbols for modifiers insead of letters
   ⌘ ⇧ | g: string(lazygit) # command + shift + g to send string 'lazygit'
-
   ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
   ☆      | o: /open/ # hyper + o to toggle /open/ layer
 
@@ -91,6 +90,7 @@ json:
 - Multiple frontmost-app conditional remaps in a single yaml map
 - Aliases for symbols, shifted keys, and complex names (e.g.
   `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
+- Define your own aliases for keycodes and modfiers!
 - 'Special event' shorthands, e.g. app launchers, shell commands,
   notifications, and more
 - Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml
@@ -317,6 +317,8 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | `delete`       | `delete_forward`                |
 | `space`        | `spacebar`                      |
 | ` ` (a space)  | `spacebar`                      |
+| `SPC`          | `spacebar`                      |
+| `spc`          | `spacebar`                      |
 | `-`            | `hyphen`                        |
 | `underscore`   | `hyphen` + `shift`                |
 | `_`           | `hyphen` + `shift`                |
@@ -392,6 +394,66 @@ add a way to define your own aliases in the config file.
 - `+`, since it's used to join multiple key codes and I need
   to figure out a way around that. Use `plus` in the meantime
 - `kp+` for the same reason, so use `kpplus` as an alternate
+
+
+### Defining own aliases
+
+You can define your own aliases by adding a top level key named `aliases`
+anywhere in your config file. This YAML map will be merged with the default
+aliases.
+
+```yaml
+aliases:
+
+  ⏎: return_or_enter
+  tilde:
+    - grave_accent_and_tilde
+    - [left_shift]
+
+/base/:
+  ⌘ | ⏎: app(WezTerm)
+  tilde: '`'
+  '`': tilde
+```
+
+In the above example, the Unicode character `⏎` can be used as an alias for
+`return_or_enter`, and `tilde` can be used as an alias for a tilde `~`
+character. Now these can be used in any layer in the config. In the example,
+`⌘ | ⏎` (`return_or_enter` with the `command` modirief) is used to launch
+WezTerm, and `tilde` key's usual function has been reversed so that now you
+have to press shift + the backtick character to get a backtick instead of vice
+versa.
+
+This aliasing feature does not give you the ability to create aliases for the
+modifier field of a karaml mapping. That will come in future updates. You can
+however make aliases for a stand-alone modifier or multi-modifier, e.g.
+
+```yaml
+aliases:
+  mega:
+    - left_control
+    - [left_command, left_option]
+
+/base/:
+  end: mega
+  escape: [escape, mega]
+  <cmo-8>: f8
+```
+
+Here we defined a `mega` alias, and we remapped the `end` key and `escape` key
+(when held) to be `mega`. But we can't use `mega` as a modifier alias for
+`cmo`, since karaml is more or less committed to a
+single-character-per-modifier system (but we'll put modifier-aliases on the
+todo list). So we make a new mapping, `<cmo-8>` for `f8`, and now we can use
+`escape` or `end` + `8` to send `f8`.
+
+The purpose is to let you visualize your config in whatever way you find most
+readable. Say for example you're creating a layer for your window-management
+commands. Instead of a messy series of mappings like `<coms-1>`, `<coms-2`, or
+a series of long and similar shell commands (e.g. for yabai), now you can
+create aliases like `window_eights`, `window_center`, `move_to_space_1` etc.
+This makes for a cleaner config and makes it easier to manage when you want to
+change the keybindings.
 
 ### Simultaneous from-keys, multiple to-events, requiring multiple layers
 
@@ -1030,7 +1092,8 @@ please add the stack trace in an issue!
 - ~~Protect against double maps in the same layer (accidental overwrites)~~ user will be warned but not prohibited, see [5a66a39](https://github.com/al-ce/karaml/commit/5a66a39a75271cf27a88bf20f01df690b0688c12)
 - More condition types (`device_if`, etc.)
 - More helpful configuration error messages
-- Define your own aliases
+- ~Define your own aliases~ Partially complete - modifier aliases are not yet
+  supported
 - Define your own functions
 - ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
 

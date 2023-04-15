@@ -3,9 +3,14 @@ from dataclasses import dataclass
 from typing import Union
 import yaml
 
-from karaml.helpers import translate_params, UniqueKeyLoader
+from karaml.helpers import (
+    translate_params,
+    UniqueKeyLoader,
+    validate_user_defined_aliases,
+)
 from karaml.exceptions import invalidFrontmostAppCondition
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
+from karaml.key_codes import Alias, ALIASES
 
 
 def extract_keys(mapping_node):
@@ -29,6 +34,7 @@ class KaramlConfig:
         self.title: str = self.get_ruleset_title(self.yaml_data)
         self.params: dict = self.get_params(self.yaml_data)
         self.json_rules_list: list = self.get_json_rules_list(self.yaml_data)
+        self.update_user_aliases(self.yaml_data)
         self.layers: list = self.gen_layers(self.yaml_data)
 
         self.config_stats()
@@ -102,6 +108,36 @@ class KaramlConfig:
         to_delayed_action for doube-tap modifiers).
         """
         return d.pop("json") if d.get("json") else []
+
+    def update_user_aliases(self, d: dict) -> None:
+        """
+        Checks the top-level key "aliases" for a dict of user-defined
+        aliases. Each alias key should have a valueof  a list with two to three
+        items:
+        - a string representing a valid key code
+        - a list of strings representing valid modifier key codes
+        - an optional third string defining the type of key code. If this field
+          is left blank, the key code will be treated as a key_code type. For
+          consumer_key_code and pointing_button types, the user should specify
+          this third item
+
+        This function updates the ALIASES dict with the user-defined aliases.
+        Returns None.
+        """
+        if not d.get("aliases"):
+            return
+        aliases = d.get("aliases")
+
+        for alias, alias_def in aliases.items():
+            # If the user did not add modifiers to their alias,
+            # add an empty dummy list
+            if not isinstance(alias_def, list):
+                alias_def = [alias_def, []]
+
+            validate_user_defined_aliases(alias_def)
+            ALIASES[alias] = Alias(alias_def[0], alias_def[1])
+
+        d.pop("aliases")
 
     def gen_layers(self, yaml_data: dict) -> list:
         """

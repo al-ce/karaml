@@ -8,9 +8,17 @@ from karaml.exceptions import (
     invalidStickyModifier, invalidLayerName, invalidModifier,
     invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
     invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
-    invalidMousePosArgs, invalidDictFormatInString
+    invalidMousePosArgs, invalidDictFormatInString,
+    invalidUserDefinedAlias
 )
-from karaml.key_codes import MODIFIERS, STICKY_MODS
+from karaml.key_codes import (
+    MODIFIERS,
+    PSEUDO_FUNCS,
+    STICKY_MODS,
+    KEY_CODE,
+    POINTING_BUTTON,
+    CONSUMER_KEY_CODE,
+)
 
 
 def extract_yaml_node_value(mapping_node):
@@ -139,6 +147,29 @@ def is_dict(obj) -> bool:
     return isinstance(obj, dict)
 
 
+def validate_key_code(alias_def: str) -> bool:
+    """
+    Returns a bool indicating if:
+      - the alias definition is in one of the list of key code types:
+        key_code, pointing_button, or consumer_key_code
+    """
+    return (
+        isinstance(alias_def, str) and
+        any(alias_def in x for x in (
+            KEY_CODE,
+            POINTING_BUTTON,
+            CONSUMER_KEY_CODE,
+        ))
+    )
+
+
+def validate_modifier(modifiers: list[str]) -> bool:
+    return all(
+        isinstance(mod, str) and
+        mod in MODIFIERS.values() for mod in modifiers
+    )
+
+
 def make_list(x) -> list:
     return [x] if not isinstance(x, list) else x
 
@@ -241,16 +272,16 @@ def check_and_validate_str_as_dict(string: str) -> bool:
     try:
         if type(eval(string)) != dict:
             msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
-                    " be a dict, but it failed to evaluate.\nPlease check" \
-                    " your syntax."
+                " be a dict, but it failed to evaluate.\nPlease check" \
+                " your syntax."
             invalidDictFormatInString(string, msg)
     except:  # noqa: E722
         # bad practice, but we will raise a useful Exception in this sequence
         # of function calls, and I'd rather warn the user with a generic
         # message than a misleading one
         msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
-                " be a dict, but it failed to evaluate.\nPlease check" \
-                " your syntax."
+            " be a dict, but it failed to evaluate.\nPlease check" \
+            " your syntax."
         invalidDictFormatInString(string, msg)
     return True
 
@@ -337,6 +368,24 @@ def validate_sticky_mod_value(string: str):
 def validate_sticky_modifier(string: str):
     if string not in STICKY_MODS:
         invalidStickyModifier(string)
+
+
+def validate_user_defined_aliases(alias_def: str | list) -> None:
+    """
+    Check that the user-defined primary aliases are using the correct format.
+    A user-defined primary alias is a k/v pair whose values must:
+    - contain one or two items
+    - the first item must be a string that is a valid key_code
+    - the second item must be a list of strs that are valid modifiers key_codes
+
+    Raises an error if any of the above conditions are not met. Otherwise,
+    returns None.
+    """
+
+    if not validate_key_code(alias_def[0]):
+        invalidUserDefinedAlias(alias_def)
+    if alias_def[1] and not validate_modifier(alias_def[1]):
+        invalidUserDefinedAlias(alias_def)
 
 
 def validate_var_value(name: str, value: str):

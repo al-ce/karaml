@@ -48,8 +48,8 @@ def invalidDictFormatInString(string: str, note: str):
 
     configError(
         f"Invalid dict format in string:\n\n{string}\n\n"
-        "Dicts must be well formed, with a colon separating the key and value,\n" \
-        "and a comma separating each key-value pair.\n" \
+        "Dicts must be have a colon separating their keys and values,\n"
+        "and a comma separating each key-value pair.\n"
         f"{note}\n"
     )
 
@@ -159,6 +159,21 @@ def invalidStickyModifier(string: str):
         f"Valid modifiers are:\n"
         "left_control, left_shift, left_option, left_command, right_control, "
         "right_shift, right_option, right_command, fn"
+    )
+
+
+def invalidUserDefinedAlias(alias_def: str):
+    """
+    Raises an error that the user has either specified too many items in a
+    user-defined alias or that the items are not of the correct type.
+    """
+    configError(
+        "A user-defined primary alias should have the form:\n"
+        "alias:\n"
+        "  - key_code (str of valid key code)\n"
+        "  - modifiers (list of valid modifier key codes) (optional)\n\n"
+        "Got:\n"
+        f"{alias_def}"
     )
 
 
