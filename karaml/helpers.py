@@ -378,9 +378,18 @@ def validate_user_defined_aliases(alias_def: str | list) -> None:
     - the first item must be a string that is a valid key_code
     - the second item must be a list of strs that are valid modifiers key_codes
 
+    Or, the user may define an alias for a pseudo func, e.g.
+    'mousePos(100, 200)', which we confirm with a regex search, and if so we
+    skip the validation for that case.
+
     Raises an error if any of the above conditions are not met. Otherwise,
     returns None.
     """
+
+    # Check if the alias is intended to be a pseudo-func
+    found_pf = search(r"^(\w+)\(.*\)$", alias_def[0])
+    if found_pf and found_pf.group(1) in PSEUDO_FUNCS:
+        return
 
     if not validate_key_code(alias_def[0]):
         invalidUserDefinedAlias(alias_def)

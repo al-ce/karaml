@@ -10,7 +10,7 @@ from karaml.helpers import (
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS,
-                              UNICODE_MODS,
+                              UNICODE_MODS, ALIASES
                               )
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
@@ -138,6 +138,10 @@ def translate_if_pseudo_func(usr_map: str) -> KeyStruct:
     if the user mapping matches the regex for a pseudo function, e.g.
     'shell(open .)' or 'app(Terminal)'. Otherwise, return None.
     """
+    # Check if the user mapping is an alias for a pseudo function, and if so,
+    # replace the alias with the pseudo function
+    if usr_map in ALIASES:
+        usr_map = ALIASES[usr_map].key_code
     for event_alias in PSEUDO_FUNCS:
         query = search(f"^{event_alias}\\((.+)\\)$", usr_map)
         if not query:

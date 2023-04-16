@@ -398,10 +398,19 @@ add a way to define your own aliases in the config file.
 
 ### Defining own aliases
 
-You can define your own aliases by adding a top level key named `aliases`
-anywhere in your config file. This YAML map will be merged with the default
-aliases.
+You can define your own aliases for *singular events* by adding a top level 
+key named `aliases` anywhere in your config file. This YAML map will be merged
+with the default aliases.
 
+An alias has the following format:
+
+```yaml
+alias_name:
+  - event_string  # This can be a valid key code or a valid pseudo-function
+  - [mods]        # optional
+```
+
+Example:
 ```yaml
 aliases:
 
@@ -409,20 +418,28 @@ aliases:
   tilde:
     - grave_accent_and_tilde
     - [left_shift]
+  screen_saver: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+
 
 /base/:
   ⌘ | ⏎: app(WezTerm)
   tilde: '`'
   '`': tilde
+/sys:
+  m-s: screen_saver
 ```
 
 In the above example, the Unicode character `⏎` can be used as an alias for
 `return_or_enter`, and `tilde` can be used as an alias for a tilde `~`
-character. Now these can be used in any layer in the config. In the example,
+character, and `screen_saver` is aliased to a shell command to enable the
+screen saver.
+
+Now these can be used in any layer in the config. In the example,
 `⌘ | ⏎` (`return_or_enter` with the `command` modirief) is used to launch
 WezTerm, and `tilde` key's usual function has been reversed so that now you
 have to press shift + the backtick character to get a backtick instead of vice
-versa.
+versa. And finally, the `m-s` key combination is used to start the screen
+saver if the `/sys` layer is active.
 
 This aliasing feature does not give you the ability to create aliases for the
 modifier field of a karaml mapping. That will come in future updates. You can
