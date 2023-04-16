@@ -48,7 +48,7 @@ Karabiner-Elements (consider
   ms-a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
   m s | c: app(CotEditor) # left_command + left_shift + to launch CotEditor
 
-  # Use unicode symbols for modifiers insead of letters
+  # Use Unicode symbols for modifiers insead of letters
   ⌘ ⇧ | g: string(lazygit) # command + shift + g to send string 'lazygit'
   ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
   ☆      | o: /open/ # hyper + o to toggle /open/ layer
@@ -199,8 +199,7 @@ the layer will be enabled when the 'from' key is held.
 ### Modifiers
 
 To add modifiers to a primary key, follow the format `<modifiers-primary_key>`.
-Join multiple modifiers without any separation, but wrap optional modifiers in
-parens.
+Wrap optional modifiers in parens.
 
 To add modifiers to a primary key, there are a few available formats. The
 general format is to have modifiers followed by a delimiter followed by
@@ -208,19 +207,19 @@ primary keys. Multiple modifiers can have whitespace between them if they
 help readability, or they can be joined without any whitespace. Optional
 modifiers are indicaped by wrapping them in parens.
 
-All of these are valid formats. The original format was `<modifiers-primary_key>`,
-but others have been added to give the user a choice in whatever format they
-find most readable.
+The original format for modifiers was `<modifiers-primary_key>`, but others
+have been added to give the user a choice in whatever format they find most
+readable.
 
 The following are all examples of the mapping for `left_control` +
 `left_shift` + `a` to open the Terminal app:
 
 ```yaml
 /base/:
-  <cs-a>: app(Terminal)
-  cs-a: app(Terminal)
-  c s - a: app(Terminal)
-  c s | a: app(Terminal)
+  <cs-a>   : app(Terminal)
+  cs-a     : app(Terminal)
+  c s  - a : app(Terminal)
+  c s  | a : app(Terminal)
   'c s | a': app(Terminal)
 ```
 
@@ -267,10 +266,10 @@ The mnemonics for the less-obvious modifiers are:
 - `a`: `A`lt
 - `g`: `G`ui
 
-An alternative system for modifiers uses unicode symbols: ⌘ ⌥ ⌃ ⇧
-The unicode symbols `‹` and `›` denote left and right side modifiers.
+An alternative system for modifiers uses Unicode symbols: ⌘ ⌥ ⌃ ⇧
+The Unicode symbols `‹` and `›` denote left and right side modifiers.
 
-| unicode symbol | key_code       |
+| Unicode symbol | key_code       |
 | -------------- | -------------- |
 | `⌘`            | `command` |
 | `⌥`            | `option` |
@@ -292,10 +291,10 @@ Examples:
 - `‹⌃     | h` → `left_ctrl` + `h`
 - ` ⌃› ‹⌥ | h` → `left_opt` + `right_ctrl` + `h`
 
-Of course you can use another valid syntax for the unicode characters as well,
+Of course you can use another valid syntax for the Unicode characters as well,
 e.g. `<⌘⇧-g>` or `<⌘⇧|g>`. The above syntax is suggested for readability.
 
-If you need an easy way to type these unicode characters, you can use a
+If you need an easy way to type these Unicode characters, you can use a
 text-expander or snippet tool like Typinator, the built in expanders in Raycast
 or Alfred, TextExpander, etc.
 
@@ -330,8 +329,8 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | `{`            | `open_bracket` + `shift`          |
 | `]`            | `close_bracket`                 |
 | `}`            | `close_bracket` + `shift`         |
-| `\`           | `backslash`                     |
-| `|`          | `backslash` + `shift`             |
+| `\`          | `backslash`                   |
+| \|           | `backslash` + `shift`             |
 | `;`            | `semicolon`                     |
 | `:`            | `semicolon` + `shift`             |
 | `'`            | `quote`                         |
@@ -386,8 +385,6 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | `ultra`        | `right_shift` + `right_option` + `right_command` + `right_control` + `fn` |
 | `super`        | `right_shift` + `right_command` + `right_control`                     |
 
-Feel free to suggest other aliases/better names. In the future, I would like to
-add a way to define your own aliases in the config file.
 
 #### _MISSING ALIASES_:
 
@@ -405,9 +402,10 @@ with the default aliases.
 An alias has the following format:
 
 ```yaml
-alias_name:
-  - event_string  # This can be a valid key code or a valid pseudo-function
-  - [mods]        # optional
+aliases:            # Include this top-level key anywhere in your config
+  alias_name:
+    - event_string  # This can be a valid key code or a valid pseudo-function
+    - [mods]        # optional
 ```
 
 Example:
@@ -435,11 +433,11 @@ character, and `screen_saver` is aliased to a shell command to enable the
 screen saver.
 
 Now these can be used in any layer in the config. In the example,
-`⌘ | ⏎` (`return_or_enter` with the `command` modirief) is used to launch
+`⌘ | ⏎` (`return_or_enter` with the `command` modifier) is used to launch
 WezTerm, and `tilde` key's usual function has been reversed so that now you
 have to press shift + the backtick character to get a backtick instead of vice
-versa. And finally, the `m-s` key combination is used to start the screen
-saver if the `/sys` layer is active.
+versa. And finally, the `left_command` and `s` key combination is used to start
+the screen saver if the `/sys` layer is active.
 
 This aliasing feature does not give you the ability to create aliases for the
 modifier field of a karaml mapping. That will come in future updates. You can
@@ -467,10 +465,10 @@ todo list). So we make a new mapping, `<cmo-8>` for `f8`, and now we can use
 The purpose is to let you visualize your config in whatever way you find most
 readable. Say for example you're creating a layer for your window-management
 commands. Instead of a messy series of mappings like `<coms-1>`, `<coms-2`, or
-a series of long and similar shell commands (e.g. for yabai), now you can
-create aliases like `window_eights`, `window_center`, `move_to_space_1` etc.
-This makes for a cleaner config and makes it easier to manage when you want to
-change the keybindings.
+a series of long and similar shell commands, now you can create aliases like
+`window_eights`, `window_center`, `move_to_space_1` etc. This makes for a
+cleaner config and makes it easier to manage when you want to change the
+keybindings.
 
 ### Simultaneous from-keys, multiple to-events, requiring multiple layers
 
