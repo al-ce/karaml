@@ -1047,15 +1047,15 @@ Writes to: karaml_complex_mods.json
 3. Quit
 ```
 
-`1.` updates your karabiner.json file directly, either creating a new profile
+`1.` updates your `karabiner.json` file directly, either creating a new profile
 or updating an existing one depending on the `profile_name` key in your config.
 Before every update, karaml makes a backup copy of your previous
 `karabiner.json` in the `automatic_backups` folder. This can add up! But I
 didn't want to risk a bug in the program destroying your config.
 
-`2.` writes a json file to your karabiner complex modifications folder which
-you can import with the Karabiner GUI. Then you can enable or disable layers
-individually, but you should them all at once to ensure your layer and mapping
+`2.` writes a JSON file to your karabiner complex modifications folder which
+you can import with the Karabiner-Elements GUI. Then you can enable or disable layers
+individually, but you should enable them all at once to ensure your layer and mapping
 priority is setup as intended. The file is named `karaml_complex_mods.json` by
 default, but you can change this in your karaml config with the `title` key,
 (and by doing so, you can easily switch between rulesets).
@@ -1089,10 +1089,11 @@ karaml my_karaml_config.yaml -c
 #### -d (debug) mode
 
 If there are malformed maps in your config, by default karaml prints you an
-error message and quits. By adding the `-d` flag, you can see the full stack
-trace of the error. If you're making a map that should work, either because
-it's a feature you think should be implemented or because you found a bug,
-please add the stack trace in an issue!
+error message and quits without making any changes to `karbiner.json`.
+By adding the `-d` flag, you can see the full stack trace of the error.
+If you're making a map that should work, either because it's a feature you
+think should be implemented or because you found a bug, please add the stack
+trace in an issue!
 
 ## 🪲 Known Issues / Bugs / Limitations
 
