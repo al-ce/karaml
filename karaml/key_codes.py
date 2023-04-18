@@ -10,8 +10,32 @@ Alias = namedtuple("Alias", ["key_code", "modifiers"])
 
 alias_modifiers = ["shift"]
 ALIASES = {
+
+    # Unicode chars without side indicator default to left side
+    "⌘": Alias("left_command", None),
+    "‹⌘": Alias("left_command", None),
+    "⌘›": Alias("right_command", None),
+    "⌥": Alias("left_option", None),
+    "‹⌥": Alias("left_option", None),
+    "⌥›": Alias("right_option", None),
+    "⌃": Alias("left_control", None),
+    "‹⌃": Alias("left_control", None),
+    "⌃›": Alias("right_control", None),
+    "⇧": Alias("left_shift", None),
+    "‹⇧": Alias("left_shift", None),
+    "⇧›": Alias("right_shift", None),
+
+    "lcmd": Alias("left_command", None),
+    "rcmd": Alias("right_command", None),
+    "lalt": Alias("left_option", None),
+    "ralt": Alias("right_option", None),
+    "lctrl": Alias("left_control", None),
+    "rctrl": Alias("right_control", None),
+    "lshft": Alias("left_shift", None),
+    "rshft": Alias("right_shift", None),
+
     "hyper": Alias("right_shift", ["right_command", "right_control", "right_option"]),
-    "☆": Alias("shift", ["command", "control", "option"]),
+    "☆": Alias("fn", ["shift", "command", "control", "option"]),
     "ultra": Alias("right_shift", ["right_command", "right_control", "right_option", "fn"]),
     "super": Alias("right_shift", ["right_option", "right_control"]),
     "enter": Alias("return_or_enter", None),
