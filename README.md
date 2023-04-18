@@ -376,6 +376,28 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | `kp9`          | `keypad_9`                      |
 | `kp0`          | `keypad_0`                      |
 | `kpnum`        | `keypad_num_lock`               |
+| `⌘`         | `left_command`                     |
+| `‹⌘`        | `left_command`                     |
+| `⌘›`        | `right_command`                    |
+| `⌥`         | `left_option`                      |
+| `‹⌥`        | `left_option`                      |
+| `⌥›`        | `right_option`                     |
+| `⌃`         | `left_control`                     |
+| `‹⌃`        | `left_control`                     |
+| `⌃›`        | `right_control`                    |
+| `⇧`         | `left_shift`                       |
+| `‹⇧`        | `left_shift`                       |
+| `⇧›`        | `right_shift`                      |
+| `lcmd`         | `left_command`                     |
+| `rcmd`         | `right_command`                    |
+| `lopt`         | `left_option`                      |
+| `ropt`         | `right_option`                     |
+| `lctrl`        | `left_control`                     |
+| `rctrl`        | `right_control`                    |
+| `lshift`       | `left_shift`                       |
+| `rshift`       | `right_shift`                      |
+
+
 
 #### Mutli-Modifier aliases:
 
@@ -384,6 +406,7 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | `hyper`        | `right_shift` + `right_option` + `right_command` + `right_control`      |
 | `ultra`        | `right_shift` + `right_option` + `right_command` + `right_control` + `fn` |
 | `super`        | `right_shift` + `right_command` + `right_control`                     |
+| `☆`          |  `shift` + `option` + `command` + `control` + `fn` |
 
 
 #### _MISSING ALIASES_:
