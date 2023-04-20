@@ -450,12 +450,20 @@ def is_modded_key(mapping: str) -> ModifiedKey:
     a hyphen or a pipe). The modifiers may be enclosed in angle brackets.
     """
 
-    expression = r"<?([^|>-]+)[|-]([^>]+)>?"
-    if query := search(expression, mapping):
-        modifiers, key = query.groups()
-        modifiers = modifiers.replace(" ", "")
-        key = key.strip()
-        return ModifiedKey(modifiers, key)
+    mapping = mapping.strip()
+    delim_expression = r"<?([^|>-]+)[|-]([^>]+)>?"
+    delim_query = search(delim_expression, mapping)
+    final_str_expression = r"(.*)\s+([^\s]+)$"
+    final_str_query = search(final_str_expression, mapping)
+    query = delim_query or final_str_query
+
+    if not query:
+        return
+
+    modifiers, key = query.groups()
+    modifiers = modifiers.replace(" ", "")
+    key = key.strip()
+    return ModifiedKey(modifiers, key)
 
 
 def get_modifiers(usr_mods: str, usr_map: str) -> dict:
@@ -530,4 +538,3 @@ class TranslatedMap:
     def __post_init__(self):
         translated_keys = queue_translations(self.map)
         self.keys: list[KeyStruct] = translated_keys
-

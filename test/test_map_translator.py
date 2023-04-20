@@ -1,7 +1,7 @@
 from itertools import chain
 import pytest
 import re
-from string import ascii_uppercase, ascii_letters, digits
+from string import ascii_uppercase, ascii_letters, digits, punctuation
 
 import karaml.map_translator as mp
 import karaml.helpers as helpers
@@ -32,13 +32,19 @@ def test_is_modded_key():
         "mods-primary",
         "mods|primary",
         "mods | primary",
+        " <mods-primary> ",
+        " mods-primary ",
+        " mods|primary ",
+        " mods | primary ",
+        "mods primary",
         "m o d s | primary",
+        "m o d s primary",
+        "m o  d  s  primary",
     ]
     invalid_modified = [
         "mods:primary",
         "<modsprimary>",
-        "mods |",
-        "| primary",
+        "primary",
     ]
 
     for valid in valid_modified_keys:
@@ -248,7 +254,6 @@ def test_translate_event():
         mp.translate_pseudo_func("mousePos", "one, two")
     assert inv_mouse_pos_test.type == SystemExit
 
-
     # Test for proper whitespace-stripping
     assert mp.translate_pseudo_func("notify", " some_id ,some_message") == (
         "set_notification_message", {"id": "some_id", "text": "some_message"}
@@ -428,7 +433,7 @@ def test_get_multi_keys():
             assert len(multi_keys) >= 2
 
 
-def test_multichar_func():
+def test_string_pfunc():
 
     def check_keystruct_matches_char(word: str):
         string_event = f'string({word})'
@@ -441,20 +446,15 @@ def test_multichar_func():
     word_lists = [
         [c for c in ascii_letters],
         [d for d in digits],
+        [p for p in punctuation],
         [key_code.key_code
          for alias, key_code in ALIASES.items()
          if len(alias) == 1]
     ]
     combined = list(chain.from_iterable(word_lists))
+    combined.remove('+')  # since we use it for concatenation
     for char in combined:
         check_keystruct_matches_char(char)
-
-    some_phrase = "This string should include all letters, digits, and valid "
-    "single char aliases (which means it can't include line breaks) "
-    "1234567890 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "- _ = ()[]{}\\|;:'\"`~,<.>/?!@#$%^&*"
-
-    check_keystruct_matches_char(some_phrase)
 
 
 def test_multiple_shell_cmds():
@@ -541,4 +541,3 @@ def test_mouse_pos():
     # Tests that a two-arg string with whitespace returns a two-key dict of x
     # and y in the correct order
     assert mp.mouse_pos(" 3 , 4 ") == {"x": 3, "y": 4}
-
