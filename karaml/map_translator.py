@@ -35,15 +35,15 @@ def queue_translations(usr_key: str) -> list:
     """
     multi_keys = get_multi_keys(usr_key)
     if not multi_keys:
-        if multichar_pf := multichar_func(usr_key):
-            return multichar_pf
+        if string_pf := string_pseudo_func(usr_key):
+            return string_pf
         return [key_code_translator(usr_key, usr_key)]
 
     translations = []
     shell_cmd = ""
     for key in multi_keys:
-        if multichar_pf := multichar_func(key):
-            translations += multichar_pf
+        if string_pf := string_pseudo_func(key):
+            translations += string_pf
             continue
 
         translated = key_code_translator(key, usr_key)
@@ -104,20 +104,53 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
     invalidKey("key code", usr_map, usr_key)
 
 
-def multichar_func(usr_key: str) -> list:
+def string_pseudo_func(usr_key: str) -> list:
     """
     If a user mapping matches the regex 'string\\((.*)\\)', e.g.
     string(hello), return a list of KeyStructs with each character in parens as
     its key_code, given that all chars are valid key_codes or aliases.
+
+    If the string arg contains a modifier alias, e.g. string(⌘), or any other
+    Unicode character that doesn't have a valid Karabiner-Elements keycode or
+    karaml alias, then return a list with a single KeyStruct with the key_type
+    'shell_command' and the shell command to send the Unicode string as its
+    key_code. The shell command is an AppleScript that sets the clipboard to
+    the string and then sends the paste command to the frontmost app. The prior
+    contents of the clipboard are restored after the paste command is sent.
     """
 
-    multichar = search("string\\((.*)\\)", usr_key)
-    if not multichar:
+    string_pf = search("string\\((.*)\\)", usr_key)
+    if not string_pf:
         return
-    return [
-        translate_if_valid_keycode(char, usr_key)
-        for char in multichar.group(1)
-    ]
+    string_args = string_pf.group(1)
+
+    key_codes = []
+    for char in string_args:
+        if char in UNICODE_MODS:
+            continue
+        valid_key_code = translate_if_valid_keycode(char, usr_key)
+        if valid_key_code:
+            key_codes.append(valid_key_code)
+
+    if len(string_args) > len(key_codes):
+        return [send_Unicode_string(string_args)]
+    return key_codes
+
+
+def send_Unicode_string(string: str) -> KeyStruct:
+    """
+    Return a KeyStruct with the key_type 'shell_command' and the shell command
+    to send the Unicode string as its key_code.
+    """
+    shell_cmd = (
+        "osascript -e 'set temp to the clipboard as string' "
+        f"-e 'set the clipboard to \"{string}\"' "
+        "-e 'tell application \"System Events\" to keystroke \"v\" "
+        "using command down' "
+        "-e 'delay 0.1' -e 'set the clipboard to temp'"
+    )
+
+    return KeyStruct("shell_command", shell_cmd, None)
 
 
 def translate_if_layer(string: str) -> namedtuple:
@@ -497,3 +530,4 @@ class TranslatedMap:
     def __post_init__(self):
         translated_keys = queue_translations(self.map)
         self.keys: list[KeyStruct] = translated_keys
+

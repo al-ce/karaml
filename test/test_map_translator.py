@@ -432,7 +432,7 @@ def test_multichar_func():
 
     def check_keystruct_matches_char(word: str):
         string_event = f'string({word})'
-        keystruct_list = mp.multichar_func(string_event)
+        keystruct_list = mp.string_pseudo_func(string_event)
         for i, keystruct in enumerate(keystruct_list):
             if word[i] in ALIASES.keys():
                 assert keystruct.key_code == ALIASES[word[i]].key_code
