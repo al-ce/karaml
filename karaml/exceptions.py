@@ -162,18 +162,22 @@ def invalidStickyModifier(string: str):
     )
 
 
-def invalidUserDefinedAlias(alias_def: str):
+def invalidUserDefinedAlias(alias_def: str, invalid_string: str):
     """
     Raises an error that the user has either specified too many items in a
     user-defined alias or that the items are not of the correct type.
+
+    Args:
+        alias_def (str): The target of the user-defined alias.
+        invalid_string (str): The invalid string that was passed.
     """
     configError(
         "A user-defined primary alias should have the form:\n"
-        "alias:\n"
-        "  - key_code (str of valid key code)\n"
-        "  - modifiers (list of valid modifier key codes) (optional)\n\n"
+        "alias: {modifiers (optional)} {delimiter} {key code}\n\n"
         "Got:\n"
         f"{alias_def}"
+        f"\n\nInvalid string:\n"
+        f"{invalid_string}"
     )
 
 

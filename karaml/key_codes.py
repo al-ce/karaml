@@ -149,7 +149,7 @@ MODIFIERS = {
 }
 
 
-UNICODE_MODS = {
+MODIFIER_ALIASES = {
     "⌘": "g",
     "⌥": "a",
     "⌃": "r",

@@ -9,15 +9,14 @@ from karaml.exceptions import (
     invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
     invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
     invalidMousePosArgs, invalidDictFormatInString,
-    invalidUserDefinedAlias
 )
 from karaml.key_codes import (
     MODIFIERS,
-    PSEUDO_FUNCS,
     STICKY_MODS,
     KEY_CODE,
     POINTING_BUTTON,
     CONSUMER_KEY_CODE,
+    MODIFIER_ALIASES,
 )
 
 
@@ -147,11 +146,12 @@ def is_dict(obj) -> bool:
     return isinstance(obj, dict)
 
 
-def validate_key_code(alias_def: str) -> bool:
+def validate_alias_key_code(alias_def: str) -> bool:
     """
     Returns a bool indicating if:
       - the alias definition is in one of the list of key code types:
-        key_code, pointing_button, or consumer_key_code
+        key_code, pointing_button, consumer_key_code, or a symbol alias for a
+        modifier
     """
     return (
         isinstance(alias_def, str) and
@@ -159,14 +159,8 @@ def validate_key_code(alias_def: str) -> bool:
             KEY_CODE,
             POINTING_BUTTON,
             CONSUMER_KEY_CODE,
+            MODIFIER_ALIASES,
         ))
-    )
-
-
-def validate_modifier(modifiers: list[str]) -> bool:
-    return all(
-        isinstance(mod, str) and
-        mod in MODIFIERS.values() for mod in modifiers
     )
 
 
@@ -368,33 +362,6 @@ def validate_sticky_mod_value(string: str):
 def validate_sticky_modifier(string: str):
     if string not in STICKY_MODS:
         invalidStickyModifier(string)
-
-
-def validate_user_defined_aliases(alias_def: str | list) -> None:
-    """
-    Check that the user-defined primary aliases are using the correct format.
-    A user-defined primary alias is a k/v pair whose values must:
-    - contain one or two items
-    - the first item must be a string that is a valid key_code
-    - the second item must be a list of strs that are valid modifiers key_codes
-
-    Or, the user may define an alias for a pseudo func, e.g.
-    'mousePos(100, 200)', which we confirm with a regex search, and if so we
-    skip the validation for that case.
-
-    Raises an error if any of the above conditions are not met. Otherwise,
-    returns None.
-    """
-
-    # Check if the alias is intended to be a pseudo-func
-    found_pf = search(r"^(\w+)\(.*\)$", alias_def[0])
-    if found_pf and found_pf.group(1) in PSEUDO_FUNCS:
-        return
-
-    if not validate_key_code(alias_def[0]):
-        invalidUserDefinedAlias(alias_def)
-    if alias_def[1] and not validate_modifier(alias_def[1]):
-        invalidUserDefinedAlias(alias_def)
 
 
 def validate_var_value(name: str, value: str):

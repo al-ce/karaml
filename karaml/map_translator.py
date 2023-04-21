@@ -10,7 +10,7 @@ from karaml.helpers import (
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS,
-                              UNICODE_MODS, ALIASES
+                              MODIFIER_ALIASES, ALIASES
                               )
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
@@ -126,7 +126,7 @@ def string_pseudo_func(usr_key: str) -> list:
 
     key_codes = []
     for char in string_args:
-        if char in UNICODE_MODS:
+        if char in MODIFIER_ALIASES:
             continue
         valid_key_code = translate_if_valid_keycode(char, usr_key)
         if valid_key_code:
@@ -405,7 +405,7 @@ def parse_primary_key_and_mods(usr_key: str, usr_map) -> tuple[str, dict]:
         return usr_key, {}
 
     # The modifiers should either be ascii or unicode, but not a mix
-    if bool(set(UNICODE_MODS.keys()) & set(modded_key.modifiers)):
+    if bool(set(MODIFIER_ALIASES.keys()) & set(modded_key.modifiers)):
         modifiers_string: str = translate_unicode_mods(modded_key.modifiers)
     else:
         modifiers_string: str = modded_key.modifiers
@@ -430,11 +430,11 @@ def translate_unicode_mods(modifiers: str) -> str:
         elif char in ["‹", "›", " "]:
             continue
         elif i > 0 and modifiers[i-1] == "‹":
-            translated_char = UNICODE_MODS["‹" + char]
+            translated_char = MODIFIER_ALIASES["‹" + char]
         elif i < len(modifiers) - 1 and modifiers[i + 1] == "›":
-            translated_char = UNICODE_MODS[char + "›"]
+            translated_char = MODIFIER_ALIASES[char + "›"]
         else:
-            translated_char = UNICODE_MODS[char]
+            translated_char = MODIFIER_ALIASES[char]
         translated_mods += translated_char
 
     return translated_mods

@@ -426,26 +426,33 @@ An alias has the following format:
 
 ```yaml
 aliases:            # Include this top-level key anywhere in your config
-  alias_name:
-    - event_string  # This can be a valid key code or a valid pseudo-function
-    - [mods]        # optional
+  alias_name: a valid modifiers + alias format
 ```
 
 Example:
+
 ```yaml
 aliases:
 
+  # No modifier
   ⏎: return_or_enter
-  tilde:
-    - grave_accent_and_tilde
-    - [left_shift]
   screen_saver: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+  # With modifiers (any of the following)
+  tilde: s | grave_accent_and_tilde  # left_shift + grave
+  tilde: ⇧ | grave_accent_and_tilde  # left_shift + grave
+  tilde: s   grave_accent_and_tilde  # left_shift + grave
+  tilde: ⇧   grave_accent_and_tilde  # left_shift + grave
+
+  ⁙: ⌥ ⌃ ⇧  # left_option + left_control + left_shift
+
 
 
 /base/:
   ⌘ | ⏎: app(WezTerm)
   tilde: '`'
   '`': tilde
+  ⁙ | ⏎: screen_saver
+
 /sys:
   m-s: screen_saver
 ```
@@ -462,28 +469,15 @@ have to press shift + the backtick character to get a backtick instead of vice
 versa. And finally, the `left_command` and `s` key combination is used to start
 the screen saver if the `/sys` layer is active.
 
-This aliasing feature does not give you the ability to create aliases for the
-modifier field of a karaml mapping. That will come in future updates. You can
-however make aliases for a stand-alone modifier or multi-modifier, e.g.
+If all the key codes in an alias are valid modifiers, then the alias will be
+treated as a (multi-)modifier alias and added to the dict of modifiers aliases.
 
-```yaml
-aliases:
-  mega:
-    - left_control
-    - [left_command, left_option]
+Above, `⁙` is an alias for `left_option` + `left_control` + `left_shift` that
+we can use as a modifier. In the `/base/` layer, we use it and the `⏎` alias
+for `return_or_enter` to make a rule for starting the screen saver, which also
+uses the alias `screen_saver` that we defined above. It's a rule composed
+entirely of user-defined aliases!
 
-/base/:
-  end: mega
-  escape: [escape, mega]
-  <cmo-8>: f8
-```
-
-Here we defined a `mega` alias, and we remapped the `end` key and `escape` key
-(when held) to be `mega`. But we can't use `mega` as a modifier alias for
-`cmo`, since karaml is more or less committed to a
-single-character-per-modifier system (but we'll put modifier-aliases on the
-todo list). So we make a new mapping, `<cmo-8>` for `f8`, and now we can use
-`escape` or `end` + `8` to send `f8`.
 
 The purpose is to let you visualize your config in whatever way you find most
 readable. Say for example you're creating a layer for your window-management
@@ -492,6 +486,9 @@ a series of long and similar shell commands, now you can create aliases like
 `window_eights`, `window_center`, `move_to_space_1` etc. This makes for a
 cleaner config and makes it easier to manage when you want to change the
 keybindings.
+
+Currently, only single-character aliases for modifier aliases are supported.
+We're working on a way to support multi-character aliases for modifier aliases!
 
 ### Simultaneous from-keys, multiple to-events, requiring multiple layers
 
