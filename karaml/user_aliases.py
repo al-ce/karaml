@@ -69,9 +69,15 @@ def process_alias_definition(
     if found_pf and found_pf.group(1) in PSEUDO_FUNCS:
         return found_pf.group(), None
 
-    alias_primary_key_code, alias_mods = parse_primary_key_and_mods(
+    primary_kc, alias_mods = parse_primary_key_and_mods(
         alias_def, f"{alias}: {alias_def}"
     )
+
+    if modifier_in_primary := ALIASES.get(primary_kc):
+        alias_primary_key_code = modifier_in_primary.key_code
+    else:
+        alias_primary_key_code = MODIFIERS.get(primary_kc) or primary_kc
+
     mod_key_codes = alias_mods.get("mandatory")
     if opt_mods := alias_mods.get("optional"):
         mod_key_codes += opt_mods
