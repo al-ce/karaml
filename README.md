@@ -17,11 +17,11 @@ Karabiner-Elements (consider
 # Default layer, does not require activation
 /base/:
   caps_lock: [escape, /nav/] # Escape when tapped, /nav/ layer when held
-  <oc-n>: /nav/ # Tap Left Opt + Left Ctrl + n to toggle /nav/
-  <O-w>: <o-backspace> # Right Opt + w to Left Opt + Backspace
+  oc | n: /nav/ # Tap Left Opt + Left Ctrl + n to toggle /nav/
+  O  | w: <o-backspace> # Right Opt + w to Left Opt + Backspace
 
   # Enter when tapped, Left Control when held, lazy flag, any optional modifiers
-  <(x)-enter>:
+  (x) | enter:
     - enter
     - left_control
     - null # No event when released
@@ -30,13 +30,13 @@ Karabiner-Elements (consider
   j+k: [escape, button1] # j+k to escape when tapped, left click when held
 
   # option (either side) + o/O to create new line below/above
-  <a-o>: <m-right> + return
-  <a-O>: up + <m-right> + return
+  a | o: m |right + return
+  a | O: up + m | right + return
 
-  <a-h>: string(hello world) # Send multiple chars without concatenating with +
+  a | h: string(hello world) # Send multiple chars without concatenating with +
 
   # backspace/left on tap, MacOS/Kitty hints on hold/release, depending on frontmost app
-  <c-h>: {
+  c | h: {
       # Notification with Karabiner-Style popup
       unless Terminal$ kitty$:
         [backspace, "notify(idh, My MacOS Shortcut Hints)", "notifyOff(idh)"],
@@ -45,33 +45,34 @@ Karabiner-Elements (consider
     }
 
   # Other syntax for modifiers is also supported
-  ms-a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
-  m s | c: app(CotEditor) # left_command + left_shift + to launch CotEditor
+  ms  a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
+  <ms-c>: app(CotEditor) # left_command + left_shift + c to launch CotEditor
 
   # Use Unicode symbols for modifiers instead of letters
-  ⌘ ⇧ | g: string(lazygit) # command + shift + g to send string 'lazygit'
+  ⌘ ⇧    | g: string(lazygit) # command + shift + g to send string 'lazygit'
   ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
   ☆      | o: /open/ # hyper + o to toggle /open/ layer
 
   # Utilize user-defined aliases
-  tab: [tab, ⁙]        # tab to left opt, ctrl, and shift when held
+  tab  : [tab, ⁙]        # tab to left opt, ctrl, and shift when held
   ⁙ | ⏎: screen_saver  # left opt, ctrl, shift, and enter starts screen saver
 
 # condition 'nav_layer' must be true for the following maps
 /nav/:
-  <(x)-h>: left # vim navigation with any optional mods
-  <(x)-j>: down
-  <(x)-k>: up
-  <(x)-l>: right
+  (x) | h: left # vim navigation with any optional mods
+  (x) | j: down
+  (x) | k: up
+  (x) | l: right
+
   s: [app(Safari), /sys/] # Launch Safari on tap, /sys/ layer when held
   g: open(https://github.com) # Open link in default browser
 
 # etc.
 /sys/:
-  <o-m>: [mute, null, mute] # Mute if held/key down, unmute if released/key up
-  k: play_or_pause
+  o | m: [mute, null, mute] # To mute if held/key down, unmute if released/key up
+  k  : play_or_pause
   "}": fastforward
-  u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+  u  : shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
 
 # User defined aliases
 aliases:
@@ -195,7 +196,7 @@ the layer will be enabled when the 'from' key is held.
 
 ```yaml
 /base/:
-  <oc-n>: /nav/ # enabled/disabled on tap
+  oc | n: /nav/ # enabled/disabled on tap
   caps_lock: [escape, /nav/] # enabled when held
 
 # The maps indented in this layer will only work when the layer is enabled
@@ -226,18 +227,19 @@ The following are all examples of the mapping for `left_control` +
 
 ```yaml
 /base/:
-  <cs-a>   : app(Terminal)
-  cs-a     : app(Terminal)
-  c s  - a : app(Terminal)
-  c s  | a : app(Terminal)
-  'c s | a': app(Terminal)
+  <cs-a>   : app(Terminal)  # A vim-ish syntax
+  cs-a     : app(Terminal)  # Angle brackets are optional
+  c s  - a : app(Terminal)  # Whitespace is flexible
+  c s  | a : app(Terminal)  # Use a pipe or a dash as delimiter
+  c s    a : app(Terminal)  # Or use the final whitespace as the delimiter
+  'c s | a': app(Terminal)  # Quotes may help you with escape characters
 ```
 
 The guides and the remainder of the `README` (mostly) use the
-`<modifiers-primary_key>` format.
+`modifiers | primary_key` format, with the pipe char `|` as the delimiter.
 
 Whether the optional set in parens comes first or last doesn't matter, e.g.
-`<(c)os-g>` and `<os(c)-g>` are both valid. But a single set of optional
+`(c)os | g` and `os(c) | g` are both valid. But a single set of optional
 modifiers in parens must be to the right or left of _all_ mandatory modifiers
 (if there are any mandatory modifiers).
 
@@ -261,12 +263,12 @@ lowercase, right side modifiers use uppercase.
 
 Examples:
 
-- `<c-h>` → `left_ctrl` + `h`
-- `<(x)-h` → `h` (with any optional modifiers)
-- `<mOC(s)-h>` → `left_cmd` + `right_opt` + `right_ctrl` + `left_shift` (optional) + `h`
-- `<(s)mOC-h>` → (same as above)
-- `<g(arh)-h>` → `cmd` (mandatory) + `option` + `control` + `shift` (optional) + `h`
-- `<(arh)g-h>` (same as above)
+- `c      | h` → `left_ctrl` + `h`
+- `(x)    | h` → `h` (with any optional modifiers)
+- `mOC(s) | h` → `left_cmd` + `right_opt` + `right_ctrl` + `left_shift` (optional) + `h`
+- `(s)mOC | h` → (same as above)
+- `g(arh) | h` → `cmd` (mandatory) + `option` + `control` + `shift` (optional) + `h`
+- `(arh)g | h` → (same as above)
 
 The mnemonics for the less-obvious modifiers are:
 
@@ -296,23 +298,24 @@ The Unicode symbols `‹` and `›` denote left and right side modifiers.
 
 Examples:
 
-- `⌘   ⇧  | g` → `command` + `shift` + `g`
-- `⌘  (⇧) | g` → `command` + `shift` (optional) + `g`
-- `‹⌃     | h` → `left_ctrl` + `h`
-- ` ⌃› ‹⌥ | h` → `left_opt` + `right_ctrl` + `h`
+- `⌘   ⇧  |  g` → `command` + `shift` + `g`
+- `⌘  (⇧) |  g` → `command` + `shift` (optional) + `g`
+- `‹⌃     |  h` → `left_ctrl` + `h`
+- ` ⌃› ‹⌥ |  h` → `left_opt` + `right_ctrl` + `h`
 
 Of course you can use another valid syntax for the Unicode characters as well,
-e.g. `<⌘⇧-g>` or `<⌘⇧|g>`. The above syntax is suggested for readability.
+e.g. `<⌘⇧-g>` or `⌘⇧ g`, etc.
 
 If you need an easy way to type these Unicode characters, you can use a
 text-expander or snippet tool like Typinator, the built in expanders in Raycast
-or Alfred, TextExpander, etc.
+or Alfred, TextExpander, etc. Or, set your own alias with the [user-defined
+aliases](#defining-your-own-aliases) feature.
 
 Or, see this suggestion in this Karabiner [issue](https://github.com/pqrs-org/Karabiner-Elements/issues/2949#issuecomment-1318516074).
 
 ### Key-Code Aliases
 
-You can follow the explicit mapping for any key (e.g. `<s-1>` → `!`), or use
+You can follow the explicit mapping for any key (e.g. `s | 1` → `!`), or use
 these available aliases. Be mindful in your YAML config that some characters
 need to be escaped or wrapped in quotes to be recognized as strings.
 
@@ -450,9 +453,8 @@ aliases:
   # With modifiers (any of the following)
   tilde: s | grave_accent_and_tilde  # left_shift + grave
   tilde: ⇧ | grave_accent_and_tilde  # left_shift + grave
-  tilde: s   grave_accent_and_tilde  # left_shift + grave
-  tilde: ⇧   grave_accent_and_tilde  # left_shift + grave
 
+  # No delimiter: a good visual cue to indicate that this alias is all mods
   ⁙: ⌥ ⌃ ⇧  # left_option + left_control + left_shift
 
 
@@ -460,11 +462,11 @@ aliases:
 /base/:
   ⌘ | ⏎: app(WezTerm)
   tilde: '`'
-  '`': tilde
+  '`'  : tilde
   ⁙ | ⏎: screen_saver
 
 /sys:
-  m-s: screen_saver
+  m | s: screen_saver
 ```
 
 In the above example, the Unicode character `⏎` can be used as an alias for
@@ -522,7 +524,7 @@ Join valid key codes or aliases in any part of the YAML map with a `+`. This is
 ```yaml
 /base/:
   j+k: h+l
-  <c-j>+k: [escape, "/nav/ + notify(idn, Nav Layer on!)", "notifyOff(idn)"]
+  c | j + k: [escape, "/nav/ + notify(idn, Nav Layer on!)", "notifyOff(idn)"]
 ```
 
 This also applies to joining layers if you want to enable two layers at once.
@@ -555,7 +557,8 @@ events in disguise. You can use these as if they were to.events, e.g.:
 
 ```yaml
 /base/:
-  <o-g>: open(https://github.com)
+  o | g: open(https://github.com)
+
 ```
 
 | Function                                      | Description                                           |
@@ -595,7 +598,7 @@ Open a url with your default browser.
 
 ```yaml
 /base/:
-  <o-g>: open(https://github.com)
+  o | g: open(https://github.com)
 ```
 
 #### Shell Commands
@@ -627,10 +630,10 @@ JSON object with all the valid Karabiner fields as specified
 
 ```yaml
 /sys/:
-  <o-k>+e:
+  o | k + e:
     input(en) # Set English input source
     # Set a Greek keyboard based on source id
-  <o-k>+g:
+  o | k + g:
     'input({
     "input_source_id": "com.apple.keylayout.GreekPolytonic",
     "language": "el"
@@ -655,10 +658,10 @@ object matching the Karabiner specs, just like with input sources.
   n: mouse(y, 2000)
   e: mouse(y, -2000)
   i: mouse(x, 2000)
-  <c-m>: mouse(horizontal_wheel, 100)
-  <c-n>: mouse(vertical_wheel, -100)
-  <c-e>: mouse(vertical_wheel, 100)
-  <c-i>: mouse(horizontal_wheel, -100)
+  c | m: mouse(horizontal_wheel, 100)
+  c | n: mouse(vertical_wheel, -100)
+  c | e: mouse(vertical_wheel, 100)
+  c | i: mouse(horizontal_wheel, -100)
   s: mouse(speed_multiplier, 2.5)
 ```
 
@@ -675,7 +678,7 @@ moved to the same screen as the current mouse position.
 ```yaml
 /mouse/:
   "0": mousePos(0, 0)
-  "<o-2>": mousePos(500, 500, 1)
+  ⌥ | 2: mousePos(500, 500, 1)
 ```
 
 #### Notifications (Karabiner Style)
@@ -730,11 +733,11 @@ positional arguments in the order of message, title, subtitle, and sound.
 
 ```yaml
 /sys/:
-  <o-1>: shnotify(text) # message only
-  <o-2>: shnotify(text, title) # message and title
-  <o-3>: shnotify(text, title, subtitle) # message, title, and subtitle
-  <o-4>: shnotify(text, title, subtitle, sound) # message, title, subtitle, sound
-  <o-5>: shnotify(text, null, null, sound) # message and sound only
+  o | 1: shnotify(text) # message only
+  o | 2: shnotify(text, title) # message and title
+  o | 3: shnotify(text, title, subtitle) # message, title, and subtitle
+  o | 4: shnotify(text, title, subtitle, sound) # message, title, subtitle, sound
+  o | 5: shnotify(text, null, null, sound) # message and sound only
 ```
 
 The second is to pass a string representing a JSON object with all the valid
@@ -742,14 +745,14 @@ AppleScript notification fields.
 
 ```yaml
 /sys/:
-  <o-6>: 'shnotify({
+  o | 6: 'shnotify({
     "msg": "text",
     "title": "title",
     "subtitle": "subtitle",
     "sound": "sound"
     })'
   # With a dict, you can omit any fields you don't want to use
-  <o-7>: 'shnotify({"msg": "text", "sound": "sound"})'
+  o | 7: 'shnotify({"msg": "text", "sound": "sound"})'
 ```
 
 See the [sample configuration](#sample-configuration) for an example with
@@ -781,7 +784,7 @@ turn it off ('on | off | toggle')
 
 ```yaml
 /base/:
-  <o-right_shift>: sticky(left_shift, toggle)
+  o | right_shift: sticky(left_shift, toggle)
 ```
 
 #### Strings
@@ -792,14 +795,14 @@ Instead of mapping a key to type out a string of characters using the `+` jonini
 
 ```yaml
 /base/:
-<a-g>: g+i+t+space+c+h+e+c+k+o+u+t
+  a | g: g+i+t+space+c+h+e+c+k+o+u+t
 ```
 
 You can use `string()` (though the above method is valid):
 
 ```yaml
 /base/:
-  <a-g>: string(git checkout )
+  a | g: string(git checkout )
 ```
 
 The string must contain valid key codes or valid single-character aliases.
@@ -811,7 +814,7 @@ You can use a combination if you want to send non-single character events:
 
 ```yaml
 /base/:
-  <a-g>: string(git checkout main) + enter
+  a | g: string(git checkout main) + enter
 ```
 
 #### Variables
@@ -826,7 +829,7 @@ function allows more granular control.
 
 ```yaml
 /base/:
-  <o-s>:
+  o | s:
     var(sys_layer, 1) # This does not automatically create a corresponding
     # toggle-off mapping. Don't get stuck in another layer!
 ```
@@ -863,13 +866,13 @@ to the original 'from' key. Mind your regex and your capitalization!
 
 ```yaml
 /base/:
-  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
-  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
-  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
-  <a-g>: {
+  c | u: { unless Terminal$ iterm2$ kitty$: g-backspace }
+  a | O: { unless Terminal$ iterm2$ kitty$: up + g-right + enter }
+  a | o: { unless Terminal$ iterm2$ kitty$: g-right + enter }
+  a | g: {
       # types 'git ' when tapped, 'checkout' when held if any of these apps are focused
       if Terminal$ iterm2$ kitty$: [string(git ), string(checkout)],
-      if CotEditor$: <g-l>, # 'go to line' alternate shortcut if CotEditor is focused
+      if CotEditor$: g | l, # 'go to line' alternate shortcut if CotEditor is focused
     }
 ```
 

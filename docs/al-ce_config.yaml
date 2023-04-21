@@ -17,21 +17,21 @@ parameters:
 
 
 
-  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
+  c | u: { unless Terminal$ iterm2$ kitty$: g | backspace }
 
-  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <m-right> + enter }
-  <a-o>: { unless Terminal$ iterm2$ kitty$: <m-right> + enter }
+  a | O: { unless Terminal$ iterm2$ kitty$: up + m | right + enter }
+  a | o: { unless Terminal$ iterm2$ kitty$: m | right + enter }
 
-  <(x)-end>: [grave, /symnum/] # grave | SymNum Sublayer
-  <(x)-caps_lock>: [escape, /nav/] # ESC | Nav Sublayer
+  (x) | end       : [grave, /symnum/] # grave | SymNum Sublayer
+  (x) | caps_lock : [escape, /nav/]   # ESC | Nav Sublayer
 
-  <o-w>: <o-backspace> # Delete Previous Word
-  <o-f>: <o-delete> # Delete Next Word
-  d + i + w: <o-backspace> + <o-delete>  # 'Delete Inner Word'
-  <o-p>: <m-v> # Paste
+  o | w     : o | backspace              # Delete Previous Word
+  o | f     : o | delete                 # Delete Next Word
+  d + i + w : o | backspace + o | delete # 'Delete Inner Word'
+  o | p     : m | v                      # Paste
 
   # Enter | Control (any mods, lazy)
-  <(x)-enter>:
+  (x) | enter:
     - enter
     - left_control
     - null
@@ -40,9 +40,9 @@ parameters:
   \: [\, left_option, null, [+lazy]]
 
   # Various hypers when held
-  backspace: [backspace, <mco-left_shift>]
-  grave: [grave, <mco-left_shift>]
-  quote: [quote, <mco-left_shift>]
+  backspace : [backspace, mco | left_shift]
+  grave     : [grave, mco | left_shift]
+  quote     : [quote, mco | left_shift]
 
   # (see JSON extension at the bottom of this file)
   # left_shift: ["<", left_shift]
@@ -53,58 +53,58 @@ parameters:
 
   right_control: [/nav/, right_control]      # tap toggle nav layer | r_ctrl
 
-  <o-right_shift>: sticky(left_shift, toggle)
+  o | right_shift: sticky(left_shift, toggle)
 
 
 /nav/:
 
   g:        # Home |  Git layer (waits for to_if_held_down threshold)
     - home
-    - var(git_layer, 1) + notify(idgit,"Git Layer Enabled - <c-g> to toggle off")
+    - var(git_layer, 1) + notify(idgit,"Git Layer Enabled - c | g to toggle off")
 
-  <o-quote>: /mouse/
+  o | quote: /mouse/
 
   # Rectangle Modifiers (Ctrl+Cmd+Shift)
   # enter, j, k, h, l, x, z, v, g, d, c, t, s, p, f, r, a, w, q
-  <m-enter>: [<ghr-enter>, <sm-left_control>]
-  <m-j>: <ghr-j>
-  <m-k>: <ghr-k>
-  <m-h>: <ghr-h>
-  <m-l>: <ghr-l>
-  <m-x>: <ghr-x>
-  <m-z>: <ghr-z>
-  <m-v>: <ghr-v>
-  <m-g>: <ghr-g>
-  <m-d>: <ghr-d>
-  <m-c>: <ghr-c>
-  <m-t>: <ghr-t>
-  <m-s>: <ghr-s>
-  <m-p>: <ghr-p>
-  <m-f>: <ghr-f>
-  <m-r>: <ghr-r>
-  <m-a>: <ghr-a>
-  <m-w>: <ghr-w>
-  <m-q>: <ghr-q>
+  m | enter: [ghr | enter, sm | left_control]
+  m | j: ghr | j
+  m | k: ghr | k
+  m | h: ghr | h
+  m | l: ghr | l
+  m | x: ghr | x
+  m | z: ghr | z
+  m | v: ghr | v
+  m | g: ghr | g
+  m | d: ghr | d
+  m | c: ghr | c
+  m | t: ghr | t
+  m | s: ghr | s
+  m | p: ghr | p
+  m | f: ghr | f
+  m | r: ghr | r
+  m | a: ghr | a
+  m | w: ghr | w
+  m | q: ghr | q
 
   # Vim navigation (any opt mods)
-  <(x)-m>: left
-  <(x)-n>: down
-  <(x)-e>: up
-  <(x)-i>: right
+  (x) | m: left
+  (x) | n: down
+  (x) | e: up
+  (x) | i: right
 
-  <(x)-,>: backspace
-  <(x)-.>: delete
+  (x) ,: backspace
+  (x) .: delete
 
 
-  u: pgup
-  d: [pgdn, /win/] # Pgdn | win(d)ow control sublayer
-  <o-u>: <o-pgup>
-  <o-d>: <o-pgdn>
+  u        : pgup
+  d        : [pgdn, /win/] # Pgdn | win(d)ow control sublayer
+  o | u    : o | pgup
+  o | d    : o | pgdn
 
-  <h-g>: end
-  spacebar: underscore
-  x: app(Finder)
-  r: app(Brave Browser)
+  h | g    : end
+  spacebar : underscore
+  x        : app(Finder)
+  r        : app(Brave Browser)
 
 
   # Watch your commas!! Wrap them in quotes
@@ -115,16 +115,16 @@ parameters:
     - /sys/ + notify(sysNotification,"System Layer Enabled")
     - notify(sysNotification)
 
-  <o-g>: open(https://github.com/al-ce)
+  o | g : open(https://github.com/al-ce)
 
-  t: app(CotEditor)
-  c: app(Kitty)
-  f: [app(Firefox), /fn/] # Launch Firefox | functions sublayer
-  w: app(WezTerm)
+  t     : app(CotEditor)
+  c     : app(Kitty)
+  f     : [app(Firefox), /fn/] # Launch Firefox | functions sublayer
+  w     : app(WezTerm)
 
-  y: app(System Preferences)
-  k: app(Karabiner-Elements)
-  kp-: app(Calca)
+  y     : app(System Preferences)
+  k     : app(Karabiner-Elements)
+  kp-   : app(Calca)
 
 /git/:
 
@@ -134,9 +134,9 @@ parameters:
     # - notify(idgit)  # omit the second argument to notify()
 
   # Turn off Git layer
-  <c-g>: var(git_layer, 0) + notifyOff(idgit)
-  # <c-g>: var(git_layer, 0) + notify(idgit)
-  # <c-g>: var(git_layer, 0) + notify(idgit, null)
+  c | g: var(git_layer, 0) + notifyOff(idgit)
+  # c | g: var(git_layer, 0) + notify(idgit)
+  # c | g: var(git_layer, 0) + notify(idgit, null)
 
   # Various git commands, turn off git layer after executed
   m: string(git checkout main) + CR + var(git_layer, 0) + notify(idgit)
@@ -151,14 +151,14 @@ parameters:
 
 /win/:
   # Move windows (BTT shortcuts)
-  m: <rg-m>
-  i: <rg-i>
-  e: <rg-e>
-  n: <rg-n>
-  pgdn: <rg-pgdn>
-  .: <rg-.>
-  ",": <rg-,>
-  "h": <rg-h>
+  m    : rg | m
+  i    : rg | i
+  e    : rg | e
+  n    : rg | n
+  pgdn : rg | pgdn
+  .    : <rg-.>
+  ","  : <rg-,>
+  "h"  : rg | h
 
 
 /mouse/:
@@ -166,97 +166,99 @@ parameters:
   n: mouse(y, 2000)
   e: mouse(y, -2000)
   i: mouse(x, 2000)
-  <c-m>: mouse(horizontal_wheel, 100)
-  <c-n>: mouse(vertical_wheel, -100)
-  <c-e>: mouse(vertical_wheel, 100)
-  <c-i>: mouse(horizontal_wheel, -100)
+
+  c | m: mouse(horizontal_wheel, 100)
+  c | n: mouse(vertical_wheel, -100)
+  c | e: mouse(vertical_wheel, 100)
+  c | i: mouse(horizontal_wheel, -100)
+
   s: mouse(speed_multiplier, 2.5)
 
 
 /sys/:
 
-  <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
-  # <o-s>: var(sys_layer, 0)
+  mocs | q: [ null, sm | q, null, [2000] ] # 2s delay on Log-Out
+  # o | s: var(sys_layer, 0)
 
   # Set English / Greek input source with AppleScript style notification
-  <o-e>: shnotify(English, ==KEYBOARD==) + input(en)
-  <o-g>: 'shnotify(GreekPolytoniic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+  o | e: shnotify(English, ==KEYBOARD==) + input(en)
+  o | g: 'shnotify(GreekPolytoniic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
 
-  <c-e>: <cm-[>    # Emoji Picker
+  c | e: <cm-[>    # Emoji Picker
 
   t: mission_control
-  i: <o-tab>
+  i: o | tab
   e: volume_increment
   n: volume_decrement
   m: mute
-  <o-m>: [mute, null, mute] # Toggle mute when held
-  <oC-m>: [null, null, mute] # Only send mute on release/after key up
+  o  | m: [mute, null, mute] # Toggle mute when held
+  oC | m: [null, null, mute] # Only send mute on release/after key up
 
-  k: play_or_pause
-  j: rewind
-  "[": fastforward
-  ",": display_brightness_increment
-  h: display_brightness_decrement
-  q: <CM-q> # Lock Screen
-  u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
-  y: app(togglemenubar) # Show and Hide Menubar
+  k   : play_or_pause
+  j   : rewind
+  "[" : fastforward
+  "," : display_brightness_increment
+  h   : display_brightness_decrement
+  q   : CM | q # Lock Screen
+  u   : shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+  y   : app(togglemenubar) # Show and Hide Menubar
 
   # Notification displays when held
-  <o-i>: ["notify(idHello, Hello!)", null, "notify(idHello)"]
+  o | i: ["notify(idHello, Hello!)", null, "notify(idHello)"]
 
 
 
 /fn/:
-  <(x)-h>: f1
-  <(x)-,>: f2
-  <(x)-.>: f3
-  <(x)-n>: f4
-  <(x)-e>: f5
-  <(x)-i>: f6
-  <(x)-l>: f7
-  <(x)-u>: f8
-  <(x)-y>: f9
-  <(x)-7>: f10
-  <(x)-8>: f11
-  <(x)-9>: f12
+  (x) | h: f1
+  (x) | ,: f2
+  (x) | .: f3
+  (x) | n: f4
+  (x) | e: f5
+  (x) | i: f6
+  (x) | l: f7
+  (x) | u: f8
+  (x) | y: f9
+  (x) | 7: f10
+  (x) | 8: f11
+  (x) | 9: f12
 
 /symnum/:
-  <(x)-caps_lock>: escape
-  <(x)-enter>: [enter, left_control]
-  <(x)-space>: space
-  <(x)-j>: "0"
-  <(x)-h>: "1"
-  <(x)-,>: "2"
-  <(x)-.>: "3"
-  <(x)-n>: "4"
-  <(x)-e>: "5"
-  <(x)-i>: "6"
-  <(x)-l>: "7"
-  <(x)-u>: "8"
-  <(x)-y>: "9"
-  <(x)-k>: ","
-  <(x)-[>: .
-  <(x)-/>: /
-  <(x)-m>: "="
-  <(x)-o>: ;
-  <(x)-a>: ":"
-  s: (
-  <s-s>: "{"
-  t: )
-  <s-t>: "}"
-  c: "["
-  <s-c>: <
-  d: "]"
-  <s-d>: ">"
-  <(x)-r>: "-"
-  <(x)-g>: <s-=> # +
-  <(x)-quote>: quote
-  <(x)-w>: <s-quote>
-  <(x)-f>: "{"
-  <(x)-p>: "}"
-  <(x)-x>: \
-  <(x)-v>: "`"
-  <(x)-backspace>: backspace
+  (x) | caps_lock: escape
+  (x) | enter: [enter, left_control]
+  (x) | space: space
+  (x) | j: "0"
+  (x) | h: "1"
+  (x) | ,: "2"
+  (x) | .: "3"
+  (x) | n: "4"
+  (x) | e: "5"
+  (x) | i: "6"
+  (x) | l: "7"
+  (x) | u: "8"
+  (x) | y: "9"
+  (x) | k: ","
+  (x) | [: .
+  (x) | /: /
+  (x) | m: "="
+  (x) | o: ;
+  (x) | a: ":"
+  s      : (
+  s   | s: "{"
+  t      : )
+  s   | t: "}"
+  c      : "["
+  s   | c: <
+  d      : "]"
+  s   | d: ">"
+  (x) | r: "-"
+  (x) | g: <s-=> # +
+  (x) | quote: quote
+  (x) | w: s | quote
+  (x) | f: "{"
+  (x) | p: "}"
+  (x) | x: \
+  (x) | v: "`"
+  (x) | backspace: backspace
 
 
 

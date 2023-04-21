@@ -75,14 +75,19 @@ Notice that we can use `(` as an alias for what in Karabiner-JSON would be:
 { "key_code": "9", "modifiers": ["left_shift"] }
 ```
 
-karaml uses a Vim-*ish* syntax for modifiers, with single letters representing
-the modifier keys. Let's rewrite the space-cadet remaps without the aliases:
+`karaml` offers a few syntax options for adding modifiers to your complex
+modification rule. For this guide, we'll stick to:
+
+`{modifiers} | {primary key}`
+
+With the pipe character `|` as the delimiter.
+
+Let's rewrite the space-cadet remaps without the aliases:
 
 ```yaml
-left_shift: [<s-9>, left_shift]
+left_shift: [s | 9, left_shift]
 ```
-The general syntax for modifiers is `<modifiers-key_code>`. So `<s-9>` is
-equivalent to the Karabiner-JSON above.
+So `s | 9` is equivalent to the Karabiner-JSON above.
 
 See the
 [aliases](https://github.com/al-ce/karaml/blob/main/README.md#key-code-aliases)
@@ -91,16 +96,16 @@ section in the `README` for available aliases. Let's add some more maps with mod
 #### Single Modifiers
 ```yaml
 /base/:
-  <c-w>: <o-backspace> # left_control + w to left_option + backspace
-  <o-q>: escape        # left_option + q to escape
-  <O-q>: <m-q>         # right_option + q to left_command + q
-  <r-h>: backspace     # control (either side) + h to backspace
+  c | w: o | backspace # left_control + w to left_option + backspace
+  o | q: escape        # left_option + q to escape
+  O | q: g | q         # right_option + q to command (either side) + q
+  r | h: backspace     # control (either side) + h to backspace
 
 ```
 
-The Vim-ish syntax should be pretty intuitive, but pay attention to the
-difference in letter case. Lower case is for left-side modifiers, upper case is
-for right-side. For side-ambivalent modifiers, either works. Here's a table of the modifier keys:
+Pay attention to the difference in letter case. Lower case is for left-side
+modifiers, upper case is for right-side. 
+For side-ambivalent modifiers, either works. Here's a table of the modifier keys:
 
 | Karabiner-JSON | karaml | --- | Karabiner-JSON | karaml |
 | -------------- | ------ | --- | -------------- | ------ |
@@ -113,29 +118,64 @@ for right-side. For side-ambivalent modifiers, either works. Here's a table of t
 | `option`       | `a`  | --- | `option`        | `A`  |
 | `command`      | `g`  | --- | `command`       | `G`  |
 
-(The aliases `r`, `h`, `a`, and `g` are for `contRol`, `sHift`, `Alt` (`option`), and `Gui` (`command`).
-I'm looking for suggestions to improve these!)
+The aliases `r`, `h`, `a`, and `g` are for `contRol`, `sHift`, `Alt` (`option`), and `Gui` (`command`). If you're not a fan of this system, you could use equiavlent symbols:
 
+| Unicode symbol | key_code       |
+| -------------- | -------------- |
+| `⌘`            | `command` |
+| `⌥`            | `option` |
+| `⌃`            | `control` |
+| `⇧`            | `shift` |
+| `‹⌘`            | `left_command` |
+| `‹⌥`            | `left_option` |
+| `‹⌃`            | `left_control` |
+| `‹⇧`            | `left_shift` |
+| `⌘›`            | `right_command` |
+| `⌥›`            | `right_option` |
+| `⌃›`            | `right_control` |
+| `⇧›`            | `right_shift` |
+
+
+So the above would become:
+
+```yaml
+/base/:
+  ‹⌃ | w: ‹⌥ | backspace # left_control + w to left_option + backspace
+  ‹⌥ | q: escape        # left_option + q to escape
+  ⌥› | q:  ⌘ | q         # right_option + q to command (either side) + q
+  ⌃ | h: backspace     # control (either side) + h to backspace
+```
 
 #### Multiple Modifiers
 
 To add multiple modifiers to a map, simply string them together:
 
 ```yaml
-  <o-c>: <ms-c>        # left_option + c to left_command + left_shift + c
+  o | c: ms | c        # left_option + c to left_command + left_shift + c
 ```
-
-(this is Vim-*ish* syntax, so we don't separate multiple modifiers with a
-hyphen like a vim mapping)
-
 
 What if we want to modify a modifier key? Then we use the proper Karabiner
 key_code as the primary key.
 
 ```yaml
-<C-right_shift>: <gar-shift>  # right_control + right_shift
+C | left_shift: gar | shift  # right_control + left_shift
                               # to command + option + control + shift (hyper)
 ```
+Or, you can use the modifier symbol:
+
+```yaml
+C | ⇧: gar | shift  # right_control + right_shift
+                              # to command + option + control + shift (hyper)
+```
+
+Hey, wait a minute! `⇧` is supposed to be for either side, and that makes no
+sense as a primary key, because your shift keys' `key_code` is either
+`left_shift` or `right_shift`! So shouldn't that symbol be `‹⇧`?
+
+Well, I didn't want to prevent the user from using the cleaner option of just
+`⇧`. So if the user doesn't specify a side when using one of those symbols *as
+a primary key*, then it defaults to the *left* side.
+
 
 #### Mandatory vs. Optional Modifiers
 
@@ -144,21 +184,21 @@ Let's add a map that takes optional modifiers.
 
 ```yaml
 /base/:
-  # Left, right, and side-ambivalent modifiers
-  <o-w>: <o-backspace>
-  <m-q>: escape
-  <C-q>: <m-q>
-  <a-h>: backspace
+  # Left, right, and side ambivalent modifiers
+  o | w: o | backspace
+  m | q: escape
+  C | q: m | q
+  a | h: backspace
 
   # Multiple modifier
-  <o-c>: <ms-c>
-  <C-right_shift>: <gar-shift>
+  o | c: ms | c
+  C | right_shift: gar | shift
 
   # Optional modifiers
-  <(x)-enter>: [enter, control]   # enter with any optional modifier
+  (x) | enter: [enter, control]   # enter with any optional modifier
                                   # to enter when tapped, control when held
 
-  <(mocs)-enter>: [enter, contol] # Effectively the same as 'any left side mod'
+  (mocs) | enter: [enter, contol] # Effectively the same as 'any left side mod'
 ```
 
 Optional modifiers are indicated by wrapping an optional modifier key in parentheses.
@@ -175,8 +215,8 @@ one side and the optional modifiers to the other.
 
 
 ```yaml
-<ms(oc)-enter>: <mocs-enter>  # Mandatory cmd + shift, optional alt and control
-<(oc)ms-enter>: <mocs-enter>  # (same as above)
+ms(oc) | enter: mocs | enter  # Mandatory cmd + shift, optional alt and control
+(oc)ms | enter: mocs | enter  # (same as above)
 ```
 
 #### Alternate syntaxes
@@ -184,19 +224,22 @@ one side and the optional modifiers to the other.
 Since the original release of karaml, alternate syntaxes are supported for
 mappings with modifiers.
 
-- Angle brackets (`<` and `>`) are now optional
-- Whitespace between modifiers is supported for readability
+- Surrounding angle brackets (`<` and `>`)
+- Whitespace between modifiers
 - The `|` character can be used to separate the modifiers and the primary keys
+- Any amount of whitspeace can be used to separate the modifiers and the primary keys (the final stretch of whitespace acts as the delimiter)
 - Use unicode characters for modifier keys
+- Define your *own* single character modifier aliases
 
 ```yaml
 /base/:
+  <ms-1>: shell(~/bash_scripts/my_script.sh)
   c-w: o-backspace # left_control + w to left_option + backspace
   c m o s - g: open(https://github.com) # hyper + g to open github
   cm | o: /open/  # left_control + left_command + o toggles /open/ layer
-  ⌃ ⌥ ⇧ ⌘  | s: string(git status)  # hyper + s sends a string 'git status'
-  ‹⇧ ⌃› | h + i: shnotify(hi)       # left_shift + right_control + h + i
-                                     # triggers a macos notification 'hi'
+  ⌃ ⌥ ⇧ ⌘  | s: string(git status) # hyper + s sends a string 'git status'
+  ‹⇧ ⌃› | h + i: shnotify(hi)      # left_shift + right_control + h + i
+                                   # triggers a macos notification 'hi'
 ```
 
 See the `README` for more details on the alternate syntaxes.
@@ -217,14 +260,14 @@ For multiple single characters, you could do this:
 
 ```yaml
 # Opt+g sends keystrokes 
-<a-g>: [g+i+t+space, g+i+t+space+c+o+m+m+i+t+space+-+m+space+"+"+left]
+a | g: [g+i+t+space, g+i+t+space+c+o+m+m+i+t+space+-+m+space+"+"+left]
 ```
 
 But you can also use the `string()` function to make it look cleaner (more on
 these 'special-event pseudo-functions' later):
 
 ```yaml
-<a-g>: [string(git ), string(git commit -m "") + left]
+a | g: [string(git ), string(git commit -m "") + left]
 ```
 
 ### Layers
@@ -280,10 +323,10 @@ Let's set some maps that will only trigger if the layer is enabled.
 
 ```yaml
 /nav/:
-  <(x)-h>: left
-  <(x)-j>: down
-  <(x)-k>: up
-  <(x)-l>: right
+  (x) | h: left
+  (x) | j: down
+  (x) | k: up
+  (x) | l: right
 ```
 
 We mapped four keys, but what about all the keys that we didn't map? Those will
@@ -302,7 +345,7 @@ Let's say you have the following configuration:
 ```yaml
 /base/:
   caps_lock: [escape, /nav/]
-  <o-s>: /sys/
+  o | s: /sys/
   j+k: escape
 
 /nav/:
@@ -339,9 +382,9 @@ keys/events.
 
 ```yaml
 /base/:
-  caps_lock: [escape, /nav/]
-  <o-s>: /sys/
-  <o-s> + n: /sys/ + /nav/
+  caps_lock : [escape, /nav/]
+  o | s     : /sys/
+  o | s + n : /sys/ + /nav/
 
 /nav/:
   j: down
@@ -371,8 +414,8 @@ to read up on `notify()`, `shnotify()`, and `var()`
 ```yaml
 /base/:
   caps_lock: [escape, /nav/]
-  <o-s>: var(sys_layer, 1)
-  <a-g>: [string(git ), string(git commit -m "") + left]
+  o | s: var(sys_layer, 1)
+  a | g: [string(git ), string(git commit -m "") + left]
 
 /nav/:
   c: app(Kitty)
@@ -387,30 +430,32 @@ to read up on `notify()`, `shnotify()`, and `var()`
   m: /mouse/
 
 /sys/:
-  <o-s>: var(sys_layer, 0)
+  o | s: var(sys_layer, 0)
 
   f: shell(open ~)
   v: shell(open -b com.apple.ScreenSaver.Engine)
-  <o-h>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
+  o | h: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
 
-  <o-e>: shnotify(English, ==KEYBOARD==) + input(en)
-  <o-g>: 'shnotify(GreekPolytoniic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
+  o | e: shnotify(English, ==KEYBOARD==) + input(en)
+  o | g: 'shnotify(GreekPolytoniic, ==KEYBOARD==) + input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
 
 
 /mouse/:
   spacebar: button1
-  <s-spacebar>: button2
+  s | spacebar: button2
+
   h: mouse(x, -2000)
   j: mouse(y, 2000)
   k: mouse(y, -2000)
   l: mouse(x, 2000)
-  <c-h>: mouse(horizontal_wheel, 100)
-  <c-j>: mouse(vertical_wheel, 180)
-  <c-k>: mouse(vertical_wheel, -180)
-  <c-l>: mouse(horizontal_wheel, -100)
-  s: mouse(speed_multiplier, 2.5)
 
-  <c-1>: 'softFunc("set_mouse_cursor_position": { "x": 0, "y": 0, "screen": 0 } })'
+  c | h: mouse(horizontal_wheel, 100)
+  c | j: mouse(vertical_wheel, 180)
+  c | k: mouse(vertical_wheel, -180)
+  c | l: mouse(horizontal_wheel, -100)
+
+  s: mouse(speed_multiplier, 2.5)
+  c | 1: 'softFunc("set_mouse_cursor_position": { "x": 0, "y": 0, "screen": 0 } })'
 ```
 
 The `var(layer_name, value)` function is just a way to turn layers on and off
@@ -426,9 +471,9 @@ You can add a fourth-position item to the 'to' array to add the [lazy](https://k
 
 ```yaml
 /base/:
-  <(x)-enter>: [enter, control, null, [+lazy)] ]
-  <so-g>: [ g + i + t + space, null, null, [-repeat] ]
-  <mocs-q>: [ null, <sm-q>, null, [2000] ]
+  (x) | enter: [enter, control, null, [+lazy)] ]
+  so | g: [ g + i + t + space, null, null, [-repeat] ]
+  mocs | q: [ null, sm | q, null, [2000] ]
 ```
 
 Prepend a `+` or `-` to the lazy or repeat options to set them to true or false. You can set both
@@ -442,7 +487,7 @@ multiline YAML array.
 
 ```yaml
 /base/:
-  <(x)-enter>:
+  (x) enter:
     - enter
     - left_control
     - null
@@ -478,12 +523,12 @@ depending on the frontmost app, all without having to switch layers.
 
 ```yaml
 /base/:
-  <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
-  <a-O>: { unless Terminal$ iterm2$ kitty$: up + <g-right> + enter }
-  <a-o>: { unless Terminal$ iterm2$ kitty$: <g-right> + enter }
-  <a-g>: {
+  c | u: { unless Terminal$ iterm2$ kitty$: g | backspace }
+  a | O: { unless Terminal$ iterm2$ kitty$: up + g | right + enter }
+  a | o: { unless Terminal$ iterm2$ kitty$: g | right + enter }
+  a | g: {
     if Terminal$ iterm2$ kitty$: [string(git ), string(checkout)],
-    if CotEditor$: <g-l> # 'go to line' alternate shortcut
+    if CotEditor$: g | l # 'go to line' alternate shortcut
       }
 
 ```
