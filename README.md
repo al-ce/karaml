@@ -48,10 +48,14 @@ Karabiner-Elements (consider
   ms-a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
   m s | c: app(CotEditor) # left_command + left_shift + to launch CotEditor
 
-  # Use Unicode symbols for modifiers insead of letters
+  # Use Unicode symbols for modifiers instead of letters
   ⌘ ⇧ | g: string(lazygit) # command + shift + g to send string 'lazygit'
   ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
   ☆      | o: /open/ # hyper + o to toggle /open/ layer
+
+  # Utilize user-defined aliases
+  tab: [tab, ⁙]        # tab to left opt, ctrl, and shift when held
+  ⁙ | ⏎: screen_saver  # left opt, ctrl, shift, and enter starts screen saver
 
 # condition 'nav_layer' must be true for the following maps
 /nav/:
@@ -68,6 +72,12 @@ Karabiner-Elements (consider
   k: play_or_pause
   "}": fastforward
   u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+
+# User defined aliases
+aliases:
+  ⁙: ⌥ ⌃ ⇧
+  ⏎: return_or_enter
+  screen_saver: shell(open -b com.apple.ScreenSaver.Engine)
 
 # JSON integration
 json:
@@ -416,7 +426,7 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 - `kp+` for the same reason, so use `kpplus` as an alternate
 
 
-### Defining own aliases
+### Defining your own aliases
 
 You can define your own aliases for *singular events* by adding a top level 
 key named `aliases` anywhere in your config file. This YAML map will be merged
@@ -462,12 +472,15 @@ In the above example, the Unicode character `⏎` can be used as an alias for
 character, and `screen_saver` is aliased to a shell command to enable the
 screen saver.
 
+
 Now these can be used in any layer in the config. In the example,
 `⌘ | ⏎` (`return_or_enter` with the `command` modifier) is used to launch
 WezTerm, and `tilde` key's usual function has been reversed so that now you
 have to press shift + the backtick character to get a backtick instead of vice
 versa. And finally, the `left_command` and `s` key combination is used to start
 the screen saver if the `/sys` layer is active.
+
+#### Defining your own *modifier* aliases
 
 If all the key codes in an alias are valid modifiers, then the alias will be
 treated as a (multi-)modifier alias and added to the dict of modifiers aliases.
