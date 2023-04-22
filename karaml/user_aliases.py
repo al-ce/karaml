@@ -73,10 +73,18 @@ def process_alias_definition(
         alias_def, f"{alias}: {alias_def}"
     )
 
-    if modifier_in_primary := ALIASES.get(primary_kc):
-        alias_primary_key_code = modifier_in_primary.key_code
-    else:
-        alias_primary_key_code = MODIFIERS.get(primary_kc) or primary_kc
+    alias_primary_key_code = (
+        ALIASES.get(primary_kc) or
+        MODIFIER_ALIASES.get(primary_kc) or
+        # e.g. `s` counts as `left_shift` only if there's no
+        # non-whitspace delimiter in the alias definition, else it's `s`
+        MODIFIERS.get(primary_kc) if (
+            MODIFIERS.get(primary_kc) and
+            not search(r"[-|].+$", alias_def)
+        ) else None or
+
+        primary_kc
+    )
 
     mod_key_codes = alias_mods.get("mandatory")
     if opt_mods := alias_mods.get("optional"):
