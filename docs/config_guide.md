@@ -36,7 +36,7 @@ indentation. The first is a simple remap - `caps_lock` becomes `escape` whether
 it's tapped or held.
 
 The next two are the classic space-cadet remaps. More complex modifications go
-in a JSON-style ordered list or a yaml sequence, which is an indented list of
+in a JSON-style ordered list or a YAML sequence, which is an indented list of
 items starting with a dash and a space. Use whatever looks best to you in
 different situations. What's important for karaml is the order:
 
@@ -596,7 +596,7 @@ json:
 
 ### Profile names, rule-set title, and global parameters
 
-At the top of your config, you can add some **optional** yaml maps that will
+At the top of your config, you can add some **optional** YAML maps that will
 give your config a profile name, a complex-modifications rule-set title, and
 global parameters that will apply to your profile. All these can exist in a
 config regardless of how you use it. 

@@ -17,6 +17,9 @@ parameters:
     "mouse_motion_to_scroll.speed": 100,
   }
 
+# NOTE: This configuration uses the original <mods-key> syntax
+#      for specifying keys with modifiers. See the docs for other
+#      valid syntaxes, e.g. `mods | key`
 
 /base/:
   caps_lock: [escape, /nav/]  # tap: escape, hold: /nav/

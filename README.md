@@ -2,7 +2,7 @@
 
 **karaml** (**_Kara_**biner in ya**_ml_**) lets you write and maintain a
 virtual layers-based [Karabiner-Elements](https://karabiner-elements.pqrs.org/) keyboard customization
-configuration in YAML. It uses Python to translate the yaml into
+configuration in YAML. It uses Python to translate the YAML into
 Karabiner-compatible JSON.
 
 karaml is based on the philosophy of [mxstbr](https://github.com/mxstbr)'s
@@ -16,9 +16,9 @@ Karabiner-Elements (consider
 ```yaml
 # Default layer, does not require activation
 /base/:
-  caps_lock: [escape, /nav/] # Escape when tapped, /nav/ layer when held
-  oc | n: /nav/ # Tap Left Opt + Left Ctrl + n to toggle /nav/
-  O  | w: <o-backspace> # Right Opt + w to Left Opt + Backspace
+  caps_lock: [escape, /nav/]  # Escape when tapped, /nav/ layer when held
+  oc | n: /nav/               # Tap left opt + left ctrl + n to toggle /nav/
+  O  | w: <o-backspace>       # right opt + w to left opt + Backspace
 
   # Enter when tapped, Left Control when held, lazy flag, any optional modifiers
   (x) | enter:
@@ -45,16 +45,16 @@ Karabiner-Elements (consider
     }
 
   # Other syntax for modifiers is also supported
-  ms  a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
+  ms   a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
   <ms-c>: app(CotEditor) # left_command + left_shift + c to launch CotEditor
 
   # Use Unicode symbols for modifiers instead of letters
-  ⌘ ⇧    | g: string(lazygit) # command + shift + g to send string 'lazygit'
+  ⌘ ⇧    | g: string(lazygit)    # command + shift + g to send string 'lazygit'
   ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
-  ☆      | o: /open/ # hyper + o to toggle /open/ layer
+  ☆      | o: /open/             # hyper + o to toggle /open/ layer
 
   # Utilize user-defined aliases
-  tab  : [tab, ⁙]        # tab to left opt, ctrl, and shift when held
+  tab  : [tab, ⁙]      # tab to left opt, ctrl, and shift when held
   ⁙ | ⏎: screen_saver  # left opt, ctrl, shift, and enter starts screen saver
 
 # condition 'nav_layer' must be true for the following maps
@@ -64,7 +64,7 @@ Karabiner-Elements (consider
   (x) | k: up
   (x) | l: right
 
-  s: [app(Safari), /sys/] # Launch Safari on tap, /sys/ layer when held
+  s: [app(Safari), /sys/]     # Launch Safari on tap, /sys/ layer when held
   g: open(https://github.com) # Open link in default browser
 
 # etc.
@@ -80,7 +80,7 @@ aliases:
   ⏎: return_or_enter
   screen_saver: shell(open -b com.apple.ScreenSaver.Engine)
 
-# JSON integration
+# JSON integration - any Karabiner JSON can be added here
 json:
   - {
       description: "Right Shift to ) if tapped, Shift if held",
@@ -93,15 +93,15 @@ json:
 
 ## ✨ Features
 
-- Complex modifications on a single line of yaml so you can create and update keymaps quickly
+- Complex modifications on a single line of YAML so you can create and update keymaps quickly
 - Events for when a key is tapped, held, and released defined by position in an
   array (rather than k/v pairs)
 - Simple schema for requiring mandatory or optional modifiers in a pseudo-Vim
   style
-- Multiple frontmost-app conditional remaps in a single yaml map
+- Multiple frontmost-app conditional remaps in a single YAML map
 - Aliases for symbols, shifted keys, and complex names (e.g.
   `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
-- Define your own aliases for keycodes and modfiers!
+- Define your own aliases for keycodes and modifiers!
 - 'Special event' shorthands, e.g. app launchers, shell commands,
   notifications, and more
 - Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml
@@ -216,7 +216,7 @@ To add modifiers to a primary key, there are a few available formats. The
 general format is to have modifiers followed by a delimiter followed by
 primary keys. Multiple modifiers can have whitespace between them if they
 help readability, or they can be joined without any whitespace. Optional
-modifiers are indicaped by wrapping them in parens.
+modifiers are indicated by wrapping them in parens.
 
 The original format for modifiers was `<modifiers-primary_key>`, but others
 have been added to give the user a choice in whatever format they find most
@@ -439,7 +439,7 @@ An alias has the following format:
 
 ```yaml
 aliases:            # Include this top-level key anywhere in your config
-  alias_name: a valid modifiers + alias format
+  alias_name: /{modifiers (optional)} {delimiter (optional)} {key_code}/
 ```
 
 Example:
@@ -454,10 +454,16 @@ aliases:
   tilde: s | grave_accent_and_tilde  # left_shift + grave
   tilde: ⇧ | grave_accent_and_tilde  # left_shift + grave
 
-  # No delimiter: a good visual cue to indicate that this alias is all mods
-  ⁙: ⌥ ⌃ ⇧  # left_option + left_control + left_shift
+  ⁙: o c | s  # With an explicit delimiter (`|` or `-`), the final `s` is
+              # interpreted as the # key code it represents,
+              # So this is an alias for `left_option` + `left_control` + `s`
 
+  ⁙: o c s    # Without an explicit delimiter, this alias is all mods, since
+              # `s` is one of the single-character modifier aliases.
+              # So this is an alias for `left_option` + `left_control` + `left_shift`
 
+  ⁙: ⌥ ⌃ ⇧    # An alias of all modifier symbols is added to the modifier
+              # alias dict regardless of its syntax
 
 /base/:
   ⌘ | ⏎: app(WezTerm)
@@ -480,12 +486,7 @@ Now these can be used in any layer in the config. In the example,
 WezTerm, and `tilde` key's usual function has been reversed so that now you
 have to press shift + the backtick character to get a backtick instead of vice
 versa. And finally, the `left_command` and `s` key combination is used to start
-the screen saver if the `/sys` layer is active.
-
-#### Defining your own *modifier* aliases
-
-If all the key codes in an alias are valid modifiers, then the alias will be
-treated as a (multi-)modifier alias and added to the dict of modifiers aliases.
+the screen saver if the `/sys/` layer is active.
 
 Above, `⁙` is an alias for `left_option` + `left_control` + `left_shift` that
 we can use as a modifier. In the `/base/` layer, we use it and the `⏎` alias
@@ -504,6 +505,22 @@ keybindings.
 
 Currently, only single-character aliases for modifier aliases are supported.
 We're working on a way to support multi-character aliases for modifier aliases!
+
+#### Rules for defining your own *modifier* aliases
+
+If all the key codes in an alias are valid modifiers, then the alias may be
+treated as a (multi-)modifier alias and added to the dict of modifiers aliases.
+
+If the alias is composed entirely of modifier *symbol* characters (⌥, ⌘, ⇧,
+⌃, etc.), then it will be added to the dict of modifier aliases, regardless of
+the syntax used to define it.
+
+If the alias is composed entirely of single characters that are all valid
+modifier aliases (see the [modifiers](#modifiers) section), *AND* there are no
+explicit delimiters in the alias definition, then it will be added to the dict
+of modifier aliases. Otherwise, the final character will be treated as the
+key code it represents. See the examples above.
+
 
 ### Simultaneous from-keys, multiple to-events, requiring multiple layers
 
@@ -564,7 +581,7 @@ events in disguise. You can use these as if they were to.events, e.g.:
 | Function                                      | Description                                           |
 | --------------------------------------------- | ----------------------------------------------------- |
 | [app](#app-launchers)                         | Launch an app from the Applications folder            |
-| [open](#open-browser-link)                    | Open a url in your default browser                    |
+| [open](#open-browser-link)                    | Open a URL in your default browser                    |
 | [shell](#shell-commands)                      | Run a shell command                                   |
 | [input](#input-sources)                       | Switch input source                                   |
 | [mouse](#mouse-movement)                      | Move the mouse cursor in the x or y directions        |
@@ -594,7 +611,7 @@ want these in a standalone `/apps/` layer.
 
 `open(url)`
 
-Open a url with your default browser.
+Open a URL with your default browser.
 
 ```yaml
 /base/:
@@ -791,7 +808,7 @@ turn it off ('on | off | toggle')
 
 `string(a string of valid key codes or aliases)`
 
-Instead of mapping a key to type out a string of characters using the `+` joninig method, e.g. `git checkout` like so:
+Instead of mapping a key to type out a string of characters using the `+` joining method, e.g. `git checkout` like so:
 
 ```yaml
 /base/:
@@ -855,7 +872,7 @@ bundle identifier of the app you want to match (read the [Karabiner
 docs](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/conditions/frontmost-application/)
 for more info). karaml will yell at you if your conditional term isn't `if` or
 `unless`. Every following substring separated by a space will be interpreted
-by karaml as a list (yaml supports lists in keys, but Python doesn't, so use
+by karaml as a list (YAML supports lists in keys, but Python doesn't, so use
 a string here).
 
 The dictionary's values are your usual karaml map values. Each k/v pair
@@ -919,7 +936,7 @@ is intended for cases where karaml doesn't support a feature you need, or when
 you think the JSON looks easier to read than the karaml syntax, but you still
 want to use karaml for the rest of your config.
 
-Be mindful of the slight differences in syntax between yaml and JSON. Namely,
+Be mindful of the slight differences in syntax between YAML and JSON. Namely,
 quotes are optional unless needed for escaping characters, elements of the
 `json` map are separated as sequence item (a properly indented dash `-`
 followed by a space), and no commas are used to separate those items.
@@ -1009,7 +1026,7 @@ immediate switching between layers or enabling of modifier keys, since the `to`
 dictionary doesn't wait for the `to_if_held_down_threshold_milliseconds` timeout. This means
 sending the `to` event even when `to_if_alone` is sent , but so long as the
 event is 'harmless', or not 'chatty', i.e. it is a layer, a modifier, or a
-notfication, and so long as we set the `lazy` opt when necessary (e.g. for my
+notification, and so long as we set the `lazy` opt when necessary (e.g. for my
 mapping of `enter` → `control` when held), this doesn't cause any significant
 side effects.
 
@@ -1056,7 +1073,7 @@ pip install .
 
 After you've made a well-formed karaml config, open your terminal app.
 
-The `karaml` command requires one positional argument: the name of the yaml
+The `karaml` command requires one positional argument: the name of the YAML
 file with your karaml config in the current folder (or the relative/absolute
 path to that file).
 
@@ -1115,7 +1132,7 @@ update your complex modifications folder directly. If you're updating an old
 complex rule set, you'll have to remove the old complex modifications and
 re-enable the updated ones, as you would normally. No backup files will be
 created for complex modifications, but you will get a confirmation prompt to
-confirm the overwrite/update. If you do not provide a `title` map in your yaml
+confirm the overwrite/update. If you do not provide a `title` map in your YAML
 config, karaml will default to writing/updating the 'Karaml rules' ruleset.
 
 ```bash
