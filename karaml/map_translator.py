@@ -9,9 +9,10 @@ from karaml.helpers import (
     check_and_validate_str_as_dict,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
-from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS, PSEUDO_FUNCS,
+from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS,
                               MODIFIER_ALIASES, ALIASES
                               )
+from karaml.templates import TEMPLATES, USER_TEMPLATES, TemplateInstance
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
@@ -175,7 +176,7 @@ def translate_if_pseudo_func(usr_map: str) -> KeyStruct:
     # replace the alias with the pseudo function
     if usr_map in ALIASES:
         usr_map = ALIASES[usr_map].key_code
-    for event_alias in PSEUDO_FUNCS:
+    for event_alias in TEMPLATES:
         query = search(f"^{event_alias}\\((.+)\\)$", usr_map)
         if not query:
             continue
@@ -195,11 +196,14 @@ def translate_pseudo_func(event: str, cmd: str) -> tuple[str, str]:
     # We don't actually check if the command/argument for 'open()' or
     # 'shell()' are valid links, commands, etc.) & trust the user
 
-    # TODO: add validation for select_input_source, mouse_key, soft_func,
+    # TODO: add valiation for select_input_source, mouse_key, soft_func,
     # etc. For now, it's the user's responsibility
 
+    if template_instance := get_user_template_instance(event, cmd):
+        return template_instance
+
     match event:
-        # NOTE: need to update PSEUDO_FUNCS if adding new events here
+        # NOTE: need to update TEMPLATES if adding new events here
         case "app":
             event, cmd = "shell_command", f"open -a '{cmd}'.app"
         case "input":
@@ -226,6 +230,21 @@ def translate_pseudo_func(event: str, cmd: str) -> tuple[str, str]:
         case "var":
             event, cmd = "set_variable", set_variable(cmd)
     return event, cmd
+
+
+def get_user_template_instance(event: str, cmd: str) -> tuple[str, str]:
+    """
+    Returns a tuple with the event and command strings that will be used to
+    create a KeyStruct for a user template instance.
+    """
+
+    if event not in USER_TEMPLATES:
+        return
+
+    template = USER_TEMPLATES[event]
+    template_instance_args = [arg.strip() for arg in cmd.split(",")]
+    instance = TemplateInstance(template, template_instance_args)
+    return "shell_command", instance.shell_script
 
 
 def input_source(regex_or_dict: str) -> dict:

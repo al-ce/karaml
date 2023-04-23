@@ -10,6 +10,7 @@ from karaml.helpers import (
 )
 from karaml.exceptions import invalidFrontmostAppCondition
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
+from karaml.templates import update_user_templates
 
 
 def extract_keys(mapping_node):
@@ -33,6 +34,7 @@ class KaramlConfig:
         self.title: str = self.get_ruleset_title(self.yaml_data)
         self.params: dict = self.get_params(self.yaml_data)
         self.json_rules_list: list = self.get_json_rules_list(self.yaml_data)
+        update_user_templates(self.yaml_data)
         update_user_aliases(self.yaml_data)
         self.layers: list = self.gen_layers(self.yaml_data)
 

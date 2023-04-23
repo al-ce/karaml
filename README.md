@@ -102,8 +102,9 @@ json:
 - Aliases for symbols, shifted keys, and complex names (e.g.
   `grave_accent_and_tilde` → `grave`, `left_shift` + `[` → `{` )
 - Define your own aliases for keycodes and modifiers!
-- 'Special event' shorthands, e.g. app launchers, shell commands,
-  notifications, and more
+- Template for app launchers, shell commands,
+  notifications, and more by default
+- Define your own templates for shell commands!
 - Accepts regular Karabiner JSON in an 'appendix' table so all cases Karaml
   can't or doesn't plan to handle can still be in one config
 - Automatically update your `karabiner.json` or write to the complex
@@ -566,11 +567,14 @@ non-conflicting keys will all work as intended.
 Alternatively, for sending multiple singe characters, you can use `string()`.
 See: [string special event function](#strings)
 
-### Special Event Functions
+### Templates for common actions
 
-Shorthands for common-use events. Some are just
+karaml provides some templates for common-use actions. Some are just
 [to.shell_command](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/shell-command/)
-events in disguise. You can use these as if they were to.events, e.g.:
+events in disguise. You can define your own templates for shell scripts - see
+[user-defined templates](#user-defined-shell-command-templates)
+
+You can use these as if they were to.events, e.g.:
 
 ```yaml
 /base/:
@@ -849,6 +853,70 @@ function allows more granular control.
   o | s:
     var(sys_layer, 1) # This does not automatically create a corresponding
     # toggle-off mapping. Don't get stuck in another layer!
+```
+
+
+### User Defined Shell Command Templates
+
+This feature copies much of the design of the template feature in
+[GokuRakuJoudo](https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md#predefined-templates),
+though not as fully featured.
+
+You can define your own templates for shell commands in the `templates` section
+of your configuration file. This may be useful if you want to create a lot of
+maps for similar long and complex shell commands.
+
+```yaml
+templates:
+  template_name: "command template %s || another command %s"
+
+/base/:
+  ⌥ | 1: template(arg1, arg2)
+```
+
+All `%s` will be replaced by the arguments passed to any instances of a
+template in your layers. You can have as many args as you want, but karaml
+will check that the amount of args passed to a template instance matches the
+amount of `%s` in the template definition.
+
+As an example of a good use case, here is a template for triggering
+[Rectangle Pro](https://rectangleapp.com/) actions using [urls](https://github.com/rxhanson/RectanglePro-Community#programmatically-triggering-window-sizes--positions).
+
+```yaml
+templates:
+  rectangle: open -g "rectangle-pro://execute-action?name=%s"
+
+/rectangle/:
+  ⌘ ⇧ | 1: rectangle( fullscreen       )
+  ⌘ ⇧ | 2: rectangle( left-half        )
+  ⌘ ⇧ | 3: rectangle( right-half       )
+  ⌘ ⇧ | 4: rectangle( next-display     )
+  ⌘ ⇧ | 5: rectangle( previous-display )
+  # etc.
+```
+
+This looks much cleaner than having a few dozen lines of the same long
+command.
+
+Note that the `templates` map in your configuration file is loaded *BEFORE*
+your `aliases` map (regardless of where you place those maps in your config),
+so you can use templates in your aliases, but not the other
+way around.
+
+```yaml
+templates:
+  rectangle: open -g "rectangle-pro://execute-action?name=%s"
+
+aliases:
+  fullscreen : rectangle( fullscreen )
+  left-half  : rectangle( left-half  )
+  right-half : rectangle( right-half )
+
+/rectangle/:
+  ⌘ ⇧ | 1: fullscreen
+  ⌘ ⇧ | 2: left-half
+  ⌘ ⇧ | 3: right-half
+  # etc.
 ```
 
 ### Frontmost-App Conditions

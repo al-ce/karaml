@@ -429,22 +429,6 @@ POINTING_BUTTON = [
 ]
 
 
-PSEUDO_FUNCS = [
-    "app",
-    "input",
-    "mouse",
-    "mousePos",
-    "notify",
-    "notifyOff",
-    "open",
-    "sfunc",
-    "shell",
-    "shnotify",
-    "sticky",
-    "var",
-]
-
-
 KeyCodesRef = namedtuple("KeyCodesRef", ["key_type", "ref"])
 
 KEY_CODE_REF_LISTS = [

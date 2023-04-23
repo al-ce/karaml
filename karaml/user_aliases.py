@@ -6,9 +6,9 @@ from karaml.key_codes import (
     ALIASES,
     MODIFIER_ALIASES,
     MODIFIERS,
-    PSEUDO_FUNCS,
 )
 from karaml.map_translator import parse_primary_key_and_mods
+from karaml.templates import TEMPLATES
 
 
 def update_user_aliases(d: dict) -> None:
@@ -65,9 +65,9 @@ def process_alias_definition(
 
     Returns a tuple of the primary key code and the optional modifiers.
     """
-    found_pf = search(r"^(\w+)\(.*\)$", alias_def)
-    if found_pf and found_pf.group(1) in PSEUDO_FUNCS:
-        return found_pf.group(), None
+    template_pattern = search(r"^(\w+)\(.*\)$", alias_def)
+    if template_pattern and template_pattern.group(1) in TEMPLATES:
+        return template_pattern.group(), None
 
     primary_kc, alias_mods = parse_primary_key_and_mods(
         alias_def, f"{alias}: {alias_def}"

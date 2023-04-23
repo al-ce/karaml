@@ -5,12 +5,13 @@ from karaml.helpers import (
     validate_to_opts, translate_params, validate_condition_dict, validate_layer
 )
 from karaml.key_codes import (
-    CHATTY, MODIFIERS, KEY_CODE_REF_LISTS, PSEUDO_FUNCS
+    CHATTY, MODIFIERS, KEY_CODE_REF_LISTS
 )
 from karaml.exceptions import (
     invalidToModType, missingToMap
 )
 from karaml.map_translator import TranslatedMap, KeyStruct
+from karaml.templates import TEMPLATES
 
 
 @dataclass
@@ -218,7 +219,7 @@ def chatter_safeguard(hold_map: str, key_list: list, to_event: str) -> str:
         return to_event
 
     # Pseudo funcs/special events are chatty except for notify
-    for pf in PSEUDO_FUNCS:
+    for pf in TEMPLATES:
         if pf == "notify":
             continue
         if pf in hold_map:
