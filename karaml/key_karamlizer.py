@@ -219,10 +219,10 @@ def chatter_safeguard(hold_map: str, key_list: list, to_event: str) -> str:
         return to_event
 
     # Pseudo funcs/special events are chatty except for notify
-    for pf in TEMPLATES:
-        if pf == "notify":
+    for template in TEMPLATES:
+        if template == "notify":
             continue
-        if pf in hold_map:
+        if template in hold_map:
             return "to_if_held_down"
 
     for key in key_list:

@@ -303,7 +303,8 @@ def validate_layer(string: str) -> str:
     The format must be a string enclosed in forward slashes, e.g. '/layer1/'
     with only alphanumeric characters and underscores.
     """
-    return search("^/(\\w+)/$", string).group(1) or invalidLayerName(string)
+    layer = is_layer(string)
+    return layer.group(1) or invalidLayerName(string)
 
 
 def validate_mod_aliases(mods: str) -> str:

@@ -6,7 +6,7 @@ from karaml.helpers import (
     get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
     validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
     validate_shnotify_dict, validate_mouse_pos_args,
-    check_and_validate_str_as_dict,
+    check_and_validate_str_as_dict, is_layer,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
 from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS,
@@ -157,10 +157,10 @@ def send_Unicode_string(string: str) -> KeyStruct:
 def translate_if_layer(string: str) -> namedtuple:
     """
     Return a KeyStruct with the key_type 'layer' and the layer name as the
-    key_code if the string matches the regex '^/(\\w+)/$', e.g. '/layer1/'.
+    key_code if the string matches the regex determined in the is_layer func.
     Otherwise, return None.
     """
-    layer = search("^/(\\w+)/$", string)
+    layer = is_layer(string)
     if not layer:
         return
     return KeyStruct("layer", layer.group(1), None)
@@ -176,19 +176,20 @@ def translate_if_pseudo_func(usr_map: str) -> KeyStruct:
     # replace the alias with the pseudo function
     if usr_map in ALIASES:
         usr_map = ALIASES[usr_map].key_code
-    for event_alias in TEMPLATES:
-        query = search(f"^{event_alias}\\((.+)\\)$", usr_map)
+    for template in TEMPLATES:
+        query = search(f"^{template}\\((.+)\\)$", usr_map)
         if not query:
             continue
 
-        event, command = translate_pseudo_func(event_alias, query.group(1))
+        event, command = translate_template(template, query.group(1))
         return KeyStruct(event, command, None)
 
 
-def translate_pseudo_func(event: str, cmd: str) -> tuple[str, str]:
+def translate_template(event: str, cmd: str) -> tuple[str, str]:
     """
-    Takes a pseudo function event and command and returns a tuple with the
-    event and command strings that will be used to create a KeyStruct.
+    Takes a template its args. Tturns a tuple with the event and command 
+    strings that will be used to create the appropriate KeyStruct.
+
     e.g. 'shell(open .)' -> ('shell_command', 'open .') for the KeyStruct
 
     KeyStruct('shell_command', 'open .', None)
