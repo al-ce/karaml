@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from karaml.helpers import (
     dict_eval, flag_check, is_layer, get_multi_keys, make_list,
-    validate_to_opts, translate_params, validate_condition_dict, validate_layer
+    validate_to_opts, translate_params, validate_layer
 )
 from karaml.key_codes import (
     CHATTY, MODIFIERS, KEY_CODE_REF_LISTS
@@ -273,7 +273,6 @@ def get_condition_dict(layer_name: str, value: int) -> dict[str, dict | int]:
     This condition must be true for the "from" event to be triggered.
     """
     condition = {"name": layer_name, "type": "variable_if", "value": value}
-    validate_condition_dict(condition)
     return condition
 
 

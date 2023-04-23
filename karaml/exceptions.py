@@ -19,14 +19,6 @@ def invalidConditionValue(name: str, value: str):
     )
 
 
-def invalidConditionName(name: str):
-    configError(
-        f"Invalid condition name: {name}.\n"
-        "Condition names must only contain letters.\n"
-        f"Got: {name}"
-    )
-
-
 def invalidFrontmostAppCondition(condition: str, map_rhs: dict):
     configError(
         "Invalid condition for frontmost_application\n"

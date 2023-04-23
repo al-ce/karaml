@@ -8,7 +8,7 @@ from karaml.key_codes import (
     KEY_CODE_REF_LISTS, MODIFIERS
 )
 from karaml.helpers import (
-    get_multi_keys, validate_layer, validate_condition_dict
+    get_multi_keys, validate_layer
 )
 from karaml.key_karamlizer import (
     KaramlizedKey, UserMapping, chatter_safeguard, from_simultaneous_dict,
@@ -52,17 +52,6 @@ def test_get_condition_dict():
     assert valid_condition_dict_args["name"] == "nav_layer"
     assert valid_condition_dict_args["type"] == "variable_if"
     assert valid_condition_dict_args["value"] == 1
-
-
-def test_validate_condition_dict():
-    with pytest.raises(SystemExit) as inv_value_test:
-        inv_value = {"name": "nav", "type": "variable_if", "value": 2}
-        validate_condition_dict(inv_value)
-    with pytest.raises(SystemExit) as inv_name_test:
-        inv_name = {"name": "99", "type": "variable_if", "value": 1}
-        validate_condition_dict(inv_name)
-    assert inv_value_test.type == SystemExit
-    assert inv_name_test.type == SystemExit
 
 
 def test_get_layer_toggle_dict():

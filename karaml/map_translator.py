@@ -96,7 +96,7 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
     if layer := translate_if_layer(usr_key):
         return layer
 
-    if to_event := translate_if_pseudo_func(usr_key):
+    if to_event := translate_if_template(usr_key):
         return to_event
 
     if keystruct := translate_if_valid_keycode(usr_key, usr_map):
@@ -166,7 +166,7 @@ def translate_if_layer(string: str) -> namedtuple:
     return KeyStruct("layer", layer.group(1), None)
 
 
-def translate_if_pseudo_func(usr_map: str) -> KeyStruct:
+def translate_if_template(usr_map: str) -> KeyStruct:
     """
     Return a KeyStruct with the key_type and key_code for a pseudo function
     if the user mapping matches the regex for a pseudo function, e.g.

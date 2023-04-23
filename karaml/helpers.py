@@ -4,7 +4,7 @@ from yaml import SafeLoader
 from re import search
 
 from karaml.exceptions import (
-    invalidConditionName, invalidConditionValue, invalidFlag,
+    invalidConditionValue, invalidFlag,
     invalidStickyModifier, invalidLayerName, invalidModifier,
     invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
     invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
@@ -139,7 +139,7 @@ def is_layer(string: str) -> bool:
     rather than a 'to_if_held_down' event so the layer can be accessed
     immediately without waiting for the 'to_if_held_down_threshold'.
     """
-    return search("^/(\\w+)/$", string)
+    return search("^/(.+)/$", string)
 
 
 def is_dict(obj) -> bool:
@@ -209,14 +209,6 @@ def translate_params(params: dict) -> dict:
         if type(v) != int:
             invalidParamValues(params, v)
     return {"parameters": translated} if translated else {}
-
-
-def validate_condition_dict(condition_dict: dict):
-    name, cond_type, value = list(condition_dict.values())
-    if not 0 <= value <= 1:
-        invalidConditionValue(name, value)
-    if not search("^[a-zA-Z_]+$", name):
-        invalidConditionName(name)
 
 
 def check_and_validate_str_as_dict(string: str) -> bool:

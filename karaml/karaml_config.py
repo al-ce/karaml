@@ -46,6 +46,8 @@ class KaramlConfig:
         by the PyYAML library.
         """
         with open(from_file) as f:
+            # TODO: need some kind of health check here for characters that
+            # raise errors, e.g `?`
             yaml_data: dict = yaml.load(f, Loader=UniqueKeyLoader)
         return yaml_data
 

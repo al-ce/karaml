@@ -305,19 +305,19 @@ def test_translate_event():
 
 def test_special_to_event_check():
     # Checks for special events, not regular keycodes
-    assert not mp.translate_if_pseudo_func("j")
+    assert not mp.translate_if_template("j")
 
-    se_case = mp.translate_if_pseudo_func("app(Firefox)")
+    se_case = mp.translate_if_template("app(Firefox)")
     assert type(se_case) == KeyStruct
     assert se_case.key_code == "open -a 'Firefox'.app"
     assert se_case.key_type == "shell_command"
     assert not se_case.modifiers
 
     # Special events need to be in the form of 'event(arg)'
-    assert not mp.translate_if_pseudo_func("app")
-    assert not mp.translate_if_pseudo_func("app()")
+    assert not mp.translate_if_template("app")
+    assert not mp.translate_if_template("app()")
     # And must be valid special events, not just some_string(arg)
-    assert not mp.translate_if_pseudo_func("some_string(arg)")
+    assert not mp.translate_if_template("some_string(arg)")
 
 
 def test_resolve_alias():
