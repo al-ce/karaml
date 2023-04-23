@@ -57,6 +57,9 @@ Karabiner-Elements (consider
   tab  : [tab, ⁙]      # tab to left opt, ctrl, and shift when held
   ⁙ | ⏎: screen_saver  # left opt, ctrl, shift, and enter starts screen saver
 
+  # Utilize user-defined templates
+  ⌘ ⇧ | f: rectangle(fullscreen)
+
 # condition 'nav_layer' must be true for the following maps
 /nav/:
   (x) | h: left # vim navigation with any optional mods
@@ -79,6 +82,11 @@ aliases:
   ⁙: ⌥ ⌃ ⇧
   ⏎: return_or_enter
   screen_saver: shell(open -b com.apple.ScreenSaver.Engine)
+
+# User defined templates
+templates:
+  rectangle: open -g "rectangle-pro://execute-action?name=%s"
+
 
 # JSON integration - any Karabiner JSON can be added here
 json:
@@ -365,15 +373,19 @@ need to be escaped or wrapped in quotes to be recognized as strings.
 | `%`            | `5` + `shift`                     |
 | `^`            | `6` + `shift`                     |
 | `&`            | `7` + `shift`                     |
-| `*`           | `8` + `shift`                     |
+| `*`           | `8` + `shift`                      |
 | `up`           | `up_arrow`                      |
 | `down`         | `down_arrow`                    |
 | `left`         | `left_arrow`                    |
 | `right`        | `right_arrow`                   |
+| `↑`            | `up_arrow`                      |
+| `↓`            | `down_arrow`                    |
+| `←`            | `left_arrow`                    |
+| `→`            | `right_arrow`                   |
 | `pgup`         | `page_up`                       |
 | `pgdn`         | `page_down`                     |
 | `kp-`          | `keypad_hyphen`                 |
-| `kp*`         | `keypad_asterisk`               |
+| `kp*`          | `keypad_asterisk`               |
 | `kp/`          | `keypad_slash`                  |
 | `kp=`          | `keypad_equal_sign`             |
 | `kp.`          | `keypad_period`                 |
