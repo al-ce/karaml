@@ -66,6 +66,21 @@ def process_alias_definition(
     Returns a tuple of the primary key code and the optional modifiers.
     """
     template_pattern = search(r"^(\w+)\(.*\)$", alias_def)
+
+    # TODO: if this is a string(), it needs to default to the shell_command
+    # version of string(), since the default 'fast' version is a concatenation
+    # of 'to:' events, which is not how aliases work
+    # HACK: lets make a quick warning.
+    if template_pattern and template_pattern.group(1) == "string":
+        print(
+            f"WARNING: {alias_name} is a string() template. "
+            "Aliasing string() templates is not yet supported.\n"
+            "Got:\n"
+            f"\t{alias_name}: {alias_def}\n"
+        )
+        from sys import exit
+        exit(1)
+
     if template_pattern and template_pattern.group(1) in TEMPLATES:
         return template_pattern.group(), None
 
