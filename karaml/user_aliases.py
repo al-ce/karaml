@@ -36,20 +36,20 @@ def update_user_aliases(d: dict) -> None:
         return
     aliases = d.get("aliases")
 
-    for alias, alias_def in aliases.items():
-        alias_codes = process_alias_definition(alias, alias_def)
+    for alias_name, alias_def in aliases.items():
+        alias_codes = process_alias_definition(alias_name, alias_def)
         alias_primary_key_code, mod_key_codes = alias_codes
 
-        ALIASES[alias] = Alias(alias_primary_key_code, mod_key_codes)
+        ALIASES[alias_name] = Alias(alias_primary_key_code, mod_key_codes)
 
-        add_modifier_alias(alias, alias_def)
+        add_modifier_alias(alias_name, alias_def)
 
     d.pop("aliases")
 
 
 def process_alias_definition(
 
-    alias: str,
+    alias_name: str,
     alias_def: str
 ) -> tuple[str, str | None]:
     """
@@ -70,7 +70,7 @@ def process_alias_definition(
         return template_pattern.group(), None
 
     primary_kc, alias_mods = parse_primary_key_and_mods(
-        alias_def, f"{alias}: {alias_def}"
+        alias_def, f"{alias_name}: {alias_def}"
     )
 
     alias_primary_key_code = (
@@ -94,7 +94,7 @@ def process_alias_definition(
     return alias_primary_key_code, mod_key_codes
 
 
-def add_modifier_alias(alias: str, alias_def: str) -> None:
+def add_modifier_alias(alias_name: str, alias_def: str) -> None:
     """
     Checks if all the key codes in the alias definition are valid modifier
     key codes. If so, adds the alias to the MODIFIER_ALIASES dict.
@@ -111,4 +111,4 @@ def add_modifier_alias(alias: str, alias_def: str) -> None:
         elif item in MODIFIER_ALIASES:
             new_mod_alias_value += MODIFIER_ALIASES[item]
 
-    MODIFIER_ALIASES[alias] = new_mod_alias_value
+    MODIFIER_ALIASES[alias_name] = new_mod_alias_value
