@@ -1,5 +1,6 @@
 from copy import deepcopy
 from dataclasses import dataclass
+from re import search
 from typing import Union
 import yaml
 
@@ -121,8 +122,9 @@ class KaramlConfig:
         layers_list = []
 
         for layer_name, layer_maps in yaml_data.items():
+            layer_name, layer_description = parse_layer_description(layer_name)
             manipulators: list = self.get_manipulators(layer_name, layer_maps)
-            layer = {"description": f"{layer_name} layer",
+            layer = {"description": layer_description,
                      "manipulators": manipulators}
             layers_list.append(layer)
 
@@ -259,3 +261,20 @@ def get_karamlized_key(from_keys: str, layer_name: str, hold_flavor: str,
     """
     user_map = UserMapping(from_keys, rhs)
     return KaramlizedKey(user_map, layer_name, hold_flavor)
+
+
+def parse_layer_description(layer_name: str) -> tuple[str, str]:
+    """
+    If a layer name contains the syntax indicating a layer description,
+    indicated by a pipe character separating the rightmost string as the
+    descrpition and anything to the left as the layer name, this function
+    parses the layer name and description and returns them as a tuple.
+    Otherwise, returns the layer name and a default description.
+    """
+
+    description = search(r"/(.*)\|(.*)/", layer_name)
+    if not description:
+        return layer_name, f"{layer_name} layer"
+    layer_name = f"/{description.group(1).strip()}/"
+    layer_description = description.group(2).strip()
+    return layer_name, layer_description
