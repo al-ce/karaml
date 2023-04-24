@@ -278,6 +278,10 @@ def parse_layer_key(layer_name: str) -> tuple[str, str]:
     Returns a tuple of the layer name and the layer description as strings.
     """
 
+    # Remove newlines from the layer name in case the user formatted the YAML
+    # key with the `? |` syntax to allow a multi-line string in the key.
+    layer_name = layer_name.replace("\n", " ")
+
     layer_info = re.search(r"^(/.+/)(.*)", layer_name)
     if not layer_info:
         invalidLayerName(layer_name)
