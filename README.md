@@ -71,7 +71,10 @@ Karabiner-Elements (consider
   g: open(https://github.com) # Open link in default browser
 
 # etc.
-/sys/:
+? /sys/
+  System Layer
+: # ↑ inserts a description for the layer into karabiner.json
+
   o | m: [mute, null, mute] # To mute if held/key down, unmute if released/key up
   k  : play_or_pause
   "}": fastforward
@@ -931,6 +934,56 @@ aliases:
   # etc.
 ```
 
+### Layer descriptions
+
+If no description is provided for a layer, karaml will add a default one to the
+`karabiner.json` file in the form of `{layer name} layer`. You can override
+this by adding some text to your layer's key *after* the layer (or layers).
+
+```yaml
+/mouse/     Mouse Movements:  # Excess whitespace is ignored
+  m       : mouse(x, -2000)
+  n       : mouse(y, 2000)
+  e       : mouse(y, -2000)
+  i       : mouse(x, 2000)
+
+# Using YAML's complex-key syntax for multi-line keys
+? /symnum/
+
+  Numpad + Symbols Layer
+:
+  (x) j: "0"
+  (x) k: ","
+
+# Layers with multiple conditions can also be split across multiple lines
+? /symnum/ +
+  /nav/
+
+  Sym & Nav Multi-layer
+:
+  m   : left
+  n   : down
+  e   : up
+  i   : right
+```
+The parser will replace all the newline chars in the complex key with a space
+and parse it as if it were a single line, as in the `/mouse/` layer example.
+
+This is an unconventional way to use YAML, but since a major part of karaml's
+design is to make a compact Karabiner-Elements configuration file and avoid
+dictionaries and excess brackets where possible and sensible, 
+this was a good compromise.
+
+The advantage of this over simply adding YAML comments near the layer is that
+the description makes it into the `karabiner.json` file and is displayed in
+the Karabiner-Elements GUI.
+
+***NOTE***: The only restriction on layer descriptions is that they must not
+contain a forward slash (`/`). This was done to simplify the parsing of
+muti-conditional layers. karaml will raise an error if it detects a forward
+slash in a layer description.
+
+
 ### Frontmost-App Conditions
 
 To set frontmost-app conditions, the from-key part of your map remains the
@@ -1230,7 +1283,8 @@ trace in an issue!
 
 ## 🪲 Known Issues / Bugs / Limitations
 
-- Can't toggle layer in 'when-tapped' position if also set in 'when-held' position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
+- Can't toggle layer in 'when-tapped' position if also set in 'when-held'
+position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
 - `halt` option for `to_if_held_down` and `to_if_alone` not yet supported
@@ -1241,9 +1295,8 @@ trace in an issue!
 - ~~Protect against double maps in the same layer (accidental overwrites)~~ user will be warned but not prohibited, see [5a66a39](https://github.com/al-ce/karaml/commit/5a66a39a75271cf27a88bf20f01df690b0688c12)
 - More condition types (`device_if`, etc.)
 - More helpful configuration error messages
-- ~Define your own aliases~ Partially complete - modifier aliases are not yet
-  supported
-- Define your own functions
+- ~Define your own aliases~ - done for both primary keys and modifiers
+- ~Define your own templates~ - available for custom shell commands
 - ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
 
 ## 🔭 Alternatives
