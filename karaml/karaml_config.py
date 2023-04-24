@@ -1,14 +1,16 @@
 from copy import deepcopy
 from dataclasses import dataclass
+import re
 from typing import Union
 import yaml
 
 from karaml.user_aliases import update_user_aliases
 from karaml.helpers import (
+    is_layer,
     translate_params,
     UniqueKeyLoader,
 )
-from karaml.exceptions import invalidFrontmostAppCondition
+from karaml.exceptions import invalidFrontmostAppCondition, invalidLayerName
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
 from karaml.templates import update_user_templates
 
@@ -120,9 +122,11 @@ class KaramlConfig:
         """
         layers_list = []
 
-        for layer_name, layer_maps in yaml_data.items():
-            manipulators: list = self.get_manipulators(layer_name, layer_maps)
-            layer = {"description": f"{layer_name} layer",
+        for layer_key, layer_maps in yaml_data.items():
+            name, description = parse_layer_key(layer_key)
+
+            manipulators: list = self.get_manipulators(name, layer_maps)
+            layer = {"description": description,
                      "manipulators": manipulators}
             layers_list.append(layer)
 
@@ -259,3 +263,27 @@ def get_karamlized_key(from_keys: str, layer_name: str, hold_flavor: str,
     """
     user_map = UserMapping(from_keys, rhs)
     return KaramlizedKey(user_map, layer_name, hold_flavor)
+
+
+def parse_layer_key(layer_name: str) -> tuple[str, str]:
+    """
+    Parses the layer key in the YAML config file and returns a tuple containing
+    the layer name and the layer description. This function also serves as a
+    check that the layer's syntax is valid.
+
+    The name and description are parsed by a regex that matches the syntax
+    "/layer_name/ layer_description (optional)". If no description is given,
+    the description defaults to "/layer_name/ layer".
+
+    Returns a tuple of the layer name and the layer description as strings.
+    """
+
+    layer_info = re.search(r"^(/.+/)(.*)", layer_name)
+    if not layer_info:
+        invalidLayerName(layer_name)
+
+    layer_name, description = map(str.strip, layer_info.groups())
+
+    if not description:
+        description = f"{layer_name} layer"
+    return layer_name, description

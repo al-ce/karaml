@@ -139,7 +139,7 @@ def is_layer(string: str) -> bool:
     rather than a 'to_if_held_down' event so the layer can be accessed
     immediately without waiting for the 'to_if_held_down_threshold'.
     """
-    return search("^/(.+)/$", string)
+    return search("^/([^/]+)/$", string)
 
 
 def is_dict(obj) -> bool:
@@ -296,7 +296,9 @@ def validate_layer(string: str) -> str:
     with only alphanumeric characters and underscores.
     """
     layer = is_layer(string)
-    return layer.group(1) or invalidLayerName(string)
+    if not layer:
+        invalidLayerName(string)
+    return layer.group(1)
 
 
 def validate_mod_aliases(mods: str) -> str:

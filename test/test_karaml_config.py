@@ -1,6 +1,8 @@
 import re
 import pytest
 from karaml.karaml_config import get_app_conditions_dict
+import karaml.karaml_config as kc
+
 
 from testing_assets import (
     MIN_CONFIG_SAMPLE, FULL_CONFIG_SAMPLE, AUTO_TOGGLE_CONFIG_SAMPLE,
@@ -153,3 +155,43 @@ def test_get_app_conditions_dict():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         get_app_conditions_dict("ifff firefox kitty", "dummy_rhs")
     assert pytest_wrapped_e.type == SystemExit
+
+
+def test_parse_layer_key():
+    test_layer_keys = [
+        "/base/",
+        "/base/ description",
+        "/layer name with spaces/",
+        "/base/ description with spaces",
+        "/layer name with spaces/ description",
+    ]
+
+    for layer_key in test_layer_keys:
+
+        # This needs to be tested as (/.+/)(.*) rather than (/[^/]+/)(.*)
+        # because the latter break up a multi-layer key like /nav/ + /sym/.
+        # This will pass an invalid layer, but this should be caught by
+        # the validate_layer_name() function
+
+        expected = re.search(r"^(/.+/)(.*)", layer_key).groups()
+        expected_name = expected[0].strip()
+        expected_desc = expected[1].strip()
+        if not expected_desc:
+            expected_desc = f"{expected_name} layer"
+
+        layer_name, layer_description = kc.parse_layer_key(
+            layer_key)
+
+        assert layer_name == expected_name
+        assert layer_description == expected_desc
+
+    invalid_layer_keys = [
+        "base/",
+        "/base",
+        "base",
+    ]
+
+    for layer_key in invalid_layer_keys:
+        with pytest.raises(SystemExit) as pytest_wrapped_e:
+            kc.parse_layer_key(layer_key)
+        assert pytest_wrapped_e.type == SystemExit
