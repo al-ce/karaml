@@ -13,8 +13,19 @@ parameters:
     "mouse_motion_to_scroll.speed": 100,
   }
 
+templates:
+  rectangle: open -g "rectangle-pro://execute-action?name=%s"
+
+aliases:
+  # https://www.vertex42.com/ExcelTips/unicode-symbols.html
+  ⁙: ⌥ ⌃ ⇧
+  ⏎: return_or_enter
+  screen_saver: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
+
 /base/:
 
+  tab: [tab, ⁙]    # tab to left opt, ctrl, and shift when held
+  ⁙ | ⏎: screen_saver  # left opt, ctrl, shift, and enter starts screen saver
 
 
   c | u: { unless Terminal$ iterm2$ kitty$: g | backspace }
@@ -22,8 +33,8 @@ parameters:
   a | O: { unless Terminal$ iterm2$ kitty$: up + m | right + enter }
   a | o: { unless Terminal$ iterm2$ kitty$: m | right + enter }
 
-  (x) | end       : [grave, /symnum/] # grave | SymNum Sublayer
-  (x) | caps_lock : [escape, /nav/]   # ESC | Nav Sublayer
+  (x) | end       : [grave, /symnum/]    # grave | SymNum Sublayer
+  (x) | caps_lock : [escape, /nav/]      # ESC | Nav Sublayer
 
   o | w     : o | backspace              # Delete Previous Word
   o | f     : o | delete                 # Delete Next Word
@@ -64,27 +75,29 @@ parameters:
 
   o | quote: /mouse/
 
-  # Rectangle Modifiers (Ctrl+Cmd+Shift)
-  # enter, j, k, h, l, x, z, v, g, d, c, t, s, p, f, r, a, w, q
-  m | enter: [ghr | enter, sm | left_control]
-  m | j: ghr | j
-  m | k: ghr | k
-  m | h: ghr | h
-  m | l: ghr | l
-  m | x: ghr | x
-  m | z: ghr | z
-  m | v: ghr | v
-  m | g: ghr | g
-  m | d: ghr | d
-  m | c: ghr | c
-  m | t: ghr | t
-  m | s: ghr | s
-  m | p: ghr | p
-  m | f: ghr | f
-  m | r: ghr | r
-  m | a: ghr | a
-  m | w: ghr | w
-  m | q: ghr | q
+  # User-defined RectanglePro Template
+  ⌘ enter:
+    - rectangle(  almost-maximize   )
+    - ⇧ ⌘ | ⌃
+
+  ⌘ x: rectangle( right-half        )
+  ⌘ z: rectangle( left-half         )
+
+
+
+  ⌘ r: rectangle( bottom-right      )
+  ⌘ a: rectangle( bottom-left       )
+  ⌘ w: rectangle( top-right         )
+  ⌘ q: rectangle( top-left          )
+
+  ⌘ f: rectangle( first-third       )
+  ⌘ p: rectangle( last-third        )
+
+
+
+  ⌘ s: rectangle( first-two-thirds  )
+  ⌘ d: rectangle( center-two-thirds )
+  ⌘ t: rectangle( last-two-thirds   )
 
   # Vim navigation (any opt mods)
   (x) | m: left
