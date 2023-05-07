@@ -17,6 +17,8 @@ Karabiner-Elements (consider
 # Default layer, does not require activation
 /base/:
   caps_lock: [escape, /nav/]  # Escape when tapped, /nav/ layer when held
+  # Separate modifiers and keycodes with a pipe `|`
+  # Lowercase modifiers = left, uppercase = right
   oc | n: /nav/               # Tap left opt + left ctrl + n to toggle /nav/
   O  | w: <o-backspace>       # right opt + w to left opt + Backspace
 
@@ -48,7 +50,7 @@ Karabiner-Elements (consider
   ms   a: app(Alacritty) # left_command + left_shift + a to launch Alacritty
   <ms-c>: app(CotEditor) # left_command + left_shift + c to launch CotEditor
 
-  # Use Unicode symbols for modifiers instead of letters
+  # You can use Unicode symbols for modifiers instead of letters
   ⌘ ⇧    | g: string(lazygit)    # command + shift + g to send string 'lazygit'
   ⌃› ‹⌥  | s: string(git status) # right_control + left_option + s to send string 'git status'
   ☆      | o: /open/             # hyper + o to toggle /open/ layer

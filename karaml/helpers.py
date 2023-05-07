@@ -95,9 +95,12 @@ Do you want to continue? (y/n): """).lower()
 
 
 def dict_eval(string: str) -> dict:
+    """
+    Returns a dict if the string is a valid dict, else returns None.
+    """
     try:
         ast_dict = ast.literal_eval(string)
-        return eval(string) if isinstance(ast_dict, dict) else None
+        return ast_dict if isinstance(ast_dict, dict) else None
     except (ValueError, SyntaxError):
         return ""
 
@@ -256,7 +259,9 @@ def check_and_validate_str_as_dict(string: str) -> bool:
             msg = f"Key '{k}' in dict '{string}' must be wrapped in quotes."
             invalidDictFormatInString(string, msg)
     try:
-        if type(eval(string)) != dict:
+        if well_formed_dict := dict_eval(string):
+            return well_formed_dict
+        else:
             msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
                 " be a dict, but it failed to evaluate.\nPlease check" \
                 " your syntax."
@@ -269,7 +274,6 @@ def check_and_validate_str_as_dict(string: str) -> bool:
             " be a dict, but it failed to evaluate.\nPlease check" \
             " your syntax."
         invalidDictFormatInString(string, msg)
-    return True
 
 
 def validate_shnotify_dict(notification_dict: dict):
@@ -298,7 +302,7 @@ def validate_layer(string: str) -> str:
     layer = is_layer(string)
     if not layer:
         invalidLayerName(string)
-    return layer.group(1)
+    return layer.group(1) or invalidLayerName(string)
 
 
 def validate_mod_aliases(mods: str) -> str:

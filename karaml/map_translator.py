@@ -1,3 +1,4 @@
+import ast
 from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
@@ -261,8 +262,8 @@ def input_source(regex_or_dict: str) -> dict:
     the latter for simple switching between languages.
     """
 
-    if check_and_validate_str_as_dict(regex_or_dict):
-        return eval(regex_or_dict)
+    if regex_dict := check_and_validate_str_as_dict(regex_or_dict):
+        return regex_dict
     return {"language": regex_or_dict.strip()}
 
 
@@ -276,8 +277,8 @@ def mouse_key(mouse_key_funcs: str) -> dict:
     the key 'x' and the value of the string, e.g. {'x': 200}.
     """
 
-    if check_and_validate_str_as_dict(mouse_key_funcs):
-        return eval(mouse_key_funcs)
+    if mouse_key_dict := check_and_validate_str_as_dict(mouse_key_funcs):
+        return mouse_key_dict
 
     key, value = mouse_key_funcs.split(",")
     return {key.strip(): float(value.strip())}
@@ -345,8 +346,8 @@ def shnotify_dict(n_dict: dict) -> str:
 
 def shnotify(notification: str) -> str:
 
-    if check_and_validate_str_as_dict(notification):
-        return shnotify_dict(eval(notification))
+    if shnofity_dict := check_and_validate_str_as_dict(notification):
+        return shnotify_dict(shnofity_dict)
 
     default = {
         "msg": "",
@@ -376,11 +377,8 @@ def shnotify(notification: str) -> str:
 
 
 def soft_func(softfunc_args: str) -> dict:
-    # TODO: This is easy to break, consider implementing
-    # check_and_validate_str_as_dict() for this
-
     # Only accept well formed dict here
-    sf_dict = eval(softfunc_args)
+    sf_dict = check_and_validate_str_as_dict(softfunc_args)
     if type(sf_dict) != dict:
         invalidSoftFunct(softfunc_args)
     return sf_dict

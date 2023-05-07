@@ -55,13 +55,16 @@ def test_check_and_validate_str_as_dict():
     """
 
     # Test that a well-formed dict string returns True
-    assert check_and_validate_str_as_dict("{'hello': 'world'}") is True
+    valid_string = '{"hello": "world"}'
+    valid_dict = {'hello': 'world'}
+    assert check_and_validate_str_as_dict(valid_string) == valid_dict
 
     # Test that a string that is not intended to be a dict returns False
-    assert check_and_validate_str_as_dict("1,2") is False
+    assert not check_and_validate_str_as_dict("1,2")
+
     # Must have both an opening and closing bracket
-    assert check_and_validate_str_as_dict("{'hello': 'world'") is False
-    assert check_and_validate_str_as_dict("'hello': 'world'}") is False
+    assert not check_and_validate_str_as_dict("{'hello': 'world'")
+    assert not check_and_validate_str_as_dict("'hello': 'world'}")
 
     # Raise an exception if the key in a key-value pair is not a string
     with pytest.raises(SystemExit) as pytest_wrapped_e:
