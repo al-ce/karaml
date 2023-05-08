@@ -1306,3 +1306,4 @@ position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
 - @mxstbr's [Karabiner configuration
   generator](https://github.com/mxstbr/karabiner) written in TypeScript
 - [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
+- [karabiner.ts](https://github.com/evan-liu/karabiner.ts)
