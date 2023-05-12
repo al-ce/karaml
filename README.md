@@ -818,11 +818,15 @@ as specified
 
 Pass two arguments: the modifier to be held on the next keypress (must be a
 valid modifier key code), and whether to toggle the modifier, turn it on, or
-turn it off ('on | off | toggle')
+turn it off (`on`, `off`, or `toggle`).
+
+```yaml
 
 ```yaml
 /base/:
-  o | right_shift: sticky(left_shift, toggle)
+  ⌥ | ['right_shift: sticky(left_shift, toggle)', right_shift]
+  ⌘ | ['right_shift: sticky(left_shift, on)', right_shift]
+  ⌃ | ['right_shift: sticky(left_shift, off)', right_shift]
 ```
 
 #### Strings
@@ -1290,16 +1294,12 @@ position (e.g. `<a-f>: [/fn/, /fn/]` only enables the `/fn/` layer when held)
 - `from.simultaneous_options` not yet supported (this one will be tricky)
 - `to_delayed_action` not yet supported
 - `halt` option for `to_if_held_down` and `to_if_alone` not yet supported
-- ~~Can't add multiple shell-based pseudo-funcs in one mapping (see this [issue](https://github.com/al-ce/karaml/issues/3))~~
+- ~~Can't add multiple shell-based templates in one mapping (see this [issue](https://github.com/al-ce/karaml/issues/3))~~
 
 ## 🌱 TODOs
 
-- ~~Protect against double maps in the same layer (accidental overwrites)~~ user will be warned but not prohibited, see [5a66a39](https://github.com/al-ce/karaml/commit/5a66a39a75271cf27a88bf20f01df690b0688c12)
 - More condition types (`device_if`, etc.)
 - More helpful configuration error messages
-- ~Define your own aliases~ - done for both primary keys and modifiers
-- ~Define your own templates~ - available for custom shell commands
-- ~~pseudo-function for typing out strings e.g. `string(git)`~~ Done!
 
 ## 🔭 Alternatives
 

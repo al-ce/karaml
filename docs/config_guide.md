@@ -263,8 +263,8 @@ For multiple single characters, you could do this:
 a | g: [g+i+t+space, g+i+t+space+c+o+m+m+i+t+space+-+m+space+"+"+left]
 ```
 
-But you can also use the `string()` function to make it look cleaner (more on
-these 'special-event pseudo-functions' later):
+But you can also use the `string()` template to make it look cleaner (more on
+these templates later)
 
 ```yaml
 a | g: [string(git ), string(git commit -m "") + left]
@@ -279,7 +279,7 @@ Karabiner. Let's get out of the base layer and create our 'nav' layer.
 
 The two basic ways of enabling layers are to either enable them when a key is
 pressed and held, then disable them on release, or toggle them on and off with
-the same key (the other way is with the `var()` function, explained later).
+the same key (the other way is with the `var()` template, explained later).
 Let's set up both, starting with the 'enable when held' method by enhancing our
 `caps_lock` map.
 
@@ -399,15 +399,12 @@ keys/events.
 ```
 
 
-### Special Event Shorthands / Pseudo-Functions
-
-(All credit to [mxstbr](https://github.com/mxstbr) for the idea of this design, which impelled me to start
-this project)
+### Templates
 
 Karabiner supports different types of [to events](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/), which karaml (and other Karabiner-config tools) simplifies as much as
-possible by accepting a pseudo-function shorthand in the form `func_name(args)`
+possible by accepting a template shorthand in the form `template_name(args)`
 
-Check out the [descriptions](https://github.com/al-ce/karaml/blob/main/README.md#special-event-functions)
+Check out the [descriptions](https://github.com/al-ce/karaml/blob/main/README.md#template)
 in the `README.md` for more info. Most are straightforward, but you might want
 to read up on `notify()`, `shnotify()`, and `var()`
 
@@ -458,7 +455,7 @@ to read up on `notify()`, `shnotify()`, and `var()`
   c | 1: 'softFunc("set_mouse_cursor_position": { "x": 0, "y": 0, "screen": 0 } })'
 ```
 
-The `var(layer_name, value)` function is just a way to turn layers on and off
+The `var(layer_name, value)` template is just a way to turn layers on and off
 (i.e. set variable values) without karaml performing its opinionated automation
 in the background, so, no automated mapping of 'toggle layer off' to the same
 key if `var()` is in the tap position, and no automatic toggling off on release

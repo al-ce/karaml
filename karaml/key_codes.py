@@ -8,7 +8,7 @@ from collections import namedtuple
 Alias = namedtuple("Alias", ["key_code", "modifiers"])
 
 
-alias_modifiers = ["shift"]
+alias_shift_mod = ["shift"]
 ALIASES = {
 
     # Unicode chars without side indicator default to left side
@@ -34,9 +34,18 @@ ALIASES = {
     "lshft": Alias("left_shift", None),
     "rshft": Alias("right_shift", None),
 
-    "hyper": Alias("right_shift", ["right_command", "right_control", "right_option"]),
+    "hyper": Alias("right_shift", [
+        "right_command",
+        "right_control",
+        "right_option",
+    ]),
     "☆": Alias("fn", ["shift", "command", "control", "option"]),
-    "ultra": Alias("right_shift", ["right_command", "right_control", "right_option", "fn"]),
+    "ultra": Alias("right_shift", [
+        "right_command",
+        "right_control",
+        "right_option",
+        "fn",
+    ]),
     "super": Alias("right_shift", ["right_option", "right_control"]),
     "enter": Alias("return_or_enter", None),
     "cr": Alias("return_or_enter", None),
@@ -56,39 +65,39 @@ ALIASES = {
     "spc": Alias("spacebar", None),
     " ": Alias("spacebar", None),
     "-": Alias("hyphen", None),
-    "underscore": Alias("hyphen", alias_modifiers),
-    "_": Alias("hyphen", alias_modifiers),
+    "underscore": Alias("hyphen", alias_shift_mod),
+    "_": Alias("hyphen", alias_shift_mod),
     "=": Alias("equal_sign", None),
-    "plus": Alias("equal_sign", alias_modifiers),
-    "(": Alias("9", alias_modifiers),
-    ")": Alias("0", alias_modifiers),
+    "plus": Alias("equal_sign", alias_shift_mod),
+    "(": Alias("9", alias_shift_mod),
+    ")": Alias("0", alias_shift_mod),
     "[": Alias("open_bracket", None),
-    "{": Alias("open_bracket", alias_modifiers),
+    "{": Alias("open_bracket", alias_shift_mod),
     "]": Alias("close_bracket", None),
-    "}": Alias("close_bracket", alias_modifiers),
+    "}": Alias("close_bracket", alias_shift_mod),
     "\\": Alias("backslash", None),
-    "|": Alias("backslash", alias_modifiers),
+    "|": Alias("backslash", alias_shift_mod),
     ";": Alias("semicolon", None),
-    ":": Alias("semicolon", alias_modifiers),
+    ":": Alias("semicolon", alias_shift_mod),
     "'": Alias("quote", None),
-    '"': Alias("quote", alias_modifiers),
+    '"': Alias("quote", alias_shift_mod),
     "grave": Alias("grave_accent_and_tilde", None),
     "`": Alias("grave_accent_and_tilde", None),
-    "~": Alias("grave_accent_and_tilde", alias_modifiers),
+    "~": Alias("grave_accent_and_tilde", alias_shift_mod),
     ",": Alias("comma", None),
-    "<": Alias("comma", alias_modifiers),
+    "<": Alias("comma", alias_shift_mod),
     ".": Alias("period", None),
-    ">": Alias("period", alias_modifiers),
+    ">": Alias("period", alias_shift_mod),
     "/": Alias("slash", None),
-    "?": Alias("slash", alias_modifiers),
-    "!": Alias("1", alias_modifiers),
-    "@": Alias("2", alias_modifiers),
-    "#": Alias("3", alias_modifiers),
-    "$": Alias("4", alias_modifiers),
-    "%": Alias("5", alias_modifiers),
-    "^": Alias("6", alias_modifiers),
-    "&": Alias("7", alias_modifiers),
-    "*": Alias("8", alias_modifiers),
+    "?": Alias("slash", alias_shift_mod),
+    "!": Alias("1", alias_shift_mod),
+    "@": Alias("2", alias_shift_mod),
+    "#": Alias("3", alias_shift_mod),
+    "$": Alias("4", alias_shift_mod),
+    "%": Alias("5", alias_shift_mod),
+    "^": Alias("6", alias_shift_mod),
+    "&": Alias("7", alias_shift_mod),
+    "*": Alias("8", alias_shift_mod),
     "up": Alias("up_arrow", None),
     "down": Alias("down_arrow", None),
     "left": Alias("left_arrow", None),
@@ -122,7 +131,7 @@ ALIASES = {
 }
 
 for letter in ascii_uppercase:
-    ALIASES[letter] = Alias(letter.lower(), alias_modifiers)
+    ALIASES[letter] = Alias(letter.lower(), alias_shift_mod)
 
 MODIFIERS = {
     "m": "left_command",
@@ -442,7 +451,7 @@ KEY_CODE_REF_LISTS = [
     KeyCodesRef("pointing_button", POINTING_BUTTON),
 ]
 
-# TODO: check if newer aliases (e.g. shift, command, caps_lock etc.) are supported
+# NOTE: As of KE 14.12.0, "shift", "command", etc. are not valid sticky mods
 STICKY_MODS = [
     "left_control",
     "left_shift",

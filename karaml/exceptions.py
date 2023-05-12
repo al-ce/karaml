@@ -34,7 +34,7 @@ def invalidKey(key_type: str, map: str, key: str):
 
 def invalidDictFormatInString(string: str, note: str):
     """
-    User intended to pass a dict as an arg to a pseudo-function, but the dict
+    User intended to pass a dict as an arg to a template, but the dict
     is not well formed.
     """
 

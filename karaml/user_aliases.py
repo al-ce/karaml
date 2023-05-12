@@ -48,15 +48,13 @@ def update_user_aliases(d: dict) -> None:
 
 
 def process_alias_definition(
-
     alias_name: str,
     alias_def: str
 ) -> tuple[str, str | None]:
     """
     Processes an alias definition to determine the primary key code and the
-    optional modifiers, if any. If the alias definition is a
-    pseudo-function, the primary key code is the entire alias definition
-    string.
+    optional modifiers, if any. If the alias definition is a template, the
+    primary key code is the entire alias definition string.
 
     Updates the ALIASES dict, and, if the alias definition is composed
     entirely of valid modifiers, adds the alias to the MODIFIER_ALIASES

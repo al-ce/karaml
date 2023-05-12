@@ -218,7 +218,7 @@ def chatter_safeguard(hold_map: str, key_list: list, to_event: str) -> str:
     if to_event != "to" or not hold_map:
         return to_event
 
-    # Pseudo funcs/special events are chatty except for notify
+    # Templates are chatty except for notify
     for template in TEMPLATES:
         if template == "notify":
             continue
@@ -247,7 +247,6 @@ def from_simultaneous_dict(from_event_list: list[dict]) -> dict:
 
     key_codes, merged_mods = [], {"mandatory": [], "optional": []}
     for k in from_event_list:
-        # key_codes.append(k["key_code"])
         for kc_type, ref_list in KEY_CODE_REF_LISTS:
             if kc := k.get(kc_type):
                 key_codes.append({kc_type: kc})
@@ -272,8 +271,7 @@ def get_condition_dict(layer_name: str, value: int) -> dict[str, dict | int]:
     Returns a dict that corresponds to a Karabiner-Elements condition dict.
     This condition must be true for the "from" event to be triggered.
     """
-    condition = {"name": layer_name, "type": "variable_if", "value": value}
-    return condition
+    return {"name": layer_name, "type": "variable_if", "value": value}
 
 
 def event_value(k: KeyStruct) -> dict:

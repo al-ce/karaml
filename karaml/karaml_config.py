@@ -6,7 +6,6 @@ import yaml
 
 from karaml.user_aliases import update_user_aliases
 from karaml.helpers import (
-    is_layer,
     translate_params,
     UniqueKeyLoader,
 )

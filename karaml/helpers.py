@@ -26,8 +26,8 @@ def extract_yaml_node_value(mapping_node):
     modification or a layer of complex modifications. This is used to
     print the key or layer that is being overwritten when a duplicate YAML key
     is found in the YAML file.
-    If the node is a single complex modification, the value is the
-    'to' event/s of the complex modification.
+    If the node is a single complex modification, the value is the 'to' event/s
+    of the complex modification.
     If the node is a layer, the value is the list of all the 'from' events
     of the complex modifications in the layer.
     """
@@ -116,7 +116,7 @@ def flag_check(string: str) -> bool:
     invalidFlag(string)
 
 
-def get_multi_keys(string: str) -> list:
+def get_multi_keys(string: str) -> list[str]:
     """
     Returns a list of keys from a string of keys separated by a '+'.
     The '+' char is used to concatenate multiple keys in a 'from' or 'to'
@@ -136,8 +136,7 @@ def is_layer(string: str) -> bool:
     """
     Returns True if the string matches the regex for an acceptable layer name.
 
-    This function is used for a different purpose than the validate_layer_name
-    function. It is used to determine what kind of to-event to assign the
+    This function is used to determine what kind of to-event to assign the
     string to. If it is a layer, we might want to assign it to a 'to' event
     rather than a 'to_if_held_down' event so the layer can be accessed
     immediately without waiting for the 'to_if_held_down_threshold'.
@@ -168,6 +167,13 @@ def validate_alias_key_code(alias_def: str) -> bool:
 
 
 def make_list(x) -> list:
+    """
+    Returns a list containing x if x is not a list, else returns the list x.
+    The purpose of this function is to convert a single string to a list
+    so it can be handled in the same way as a list of strings. In a karaml
+    config, if a user's modification only has a single 'to' event, we do not
+    want to make them wrap the string in a YAML list, so we do it for them.
+    """
     return [x] if not isinstance(x, list) else x
 
 
@@ -218,7 +224,7 @@ def check_and_validate_str_as_dict(string: str) -> bool:
     """
     This function checks whether a string is intending to be in the form of a
     dict, and if it is, confirms that it is well-formed.
-    This is used for pseudo-funcs like shnotify, mouse, input_source, etc.
+    This is used for templates like shnotify, mouse, input_source, etc.
     The string goes through a series of checks:
 
     1. The string must be enclosed in curly braces. This indicates that the
@@ -323,7 +329,7 @@ def validate_mod_aliases(mods: str) -> str:
 
 def validate_mouse_pos_args(mouse_pos_args: str) -> int:
     """
-    Validates the arguments for the mousePos() pseudo function.
+    Validates the arguments for the mousePos() templates.
     There must be at least two arguments and at most three arguments, and all
     must be integers. The first two arguments are the x and y coordinates of
     the mouse cursor, and the third argument is the screen number.
@@ -349,21 +355,41 @@ def validate_to_opts(string: str) -> str:
 
 
 def validate_optional_mod_sets(mod_string: str, opt_mod_matches: list):
+    """
+    Check that if a user has added any optional mdifiers to a map, they are
+    formatted correctly. A correctly formatted modifier string will have only
+    one set of parentheses containing the optional modifiers, and these must be
+    either at the beginning or end of the string.
+    """
     if len(opt_mod_matches) > 1 or search("\\w+\\(\\w+\\)\\w+", mod_string):
         invalidTotalParensInMods(mod_string, opt_mod_matches)
 
 
 def validate_sticky_mod_value(string: str):
+    """
+    Check that the value for the sticky modifier modification is one of the
+    three valid values: "on", "off", or "toggle".
+    """
     if string not in ["on", "off", "toggle"]:
         invalidStickyModValue(string)
 
 
 def validate_sticky_modifier(string: str):
+    """
+    Check that the sticky modifier is valid. Raises an error if it is not.
+
+    As of KE 14.12.0, 'shift', 'control', 'option', and 'command' are not
+    valid sticky modifiers.
+    """
     if string not in STICKY_MODS:
         invalidStickyModifier(string)
 
 
 def validate_var_value(name: str, value: str):
+    """
+    Check that the value for a variable is in integer form. Raises an error
+    if it is not.
+    """
     try:
         value = int(value)
     except ValueError:

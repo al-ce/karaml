@@ -1,19 +1,22 @@
-import ast
 from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
 
 from karaml.helpers import (
     get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
-    validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
-    validate_shnotify_dict, validate_mouse_pos_args,
     check_and_validate_str_as_dict, is_layer,
 )
 from karaml.exceptions import invalidKey, invalidSoftFunct
-from karaml.key_codes import (KEY_CODE_REF_LISTS, MODIFIERS,
-                              MODIFIER_ALIASES, ALIASES
-                              )
-from karaml.templates import TEMPLATES, USER_TEMPLATES, TemplateInstance
+from karaml.key_codes import (
+    KEY_CODE_REF_LISTS,
+    MODIFIERS,
+    MODIFIER_ALIASES,
+    ALIASES,
+)
+from karaml.templates import (
+    TEMPLATES,
+    translate_template,
+)
 
 KeyStruct = namedtuple("KeyStruct", ["key_type", "key_code", "modifiers"])
 ModifiedKey = namedtuple("ModifiedKey", ["modifiers", "key"])
@@ -37,14 +40,14 @@ def queue_translations(usr_key: str) -> list:
     """
     multi_keys = get_multi_keys(usr_key)
     if not multi_keys:
-        if string_pf := string_pseudo_func(usr_key):
+        if string_pf := string_template(usr_key):
             return string_pf
         return [key_code_translator(usr_key, usr_key)]
 
     translations = []
     shell_cmd = ""
     for key in multi_keys:
-        if string_pf := string_pseudo_func(key):
+        if string_pf := string_template(key):
             translations += string_pf
             continue
 
@@ -82,9 +85,9 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
     """
     Given a user mapping, return a KeyStruct with the key_type, key_code, and
     modifiers for the mapping.
-    A KeyStruct represents a single event, like a key press, a psuedo function,
-    i.e one of the wrappers karaml provieds for common commands like executing
-    a shell command, opening an app, etc., or a layer change, which is
+    A KeyStruct represents a single event, like a key press, a template,
+    (i.e one of the wrappers karaml provides for common commands like executing
+    a shell command, opening an app, etc.), or a layer change, which is
     equivalent to setting a variable in Karabiner-Elements.
     If the mapping does not match any of these, then it is an invalid key code
     and an exception is raised.
@@ -106,7 +109,7 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
     invalidKey("key code", usr_map, usr_key)
 
 
-def string_pseudo_func(usr_key: str) -> list:
+def string_template(usr_key: str) -> list:
     """
     If a user mapping matches the regex 'string\\((.*)\\)', e.g.
     string(hello), return a list of KeyStructs with each character in parens as
@@ -169,12 +172,12 @@ def translate_if_layer(string: str) -> namedtuple:
 
 def translate_if_template(usr_map: str) -> KeyStruct:
     """
-    Return a KeyStruct with the key_type and key_code for a pseudo function
-    if the user mapping matches the regex for a pseudo function, e.g.
+    Return a KeyStruct with the key_type and key_code for a template
+    if the user mapping matches the regex for a template, e.g.
     'shell(open .)' or 'app(Terminal)'. Otherwise, return None.
     """
-    # Check if the user mapping is an alias for a pseudo function, and if so,
-    # replace the alias with the pseudo function
+    # Check if the user mapping is an alias for a template, and if so,
+    # replace the alias with the template
     if usr_map in ALIASES:
         usr_map = ALIASES[usr_map].key_code
     for template in TEMPLATES:
@@ -186,224 +189,24 @@ def translate_if_template(usr_map: str) -> KeyStruct:
         return KeyStruct(event, command, None)
 
 
-def translate_template(event: str, cmd: str) -> tuple[str, str]:
-    """
-    Takes a template its args. Tturns a tuple with the event and command 
-    strings that will be used to create the appropriate KeyStruct.
-
-    e.g. 'shell(open .)' -> ('shell_command', 'open .') for the KeyStruct
-
-    KeyStruct('shell_command', 'open .', None)
-    """
-    # We don't actually check if the command/argument for 'open()' or
-    # 'shell()' are valid links, commands, etc.) & trust the user
-
-    # TODO: add valiation for select_input_source, mouse_key, soft_func,
-    # etc. For now, it's the user's responsibility
-
-    if template_instance := get_user_template_instance(event, cmd):
-        return template_instance
-
-    match event:
-        # NOTE: need to update TEMPLATES if adding new events here
-        case "app":
-            event, cmd = "shell_command", f"open -a '{cmd}'.app"
-        case "input":
-            event, cmd = "select_input_source", input_source(cmd)
-        case "mouse":
-            event, cmd = "mouse_key", mouse_key(cmd)
-        case "mousePos":
-            event, cmd = "software_function", \
-                {"set_mouse_cursor_position": mouse_pos(cmd)}
-        case "notify":
-            event, cmd = "set_notification_message", notification(cmd)
-        case "notifyOff":
-            event, cmd = "set_notification_message", notification_off(cmd)
-        case "open":
-            event, cmd = "shell_command", f"open {cmd}"
-        case "shell":
-            event = "shell_command"
-        case "shnotify":
-            event, cmd = "shell_command", shnotify(cmd)
-        case "softFunc":
-            event = "software_function"
-        case "sticky":
-            event, cmd = "sticky_modifier", sticky_mod(cmd)
-        case "var":
-            event, cmd = "set_variable", set_variable(cmd)
-    return event, cmd
-
-
-def get_user_template_instance(event: str, cmd: str) -> tuple[str, str]:
-    """
-    Returns a tuple with the event and command strings that will be used to
-    create a KeyStruct for a user template instance.
-    """
-
-    if event not in USER_TEMPLATES:
-        return
-
-    template = USER_TEMPLATES[event]
-    template_instance_args = [arg.strip() for arg in cmd.split(",")]
-    instance = TemplateInstance(template, template_instance_args)
-    return "shell_command", instance.shell_script
-
-
-def input_source(regex_or_dict: str) -> dict:
-    """
-    Returns a dictionary for the select_input_source event.
-    If the user mapping is a dictionary, tranform the string into a dictionary,
-    return the dictionary and trust that the user passed a valid dictionary for
-    this event.
-    If the user mapping is a string, e.g. 'English', return a dictionary with
-    the key 'language' and the value of the string, e.g.
-    {'language': 'English'}. The former is appropriate for complex mappings,
-    e.g. where a distinction between polytonic and monotonic Greek is needed,
-    the latter for simple switching between languages.
-    """
-
-    if regex_dict := check_and_validate_str_as_dict(regex_or_dict):
-        return regex_dict
-    return {"language": regex_or_dict.strip()}
-
-
-def mouse_key(mouse_key_funcs: str) -> dict:
-    """
-    Returns a dictionary for the mouse_key event.
-    If the user mapping is a dictionary, tranform the string into a dictionary,
-    return the dictionary and trust that the user passed a valid dictionary for
-    this event.
-    If the user mapping is a string, e.g. 'x, 200', return a dictionary with
-    the key 'x' and the value of the string, e.g. {'x': 200}.
-    """
-
-    if mouse_key_dict := check_and_validate_str_as_dict(mouse_key_funcs):
-        return mouse_key_dict
-
-    key, value = mouse_key_funcs.split(",")
-    return {key.strip(): float(value.strip())}
-
-
-def mouse_pos(mouse_pos_args: str) -> dict:
-    """
-    Takes the arguments for the mousePos() pseudo function and returns a
-    dictionary for the software_function event for set_mouse_cursor_position.
-
-    The pseudo function is 'mousePos(x, y, screen)' where x and y are integers
-    and screen is an optional integer. The function returns a dictionary with
-    the keys 'x', 'y', and 'screen' if the screen is specified.
-
-    Example:
-    mouse_pos(200, 300, 1) --> {'x': 200, 'y': 300, 'screen': 1}
-    """
-
-    validate_mouse_pos_args(mouse_pos_args)
-    formatted_args = [int(arg.strip()) for arg in mouse_pos_args.split(",")]
-    x, y, *screen = formatted_args
-
-    mouse_pos_dict = {"x": x, "y": y}
-    if screen:
-        mouse_pos_dict["screen"] = int(screen[0])
-    return mouse_pos_dict
-
-
-def notification(id_and_message: str) -> dict:
-    # id, text = id_and_message.split(",")
-    # return {"id": id.strip(), "text": text.strip()}
-    default = {"id": "", "text": ""}
-    params = list(map(str.strip, id_and_message.split(",")))
-
-    if len(params) == 1 or params[1].lower() == "null":
-        default["text"] = ""
-        default["id"] = params[0]
-    elif len(params) == 2:
-        default["id"] = params[0]
-        default["text"] = params[1]
-    return default
-
-
-def notification_off(id: str) -> dict:
-    """Alternate syntax for turning off a notification. A user might prefer
-    this to passing no msg arg or 'null' as the message arg to notify()."""
-    return {"id": id.strip(), "text": ""}
-
-
-def shnotify_dict(n_dict: dict) -> str:
-    validate_shnotify_dict(n_dict)
-    if not n_dict.get("msg"):
-        n_dict["msg"] = ""
-    cmd = f"osascript -e 'display notification \"{n_dict['msg']}\""
-
-    if n_dict.get("title"):
-        cmd += f" with title \"{n_dict['title']}\""
-    if n_dict.get("subtitle"):
-        cmd += f" subtitle \"{n_dict['subtitle']}\""
-    if n_dict.get("sound"):
-        cmd += f" sound name \"{n_dict['sound']}\""
-
-    return cmd + "'"  # close the osascript command
-
-
-def shnotify(notification: str) -> str:
-
-    if shnofity_dict := check_and_validate_str_as_dict(notification):
-        return shnotify_dict(shnofity_dict)
-
-    default = {
-        "msg": "",
-        "title": "",
-        "subtitle": "",
-        "sound": "",
-    }
-
-    params = list(map(str.strip, notification.split(",")))
-
-    for i, key in enumerate(default.keys()):
-        if i < len(params) and params[i].lower() != "null":
-            default[key] = params[i]
-
-    cmd = f"osascript -e 'display notification \"{default['msg']}\""
-
-    if default["title"]:
-        cmd += f" with title \"{default['title']}\""
-
-    if default["subtitle"]:
-        cmd += f" subtitle \"{default['subtitle']}\""
-
-    if default["sound"]:
-        cmd += f" sound name \"{default['sound']}\""
-
-    return cmd + "'"  # close the osascript command
-
-
 def soft_func(softfunc_args: str) -> dict:
-    # Only accept well formed dict here
+    """
+    Return a dict with the soft function name as the key and the soft function
+    args as the value if the soft function args are valid. Otherwise, raise an
+    exception.
+    """
     sf_dict = check_and_validate_str_as_dict(softfunc_args)
     if type(sf_dict) != dict:
         invalidSoftFunct(softfunc_args)
     return sf_dict
 
 
-def sticky_mod(sticky_mod_values: str) -> dict:
-    modifier, value = sticky_mod_values.split(",")
-    validate_sticky_modifier(modifier.strip())
-    validate_sticky_mod_value(value.strip())
-    return {modifier.strip(): value.strip()}
-
-
-def set_variable(condition_items: str) -> dict:
-    # NOTE: We accept any int, but the layer system checks for 0 or 1.
-    # So, we should either set a constraint here (check for 0 or 1) or
-    # allow more values in the layer system, e.g. default to 1 for /nav/
-    # but maybe check for value == 2 for /nav/2 ?
-
-    name, value = map(str.strip, condition_items.split(","))
-    validate_var_value(name, value)
-    var_dict = {"name": name, "value": int(value)}
-    return var_dict
-
-
-def translate_if_valid_keycode(usr_key: str, usr_map: str) -> KeyStruct:
+def translate_if_valid_keycode(usr_key: str, usr_map: str) -> KeyStruct | None:
+    """
+    Return a KeyStruct with the key_type, key_code, and modifiers for the
+    mapping if the user mapping uses valid Karaibner-Elements key_codes or
+    karaml aliases. Otherwise, return None.
+    """
     for ref_list in KEY_CODE_REF_LISTS:
         key_code_type, ref = ref_list.key_type, ref_list.ref
         primary_key, modifiers = parse_primary_key_and_mods(usr_key, usr_map)
@@ -418,6 +221,12 @@ def translate_if_valid_keycode(usr_key: str, usr_map: str) -> KeyStruct:
 
 
 def parse_primary_key_and_mods(usr_key: str, usr_map) -> tuple[str, dict]:
+    """
+    Return the primary key and modifiers for the user mapping as a tuple.
+    The primary key is a string representing a Karabiner-Elements key_code.
+    The modifiers are a dict with the keys 'mandatory' and 'optional', each
+    containing a list of Karabiner-Elements key_codes for the modifiers.
+    """
     modded_key = is_modded_key(usr_key)
     if not modded_key:
         return usr_key, {}
@@ -485,6 +294,11 @@ def is_modded_key(mapping: str) -> ModifiedKey:
 
 
 def get_modifiers(usr_mods: str, usr_map: str) -> dict:
+    """
+    Return a dict with the keys 'mandatory' and 'optional', each containing
+    a list of Karabiner-Elements key_codes for the modifiers, if the user
+    modifiers are valid. Otherwise, raise an exception.
+    """
     validate_mod_aliases(usr_mods)
     mods = {}
     mandatory, optional = parse_chars_in_parens(usr_mods)
@@ -515,6 +329,11 @@ def parse_chars_in_parens(string: str) -> tuple:
 
 
 def modifier_lookup(usr_mods: list) -> list:
+    """
+    Return a list of Karabiner-Elements key_codes corresponding to the
+    user's modifier aliases. e.g. a list of `['c, 's']` would return
+    `['left_control', 'left_shift'].`
+    """
     return [MODIFIERS.get(mod) for mod in usr_mods if MODIFIERS.get(mod)]
 
 
@@ -523,7 +342,11 @@ def resolve_alias(
         key_code_type: str,
         alias_reference: dict,
         usr_mods: dict
-) -> KeyStruct:
+) -> KeyStruct | None:
+    """
+    If the user key is an alias, return a KeyStruct with the key_code and
+    modifiers for the alias. Otherwise, return None.
+    """
 
     if key_code_type != "alias":
         return
@@ -534,6 +357,19 @@ def resolve_alias(
 
 
 def update_alias_modifiers(modifiers_dict: dict, alias_mods: list) -> dict:
+    """
+    Update a modifiers dict of an key_code alias's KeyStruct with any modifiers
+    required by the alias. If no modifiers are required, return the original
+    modifiers dict. Otherwise, return a new dict with the user's modifiers
+    added to the original dict.
+
+    For example, the alias `(` is defined by the following Alias object:
+
+    `"(": Alias("9", alias_shift_mod)`
+
+    Where `alias_shift_mod` == `["shift]`. So, the KeyStruct needs to be
+    updated to include a shift modifier in its `modifiers` attribute.
+    """
     if not alias_mods:
         return modifiers_dict
     elif not modifiers_dict:
