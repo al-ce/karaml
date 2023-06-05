@@ -128,6 +128,33 @@ ALIASES = {
     "kp9": Alias("keypad_9", None),
     "kp0": Alias("keypad_0", None),
     "kpnum": Alias("keypad_num_lock", None),
+    "F1": Alias("f1", None),
+    "F2": Alias("f2", None),
+    "F3": Alias("f3", None),
+    "F4": Alias("f4", None),
+    "F5": Alias("f5", None),
+    "F6": Alias("f6", None),
+    "F7": Alias("f7", None),
+    "F8": Alias("f8", None),
+    "F9": Alias("f9", None),
+    "F10": Alias("f10", None),
+    "F11": Alias("f11", None),
+    "F12": Alias("f12", None),
+    "F13": Alias("f13", None),
+    "F14": Alias("f14", None),
+    "F15": Alias("f15", None),
+    "F16": Alias("f16", None),
+    "F17": Alias("f17", None),
+    "F18": Alias("f18", None),
+    "F19": Alias("f19", None),
+    "F20": Alias("f20", None),
+    "F21": Alias("f21", None),
+    "F22": Alias("f22", None),
+    "F23": Alias("f23", None),
+    "F24": Alias("f24", None),
+    "vol_down": Alias("volume_decrement", None),
+    "vol_up": Alias("volume_increment", None),
+    "play": Alias("play_or_pause", None),
 }
 
 for letter in ascii_uppercase:
@@ -149,8 +176,6 @@ MODIFIERS = {
     "x": "any",
     "X": "any",
 
-
-    # HACK: g and a are sensible aliases but r and h are stretches
     "G": "command",
     "R": "control",
     "A": "option",
