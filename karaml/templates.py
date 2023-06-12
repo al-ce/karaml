@@ -93,12 +93,12 @@ class TemplateInstance:
         args = self.args
         arg_count = self.template.arg_count
         args_len = len(args)
-        if args_len != arg_count:
-            raise ValueError(
-                f"Template {template_name} requires {arg_count} arguments, "
-                f"but {args_len} were passed."
-            )
-        return self.template.shell_cmd_template % tuple(self.args)
+        if args_len == arg_count:
+            return self.template.shell_cmd_template % tuple(args)
+        raise ValueError(
+            f"Template {template_name} requires {arg_count} arguments, "
+            f"but {args_len} were passed."
+        )
 
 
 # Default templates
@@ -134,9 +134,9 @@ def update_user_templates(d: dict) -> None:
 
     Returns None.
     """
-    if not d.get("templates"):
-        return
     templates = d.get("templates")
+    if not templates:
+        return
 
     for template, template_def in templates.items():
         template_pattern = search(r"^(\w+)\(.*\)$", template_def)
@@ -149,7 +149,7 @@ def update_user_templates(d: dict) -> None:
     d.pop("templates")
 
 
-def translate_template(event: str, cmd: str) -> tuple[str, str]:
+def translate_template(event: str, cmd: str) -> tuple:
     """
     Takes strings represnting a template name and its args as arguments
     and returns a tuple with the event and command strings to create the
@@ -175,34 +175,34 @@ def translate_template(event: str, cmd: str) -> tuple[str, str]:
     match event:
         # NOTE: need to update TEMPLATES if adding new events here
         case "app":
-            event, cmd = "shell_command", f"open -a '{cmd}'.app"
+            return "shell_command", f"open -a '{cmd}'.app"
         case "input":
-            event, cmd = "select_input_source", input_source(cmd)
+            return "select_input_source", input_source(cmd)
         case "mouse":
-            event, cmd = "mouse_key", mouse_key(cmd)
+            return "mouse_key", mouse_key(cmd)
         case "mousePos":
-            event, cmd = "software_function", \
+            return "software_function", \
                 {"set_mouse_cursor_position": mouse_pos(cmd)}
         case "notify":
-            event, cmd = "set_notification_message", notification(cmd)
+            return "set_notification_message", notification(cmd)
         case "notifyOff":
-            event, cmd = "set_notification_message", notification_off(cmd)
+            return "set_notification_message", notification_off(cmd)
         case "open":
-            event, cmd = "shell_command", f"open {cmd}"
+            return "shell_command", f"open {cmd}"
         case "shell":
-            event = "shell_command"
+            return "shell_command", cmd
         case "shnotify":
-            event, cmd = "shell_command", shnotify(cmd)
+            return "shell_command", shnotify(cmd)
         case "softFunc":
-            event = "software_function"
+            return "software_function", cmd
         case "sticky":
-            event, cmd = "sticky_modifier", sticky_mod(cmd)
+            return "sticky_modifier", sticky_mod(cmd)
         case "var":
-            event, cmd = "set_variable", set_variable(cmd)
+            return "set_variable", set_variable(cmd)
     return event, cmd
 
 
-def get_user_template_instance(event: str, cmd: str) -> tuple[str, str]:
+def get_user_template_instance(event: str, cmd: str) -> tuple[str, str] | None:
     """
     Returns a tuple with the event and command strings that will be used to
     create a KeyStruct for a user template instance.

@@ -32,9 +32,9 @@ def update_user_aliases(d: dict) -> None:
 
     Returns None.
     """
-    if not d.get("aliases"):
-        return
     aliases = d.get("aliases")
+    if not aliases:
+        return
 
     for alias_name, alias_def in aliases.items():
         alias_codes = process_alias_definition(alias_name, alias_def)

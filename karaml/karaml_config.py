@@ -129,7 +129,7 @@ class KaramlConfig:
                      "manipulators": manipulators}
             layers_list.append(layer)
 
-        layers_list: list = self.insert_json(layers_list)
+        self.insert_json(layers_list)
         # Reverse the list so that later mappings override earlier ones in
         # 'higher' layers
         layers_list.reverse()
@@ -170,18 +170,17 @@ class KaramlConfig:
 
         return manipulators
 
-    def insert_json(self, layers_list: list) -> list:
+    def insert_json(self, layers_list: list):
         """
-        Inserts a JSON layer at the end of the layers list if the user gave any
-        JSON-formatted rules in the YAML config file. Returns the layers list.
+        Inserts a JSON layer at the end of the layers list if the user defined
+        any JSON-formatted rules in the YAML config file.
         """
         if not self.json_rules_list:
-            return layers_list
+            return
         layers_list.append({
             "description": "/JSON/ layer",
             "manipulators": self.json_rules_list
         })
-        return layers_list
 
     def insert_toggle_off(self, karamlized_key: KaramlizedKey,
                           manipulators: list) -> list:
@@ -264,7 +263,7 @@ def get_karamlized_key(from_keys: str, layer_name: str, hold_flavor: str,
     return KaramlizedKey(user_map, layer_name, hold_flavor)
 
 
-def parse_layer_key(layer_name: str) -> tuple[str, str]:
+def parse_layer_key(layer_name: str) -> tuple[str, str] | None:
     """
     Parses the layer key in the YAML config file and returns a tuple containing
     the layer name and the layer description. This function also serves as a
@@ -284,6 +283,7 @@ def parse_layer_key(layer_name: str) -> tuple[str, str]:
     layer_info = re.search(r"^(/.+/)(.*)", layer_name)
     if not layer_info:
         invalidLayerName(layer_name)
+        return
 
     layer_name, description = map(str.strip, layer_info.groups())
 

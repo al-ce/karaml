@@ -1,7 +1,7 @@
 import ast
 import yaml
 from yaml import SafeLoader
-from re import search
+from re import search, Match
 
 from karaml.exceptions import (
     invalidConditionValue, invalidFlag,
@@ -96,19 +96,20 @@ Do you want to continue? (y/n): """).lower()
 
 def dict_eval(string: str) -> dict:
     """
-    Returns a dict if the string is a valid dict, else returns None.
+    Returns a dict if the string is a valid dict, else returns an empty dict.
     """
     try:
         ast_dict = ast.literal_eval(string)
-        return ast_dict if isinstance(ast_dict, dict) else None
+        return ast_dict if isinstance(ast_dict, dict) else {}
     except (ValueError, SyntaxError):
-        return ""
+        return {}
 
 
 def flag_check(string: str) -> bool:
     """
     Returns the value of the flag in the string for the to-event options
-    'lazy' and 'repeat' after checking if the flag is valid.
+    'lazy' and 'repeat' after checking if the flag is valid. Otherwise, raise
+    an exception and exit.
     """
     flags = {"+": True, "-": False}
     if (flag := string[0]) in flags:
@@ -130,9 +131,10 @@ def get_multi_keys(string: str) -> list[str]:
     """
     if "+" in string:
         return [s.strip() for s in string.split("+")]
+    return []
 
 
-def is_layer(string: str) -> bool:
+def is_layer(string: str) -> Match | None:
     """
     Returns True if the string matches the regex for an acceptable layer name.
 
@@ -220,7 +222,7 @@ def translate_params(params: dict) -> dict:
     return {"parameters": translated} if translated else {}
 
 
-def check_and_validate_str_as_dict(string: str) -> bool:
+def check_and_validate_str_as_dict(string: str) -> dict:
     """
     This function checks whether a string is intending to be in the form of a
     dict, and if it is, confirms that it is well-formed.
@@ -243,7 +245,7 @@ def check_and_validate_str_as_dict(string: str) -> bool:
     """
 
     if not string.startswith("{") or not string.endswith("}"):
-        return False
+        return {}
 
     kv_pairs = [
         pair.strip()
@@ -253,7 +255,7 @@ def check_and_validate_str_as_dict(string: str) -> bool:
     ]
 
     for pair in kv_pairs:
-        k, v = pair.split(":")
+        k, _ = pair.split(":")
         k = k.strip()
 
         # The key might be a dict, so rerun this function on it
@@ -295,9 +297,10 @@ def validate_shnotify_dict(notification_dict: dict):
     for k in notification_dict:
         if k not in valid:
             invalidSHNotifyDict(notification_dict, k)
+            return
 
 
-def validate_layer(string: str) -> str:
+def validate_layer(string: str) -> str | None:
     """
     Returns the layer name if the string matches the regex for an acceptable
     layer name. Otherwise, it raises an error.
@@ -305,9 +308,10 @@ def validate_layer(string: str) -> str:
     The format must be a string enclosed in forward slashes, e.g. '/layer1/'
     with only alphanumeric characters and underscores.
     """
-    layer = is_layer(string)
+    layer: Match | None = is_layer(string)
     if not layer:
         invalidLayerName(string)
+        return
     return layer.group(1) or invalidLayerName(string)
 
 
@@ -391,7 +395,7 @@ def validate_var_value(name: str, value: str):
     if it is not.
     """
     try:
-        value = int(value)
+        int(value)
     except ValueError:
         invalidConditionValue(name, value)
     if not 0 <= int(value) <= 1:

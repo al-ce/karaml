@@ -34,11 +34,11 @@ class UserMapping:
         needed (e.g. [tap, hold]) or they put a placeholder `null` in any of
         the positions they did not want to specify ([null, hold, after]).
         """
-        maps: list = make_list(maps)
-        [maps.append(None) for i in range(5-len(maps))]
+        maps_list: list = make_list(maps)
+        [maps_list.append(None) for _ in range(5-len(maps_list))]
         # tap: str, hold: str, after: str, opts: list, rule_params: dict
-        self.tap, self.hold, self.after, self.opts, self.rule_params = maps
-        return maps
+        self.tap, self.hold, self.after, self.opts, self.rule_params = maps_list
+        return maps_list
 
 
 @dataclass
@@ -48,12 +48,11 @@ class KaramlizedKey:
     layer_name: str
     hold_flavor: str
     layer_toggle: list[tuple] = field(default_factory=list)
-    _to: dict[str | str] = field(default_factory=dict)
+    _to: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
 
         self.conditions: dict = requires_sublayer(self.layer_name)
-
         self._from: dict = self.update_from_attr(self.usr_map)
         self.update_to()
         self.rule_params: dict = update_params(self.usr_map)
@@ -84,7 +83,7 @@ class KaramlizedKey:
         for k in translated_key.keys:
             layer: dict = self.to_layer_check(k, event)
             key: dict = layer if layer else event_value(k)
-            mod_list = local_mods(k.modifiers, event, self.usr_map)
+            mod_list: dict = local_mods(k.modifiers, event, self.usr_map)
             key.update(mod_list)
             opts = get_to_opts(self.usr_map.opts) if event == "to" else {}
             key.update(opts)
@@ -97,11 +96,16 @@ class KaramlizedKey:
         Return a dictionary in a format that matches a Karabiner-Elements
         compatible JSON object.
         """
-        map_attrs = [self.conditions, self._from,
-                     self._to, self.modification_type, self.rule_params]
+        map_attrs = [
+            self.conditions,
+            self._from,
+            self._to,
+            self.modification_type,
+            self.rule_params,
+        ]
         return {k: v for d in map_attrs if d for k, v in d.items()}
 
-    def to_keycodes_dict(self, to_map: str, to_event: str) -> dict:
+    def to_keycodes_dict(self, to_map: str, to_event: str) -> dict | None:
         """
         Returns a dictionary containing a key code for a given "to" event in
         any of its currently implemented variations
@@ -266,7 +270,7 @@ def from_simultaneous_dict(from_event_list: list[dict]) -> dict:
     return fs_dict
 
 
-def get_condition_dict(layer_name: str, value: int) -> dict[str, dict | int]:
+def get_condition_dict(layer_name: str, value: int) -> dict[str, str | int]:
     """
     Returns a dict that corresponds to a Karabiner-Elements condition dict.
     This condition must be true for the "from" event to be triggered.
@@ -279,9 +283,8 @@ def event_value(k: KeyStruct) -> dict:
     Returns a dict that corresponds to a Karabiner-Elements event, such as
     "from", "to", "to_if_alone", "to_if_held_down", etc.
     """
-    if dict_value := dict_eval(k.key_code):
-        return {k.key_type: dict_value}
-    return {k.key_type: k.key_code}
+    event: dict = dict_eval(k.key_code) or k.key_code
+    return {k.key_type: event}
 
 
 def get_layer_toggle_dict(layer_name: str, value: int) -> dict[str, dict]:

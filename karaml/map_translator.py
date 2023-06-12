@@ -40,9 +40,8 @@ def queue_translations(usr_key: str) -> list:
     """
     multi_keys = get_multi_keys(usr_key)
     if not multi_keys:
-        if string_pf := string_template(usr_key):
-            return string_pf
-        return [key_code_translator(usr_key, usr_key)]
+        usr_string_template = string_template(usr_key)
+        return usr_string_template or [key_code_translator(usr_key, usr_key)]
 
     translations = []
     shell_cmd = ""
@@ -50,18 +49,14 @@ def queue_translations(usr_key: str) -> list:
         if string_pf := string_template(key):
             translations += string_pf
             continue
-
         translated = key_code_translator(key, usr_key)
-
-        if translated.key_type == "shell_command":
+        if translated and translated.key_type == "shell_command":
             shell_cmd = combine_shell_commands(translated, shell_cmd)
             continue
-
         translations.append(translated)
 
     if shell_cmd:
         translations.append(KeyStruct("shell_command", shell_cmd, None))
-
     return translations
 
 
@@ -81,7 +76,7 @@ def combine_shell_commands(keystruct: KeyStruct, shell_cmd: str) -> str:
     return shell_cmd + f" && {keystruct.key_code}"
 
 
-def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
+def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct | None:
     """
     Given a user mapping, return a KeyStruct with the key_type, key_code, and
     modifiers for the mapping.
@@ -96,16 +91,12 @@ def key_code_translator(usr_key: str, usr_map: str) -> KeyStruct:
     e.g. for 'j+k', usr_map is `j+k' and usr_key are 'j' or 'k' on separate
     calls usr_map is passed for configError printing purposes
     """
-
     if layer := translate_if_layer(usr_key):
         return layer
-
     if to_event := translate_if_template(usr_key):
         return to_event
-
     if keystruct := translate_if_valid_keycode(usr_key, usr_map):
         return keystruct
-
     invalidKey("key code", usr_map, usr_key)
 
 
@@ -124,10 +115,10 @@ def string_template(usr_key: str) -> list:
     contents of the clipboard are restored after the paste command is sent.
     """
 
-    string_pf = search("string\\((.*)\\)", usr_key)
-    if not string_pf:
-        return
-    string_args = string_pf.group(1)
+    usr_string_template = search("string\\((.*)\\)", usr_key)
+    if not usr_string_template:
+        return []
+    string_args = usr_string_template.group(1)
 
     key_codes = []
     for char in string_args:
@@ -184,7 +175,6 @@ def translate_if_template(usr_map: str) -> KeyStruct:
         query = search(f"^{template}\\((.+)\\)$", usr_map)
         if not query:
             continue
-
         event, command = translate_template(template, query.group(1))
         return KeyStruct(event, command, None)
 
@@ -196,7 +186,7 @@ def soft_func(softfunc_args: str) -> dict:
     exception.
     """
     sf_dict = check_and_validate_str_as_dict(softfunc_args)
-    if type(sf_dict) != dict:
+    if not sf_dict:
         invalidSoftFunct(softfunc_args)
     return sf_dict
 
@@ -230,7 +220,6 @@ def parse_primary_key_and_mods(usr_key: str, usr_map) -> tuple[str, dict]:
     modded_key = is_modded_key(usr_key)
     if not modded_key:
         return usr_key, {}
-
     # The modifiers should either be ascii or unicode, but not a mix
     if bool(set(MODIFIER_ALIASES.keys()) & set(modded_key.modifiers)):
         modifiers_string: str = translate_unicode_mods(modded_key.modifiers)
@@ -267,7 +256,7 @@ def translate_unicode_mods(modifiers: str) -> str:
     return translated_mods
 
 
-def is_modded_key(mapping: str) -> ModifiedKey:
+def is_modded_key(mapping: str) -> ModifiedKey | None:
     """
     Check if a mapping matches a valid syntax for a modified key. If so,
     return a ModifiedKey object with the key and modifiers. Otherwise,
@@ -283,10 +272,8 @@ def is_modded_key(mapping: str) -> ModifiedKey:
     final_str_expression = r"(.*)\s+([^\s]+)$"
     final_str_query = search(final_str_expression, mapping)
     query = delim_query or final_str_query
-
     if not query:
         return
-
     modifiers, key = query.groups()
     modifiers = modifiers.replace(" ", "")
     key = key.strip()
