@@ -12,8 +12,6 @@ def main():
         "config_file",
         # dest="config_file",
         help="The Karaml config file to read from in the current directory. "
-        "If the file is not in the current directory, provide the full path. "
-        "If the file is in the current directory, provide only the file name. "
         "This argument is required.",
         action="store",
         type=str,
@@ -22,10 +20,9 @@ def main():
     parser.add_argument(
         "-c",
         dest="complex_mods_output",
-        help="Add/update the complex modifications folder to include the "
-        "Karaml config passed as an argument. Takes an argument as the name of"
-        "the file to write to. "
-        "Defaults to `karaml_complex_mods.json`",
+        help="Add/update the complex modifications folder to include the"
+        "Karaml config. Defaults to `karaml_complex_mods.json` without "
+        "specifying a filename.",
         action="store",
 
     )
