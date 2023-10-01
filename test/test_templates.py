@@ -1,4 +1,5 @@
 import pytest
+
 import karaml.templates as templates
 
 

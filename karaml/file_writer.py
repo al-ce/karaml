@@ -2,6 +2,7 @@ from datetime import datetime
 from json import dumps, loads
 from pathlib import Path
 from shutil import copyfile
+
 from karaml.karaml_config import KaramlConfig
 
 
@@ -53,9 +54,14 @@ def report_backup_folder_size(backup_dir: Path, size: int):
         print("WARNING! Backup folder size is over 100 MB.")
     rounded_size = round(size / 1000000, 2)
     print(f"Backup folder size: {rounded_size} MB\n")
+    print(f"Backup folder: ~/{backup_dir.relative_to(Path.home())}\n")
 
 
 def basic_rules_dict(karaml_config) -> dict:
+    """
+    Returns a dict with the basic structure of a Karabiner-Elements rules
+    dict. The title and rules are taken from the karaml config.
+    """
     return {"title": karaml_config.title,
             "rules": karaml_config.layers}
 

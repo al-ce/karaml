@@ -1,21 +1,23 @@
 import re
+
 import pytest
 
 # TAP_TOGGLE_LAYER is a simple escape to /nav/ map, hence, tap to toggle /nav/
-
 from testing_assets import FULL_CONFIG_KEYS
-from karaml.key_codes import (
-    KEY_CODE_REF_LISTS, MODIFIERS
-)
-from karaml.helpers import (
-    get_multi_keys, validate_layer
-)
+
+from karaml.helpers import get_multi_keys, validate_layer
+from karaml.key_codes import KEY_CODE_REF_LISTS, MODIFIERS
 from karaml.key_karamlizer import (
-    KaramlizedKey, UserMapping, chatter_safeguard, from_simultaneous_dict,
-    get_condition_dict, get_layer_toggle_dict, local_mods
+    KaramlizedKey,
+    UserMapping,
+    chatter_safeguard,
+    from_simultaneous_dict,
+    get_condition_dict,
+    get_layer_toggle_dict,
+    local_mods,
 )
 
-hold_flavor = "to"
+HOLD_FLAVOR = "to"
 
 
 def test_validate_layer():
@@ -25,9 +27,9 @@ def test_validate_layer():
 def test_karamlized_key_conditions_attr():
 
     for test_key in FULL_CONFIG_KEYS:
-        assert type(test_key.layer_name) == str
+        assert isinstance(test_key.layer_name, str)
         layers = get_multi_keys(test_key.layer_name) or [test_key.layer_name]
-        assert type(layers) == list
+        assert isinstance(layers, list)
 
         if test_key.layer_name == "/base/":
             continue
@@ -36,19 +38,19 @@ def test_karamlized_key_conditions_attr():
         assert test_key.conditions["conditions"]
 
         for condition in test_key.conditions["conditions"]:
-            assert type(condition) == dict
+            assert isinstance(condition, dict)
             # layer name is well formed
             assert re.search("^\\w+_layer$", condition["name"])
             assert condition["type"] == "variable_if"
             # value is an int, not str
-            assert type(condition["value"]) == int
+            assert isinstance(condition["value"], int)
             # value is 0 (off) or 1 (on)
             assert 0 <= condition["value"] <= 1
 
 
 def test_get_condition_dict():
     valid_condition_dict_args = get_condition_dict("nav_layer", 1)
-    assert type(valid_condition_dict_args) == dict
+    assert isinstance(valid_condition_dict_args, dict)
     assert valid_condition_dict_args["name"] == "nav_layer"
     assert valid_condition_dict_args["type"] == "variable_if"
     assert valid_condition_dict_args["value"] == 1
@@ -56,7 +58,7 @@ def test_get_condition_dict():
 
 def test_get_layer_toggle_dict():
     ltd = get_layer_toggle_dict("nav_layer", 1)
-    assert type(ltd) == dict
+    assert isinstance(ltd, dict)
     set_var = ltd["set_variable"]
     assert set_var["name"] == "nav_layer"
     assert set_var["value"] == 1
@@ -323,11 +325,12 @@ def test_from_simultaneous_dict():
 def test_local_mods():
     sample_UserMapping = UserMapping("caps_lock", ["escape", "/nav/"])
 
-    assert type(
-        local_mods({"mandatory": "control"}, "some_event", sample_UserMapping)
-    ) == dict
+    assert isinstance(
+        local_mods({"mandatory": "control"}, "some_event", sample_UserMapping),
+        dict
+    )
 
-    # Returns an emtpy dict if it's passed an empty dict
+    # Returns an empty dict if it's passed an empty dict
     assert not local_mods({}, "some_event", sample_UserMapping)
 
     # prints error/raises Exception and exits if event is not "from" and there

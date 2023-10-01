@@ -44,7 +44,7 @@ def test_UserMapping():
 
             # Test that make_list() is turning strs into lists
             to_maps, user_map_to = map(make_list, (to_maps, user_map_to))
-            assert type(to_maps) == list and type(user_map_to) == list
+            assert isinstance(to_maps, list) and isinstance(user_map_to, list)
 
             # Test that the attrs of the UserMapping instance are set in the
             # correct order

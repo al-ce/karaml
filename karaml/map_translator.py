@@ -2,16 +2,19 @@ from collections import namedtuple
 from dataclasses import dataclass
 from re import findall, search
 
-from karaml.helpers import (
-    get_multi_keys, validate_mod_aliases, validate_optional_mod_sets,
-    check_and_validate_str_as_dict, is_layer,
-)
 from karaml.exceptions import invalidKey, invalidSoftFunct
+from karaml.helpers import (
+    check_and_validate_str_as_dict,
+    get_multi_keys,
+    is_layer,
+    validate_mod_aliases,
+    validate_optional_mod_sets,
+)
 from karaml.key_codes import (
-    KEY_CODE_REF_LISTS,
-    MODIFIERS,
-    MODIFIER_ALIASES,
     ALIASES,
+    KEY_CODE_REF_LISTS,
+    MODIFIER_ALIASES,
+    MODIFIERS,
 )
 from karaml.templates import (
     TEMPLATES,

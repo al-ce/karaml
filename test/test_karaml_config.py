@@ -1,18 +1,20 @@
 import re
+
 import pytest
-from karaml.karaml_config import get_app_conditions_dict
-import karaml.karaml_config as kc
-
-
 from testing_assets import (
-    MIN_CONFIG_SAMPLE, FULL_CONFIG_SAMPLE, AUTO_TOGGLE_CONFIG_SAMPLE,
+    AUTO_TOGGLE_CONFIG_SAMPLE,
+    FULL_CONFIG_SAMPLE,
+    MIN_CONFIG_SAMPLE,
 )
+
+import karaml.karaml_config as kc
+from karaml.karaml_config import get_app_conditions_dict
 
 
 def test_load_karaml_config():
     yaml_data = MIN_CONFIG_SAMPLE.yaml_data
 
-    assert type(yaml_data) == dict
+    assert isinstance(yaml_data, dict)
     assert yaml_data == {
         "/base/": {
             "caps_lock": ["escape", "/nav/", None, None, None],
@@ -24,7 +26,7 @@ def test_get_profile_name():
     min_profile_name = MIN_CONFIG_SAMPLE.profile_name
     full_profile_name = FULL_CONFIG_SAMPLE.profile_name
     assert not min_profile_name
-    assert type(full_profile_name) == str
+    assert isinstance(full_profile_name, str)
     assert full_profile_name == "Karaml TEST Config"
 
 
@@ -49,7 +51,7 @@ def test_get_params():
     assert not min_params
 
     fp = full_params.get("parameters")
-    assert type(fp) == dict
+    assert isinstance(fp, dict)
     valid_keys = [
         "basic.to_if_alone_timeout_milliseconds",
         "basic.to_if_held_down_threshold_milliseconds",
@@ -60,7 +62,7 @@ def test_get_params():
     valid_aliases = ["a", "h", "d", "s", "m"]
     for key, value in fp.items():
         assert key in valid_keys or key in valid_aliases
-        assert type(value) == int
+        assert isinstance(value, int)
 
 
 def test_get_json_rules_list():
@@ -68,18 +70,18 @@ def test_get_json_rules_list():
     full_json = FULL_CONFIG_SAMPLE.json_rules_list
 
     assert not min_json
-    assert type(full_json) == list
+    assert isinstance(full_json, list)
     for rule in full_json:
         # PyYAML should parse the json-style objects as dicts
-        assert type(rule) == dict
+        assert isinstance(rule, dict)
 
 
 def test_gen_layers():
     min_layers = MIN_CONFIG_SAMPLE.layers
     full_layers = FULL_CONFIG_SAMPLE.layers
 
-    assert type(min_layers) == list
-    assert type(full_layers) == list
+    assert isinstance(min_layers, list)
+    assert isinstance(full_layers, list)
 
     assert len(min_layers) == 1
 
@@ -93,7 +95,7 @@ def test_gen_layers():
 
     for layer in full_layers:
         assert re.match(r"/.+/ layer", layer["description"])
-        assert type(layer["manipulators"]) == list
+        assert isinstance(layer["manipulators"], list)
         assert len(layer["manipulators"]) > 0
 
 

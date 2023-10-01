@@ -2,10 +2,10 @@ from re import search
 
 from karaml.helpers import validate_alias_key_code
 from karaml.key_codes import (
-    Alias,
     ALIASES,
     MODIFIER_ALIASES,
     MODIFIERS,
+    Alias,
 )
 from karaml.map_translator import parse_primary_key_and_mods
 from karaml.templates import TEMPLATES
@@ -90,7 +90,7 @@ def process_alias_definition(
         ALIASES.get(primary_kc) or
         MODIFIER_ALIASES.get(primary_kc) or
         # e.g. `s` counts as `left_shift` only if there's no
-        # non-whitspace delimiter in the alias definition, else it's `s`
+        # non-whitespace delimiter in the alias definition, else it's `s`
         MODIFIERS.get(primary_kc) if (
             MODIFIERS.get(primary_kc) and
             not search(r"[-|].+$", alias_def)
@@ -119,7 +119,7 @@ def add_modifier_alias(alias_name: str, alias_def: str) -> None:
     for item in alias_def_items:
         if item not in MODIFIER_ALIASES and item not in MODIFIERS:
             return
-        elif item in MODIFIERS:
+        if item in MODIFIERS:
             new_mod_alias_value += item
         elif item in MODIFIER_ALIASES:
             new_mod_alias_value += MODIFIER_ALIASES[item]

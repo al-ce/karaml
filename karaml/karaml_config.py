@@ -1,17 +1,18 @@
+import re
 from copy import deepcopy
 from dataclasses import dataclass
-import re
 from typing import Union
+
 import yaml
 
-from karaml.user_aliases import update_user_aliases
-from karaml.helpers import (
-    translate_params,
-    UniqueKeyLoader,
-)
 from karaml.exceptions import invalidFrontmostAppCondition, invalidLayerName
+from karaml.helpers import (
+    UniqueKeyLoader,
+    translate_params,
+)
 from karaml.key_karamlizer import KaramlizedKey, UserMapping
 from karaml.templates import update_user_templates
+from karaml.user_aliases import update_user_aliases
 
 
 def extract_keys(mapping_node):
@@ -109,7 +110,7 @@ class KaramlConfig:
         checking the top-level key "json" for a list of rules. JSON rules allow
         a user to specify any rule that is not fully supported by Karaml's YAML
         syntax by using any valid Karabiner-Elements rule (such as
-        to_delayed_action for doube-tap modifiers).
+        to_delayed_action for double-tap modifiers).
         """
         return d.pop("json") if d.get("json") else []
 
@@ -139,7 +140,7 @@ class KaramlConfig:
         """
         Returns a list of manipulators for a given layer. Each item in the list
         is an object (KaramlizedKey) equivalent to a Karabiner-Elements rule.
-        The KaramlizedKey objects are intrepreted from the layer_maps dict,
+        The KaramlizedKey objects are interpreted from the layer_maps dict,
         which is a dict of key mappings read into memory from the YAML Karaml
         config file by the PyYAML library.
         """
@@ -155,7 +156,7 @@ class KaramlConfig:
 
             # If this map is a dict of frontmost app based conditions, which
             # may contain multiple complex modifications
-            elif type(rhs) == dict:
+            elif isinstance(rhs, dict):
                 # Append a modification for each condition
                 for frontmost_app_key, to_keys in rhs.items():
                     karamlized_key = get_karamlized_key(*gkk_args, to_keys)

@@ -30,7 +30,7 @@ def main():
     parser.add_argument(
         "-k",
         dest="k_profile",
-        help="Add/update the karabiner.json file's proflies list to include "
+        help="Add/update the karabiner.json file's profiles list to include "
         "the Karaml config passed as an argument",
         action="store_true",
     )
@@ -66,7 +66,7 @@ def main():
     print(f"\nReading from: {config_file}...\n")
 
     if debug:
-        karaml.cfg.debug_flag = True
+        karaml.cfg.DEBUG_FLAG = True
 
     hold_flavor = "to" if not hold_down else "to_if_held_down"
     karaml_config = KaramlConfig(config_file, hold_flavor)
@@ -92,14 +92,13 @@ def main():
         if choice == "1":
             update_karabiner_json(karaml_config)
             break
-        elif choice == "2":
+        if choice == "2":
             write_complex_mods_json(karaml_config, "karaml_complex_mods.json")
             break
-        elif choice in ["3", "q"]:
+        if choice in ["3", "q"]:
             print("Goodbye!")
             break
-        else:
-            print("Invalid choice.\n")
+        print("Invalid choice.\n")
 
 
 if __name__ == "__main__":

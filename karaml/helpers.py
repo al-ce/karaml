@@ -1,22 +1,32 @@
 import ast
+from re import Match, search
+from sys import exit as sys_exit
+
 import yaml
 from yaml import SafeLoader
-from re import search, Match
 
 from karaml.exceptions import (
-    invalidConditionValue, invalidFlag,
-    invalidStickyModifier, invalidLayerName, invalidModifier,
-    invalidTotalParensInMods, invalidToOpt, invalidParamKeys,
-    invalidParamValues, invalidStickyModValue, invalidSHNotifyDict,
-    invalidMousePosArgs, invalidDictFormatInString,
+    invalidConditionValue,
+    invalidDictFormatInString,
+    invalidFlag,
+    invalidLayerName,
+    invalidModifier,
+    invalidMousePosArgs,
+    invalidParamKeys,
+    invalidParamValues,
+    invalidSHNotifyDict,
+    invalidStickyModifier,
+    invalidStickyModValue,
+    invalidToOpt,
+    invalidTotalParensInMods,
 )
 from karaml.key_codes import (
-    MODIFIERS,
-    STICKY_MODS,
-    KEY_CODE,
-    POINTING_BUTTON,
     CONSUMER_KEY_CODE,
+    KEY_CODE,
     MODIFIER_ALIASES,
+    MODIFIERS,
+    POINTING_BUTTON,
+    STICKY_MODS,
 )
 
 
@@ -90,7 +100,7 @@ Do you want to continue? (y/n): """).lower()
         continue_check = input("Please enter 'y' or 'n': ").lower()
     if continue_check == "n":
         print("Exiting...")
-        exit()
+        sys_exit()
     print()
 
 
@@ -144,10 +154,6 @@ def is_layer(string: str) -> Match | None:
     immediately without waiting for the 'to_if_held_down_threshold'.
     """
     return search("^/([^/]+)/$", string)
-
-
-def is_dict(obj) -> bool:
-    return isinstance(obj, dict)
 
 
 def validate_alias_key_code(alias_def: str) -> bool:
@@ -217,7 +223,7 @@ def translate_params(params: dict) -> dict:
             translated[k] = v
         else:
             invalidParamKeys(params, k)
-        if type(v) != int:
+        if not isinstance(v, int):
             invalidParamValues(params, v)
     return {"parameters": translated} if translated else {}
 
@@ -269,11 +275,10 @@ def check_and_validate_str_as_dict(string: str) -> dict:
     try:
         if well_formed_dict := dict_eval(string):
             return well_formed_dict
-        else:
-            msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
-                " be a dict, but it failed to evaluate.\nPlease check" \
-                " your syntax."
-            invalidDictFormatInString(string, msg)
+        msg = f"karaml interpreted that\n\n{string}\n\nwas intended to" \
+            " be a dict, but it failed to evaluate.\nPlease check" \
+            " your syntax."
+        invalidDictFormatInString(string, msg)
     except:  # noqa: E722
         # bad practice, but we will raise a useful Exception in this sequence
         # of function calls, and I'd rather warn the user with a generic
@@ -296,7 +301,7 @@ def validate_shnotify_dict(notification_dict: dict):
     valid = ["msg", "title", "subtitle", "sound"]
     for k in notification_dict:
         if k not in valid:
-            invalidSHNotifyDict(notification_dict, k)
+            invalidSHNotifyDict(str(notification_dict), k)
             return
 
 
@@ -346,6 +351,7 @@ def validate_mouse_pos_args(mouse_pos_args: str) -> int:
     return 0
 
 
+
 def validate_to_opts(string: str) -> str:
     """
     Check that the optional modifier is valid. This function is only called
@@ -360,7 +366,7 @@ def validate_to_opts(string: str) -> str:
 
 def validate_optional_mod_sets(mod_string: str, opt_mod_matches: list):
     """
-    Check that if a user has added any optional mdifiers to a map, they are
+    Check that if a user has added any optional modifiers to a map, they are
     formatted correctly. A correctly formatted modifier string will have only
     one set of parentheses containing the optional modifiers, and these must be
     either at the beginning or end of the string.

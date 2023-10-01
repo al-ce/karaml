@@ -29,10 +29,14 @@ rules, giving the user more direct control over their complex rule creation.
 
 from dataclasses import dataclass
 from re import search
+
 from karaml.helpers import (
-    validate_sticky_mod_value, validate_sticky_modifier, validate_var_value,
-    validate_shnotify_dict, validate_mouse_pos_args,
     check_and_validate_str_as_dict,
+    validate_mouse_pos_args,
+    validate_shnotify_dict,
+    validate_sticky_mod_value,
+    validate_sticky_modifier,
+    validate_var_value,
 )
 
 
@@ -151,7 +155,7 @@ def update_user_templates(d: dict) -> None:
 
 def translate_template(event: str, cmd: str) -> tuple:
     """
-    Takes strings represnting a template name and its args as arguments
+    Takes strings representing a template name and its args as arguments
     and returns a tuple with the event and command strings to create the
     appropriate KeyStruct object for the template.
 
@@ -220,7 +224,7 @@ def get_user_template_instance(event: str, cmd: str) -> tuple[str, str] | None:
 def input_source(regex_or_dict: str) -> dict:
     """
     Returns a dictionary for the select_input_source event.
-    If the user mapping is a dictionary, tranform the string into a dictionary,
+    If the user mapping is a dictionary, transform the string into a dictionary
     return the dictionary and trust that the user passed a valid dictionary for
     this event.
     If the user mapping is a string, e.g. 'English', return a dictionary with
@@ -238,7 +242,7 @@ def input_source(regex_or_dict: str) -> dict:
 def mouse_key(mouse_key_funcs: str) -> dict:
     """
     Returns a dictionary for the mouse_key event.
-    If the user mapping is a dictionary, tranform the string into a dictionary,
+    If the user mapping is a dictionary, transform the string into a dictionary
     return the dictionary and trust that the user passed a valid dictionary for
     this event.
     If the user mapping is a string, e.g. 'x, 200', return a dictionary with
@@ -289,7 +293,7 @@ def notification(id_and_message: str) -> dict:
     the behavior of the Karabiner-Elements set_notification_message event.
 
     Alternatively, the `notifyOff` template, which triggers the
-    `notificaion_off` function, can also turn the message off.
+    `notification` function, can also turn the message off.
     """
     notification_dict = {"id": "", "text": ""}
     params = list(map(str.strip, id_and_message.split(",")))
@@ -303,12 +307,12 @@ def notification(id_and_message: str) -> dict:
     return notification_dict
 
 
-def notification_off(id: str) -> dict:
+def notification_off(notification_id: str) -> dict:
     """
     Alternate syntax for turning off a notification. A user might prefer
     this to passing no msg arg or 'null' as the message arg to notify().
     """
-    return {"id": id.strip(), "text": ""}
+    return {"id": notification_id.strip(), "text": ""}
 
 
 def shnotify_dict(n_dict: dict) -> str:
@@ -332,7 +336,7 @@ def shnotify_dict(n_dict: dict) -> str:
     return cmd + "'"  # appended `'` closes the osascript command
 
 
-def shnotify(notification: str) -> str:
+def shnotify(notification_dict: str) -> str:
     """
     Takes the arguments for the shnotify() template and returns a string for
     the shell_command event that will display a macOS notification using
@@ -343,7 +347,7 @@ def shnotify(notification: str) -> str:
     are interpreted positionally and converted to a dict.
     """
 
-    if shnofity_dict := check_and_validate_str_as_dict(notification):
+    if shnofity_dict := check_and_validate_str_as_dict(notification_dict):
         return shnotify_dict(shnofity_dict)
 
     formatted_notification_dict = {
@@ -353,7 +357,7 @@ def shnotify(notification: str) -> str:
         "sound": "",
     }
 
-    params = list(map(str.strip, notification.split(",")))
+    params = list(map(str.strip, notification_dict.split(",")))
 
     for i, key in enumerate(formatted_notification_dict.keys()):
         if i < len(params) and params[i].lower() != "null":

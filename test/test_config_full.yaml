@@ -1,8 +1,6 @@
-profile_name:
-  Karaml TEST Config
+profile_name: Karaml TEST Config
 
-title:
-  KaramlTESTRules
+title: KaramlTESTRules
 
 parameters:
   {
@@ -14,45 +12,43 @@ parameters:
   }
 
 /base/:
-
   # frontmost-app conditions
-  j+k: {
-      unless firefox$ kitty$: [escape, 'notify(idh, Hello!!)', 'notify(idh,)'],
-      if firefox$ kitty$: [pgdn, 'notify(idk, Goodbye!)', 'notify(idk,)']
-      }
+  j+k:
+    {
+      unless firefox$ kitty$: [escape, "notify(idh, Hello!!)", "notify(idh,)"],
+      if firefox$ kitty$: [pgdn, "notify(idk, Goodbye!)", "notify(idk,)"],
+    }
   <c-u>: { unless Terminal$ iterm2$ kitty$: <g-backspace> }
 
   <a-O>: { unless Terminal$ iterm2$ kitty$: up + <m-right> + enter }
   <a-o>: { unless Terminal$ iterm2$ kitty$: <m-right> + enter }
-  <a-g>: { if Terminal$ iterm2$ kitty$: [g+i+t+space, c+h+e+c+k+o+u+t+space]}
+  <a-g>: { if Terminal$ iterm2$ kitty$: [g+i+t+space, c+h+e+c+k+o+u+t+space] }
 
   # send multiple (valid) chars
   <c-s>: string(hello)
   # including single character aliases
   <c-0>: string({}[]<> _=-\|;:'"`~,./HELLO 1234 )
 
+  <(x)-end>: [grave, /symnum/]  # grave | SymNum Sublayer
+  <(x)-caps_lock>: [escape, /nav/]  # ESC | Nav Sublayer
 
-  <(x)-end>: [grave, /symnum/] # grave | SymNum Sublayer
-  <(x)-caps_lock>: [escape, /nav/] # ESC | Nav Sublayer
-
-  <so-g>: [ g + i + t + space, null, null, [-repeat] ]
+  <so-g>: [g + i + t + space, null, null, [-repeat]]
 
   "!": string(exclamation point!)
   "'": string(single quote)
   '"': 'string(double quote and commas ",,,,,)'
   <a-s>+!+&: 'string(1234567890 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ - _ = ()[]{}\\|;: "`~,<.>/?!@#$%^&*)'
-  <c-plus>: string(plus sign) + plus # can't alias the plus sign right now
+  <c-plus>: string(plus sign) + plus  # can't alias the plus sign right now
 
-
-  <o-w>: <o-backspace> # Delete Previous Word
-  <o-f>: <o-delete> # Delete Next Word
-  <o-p>: <m-v> # Paste
+  <o-w>: <o-backspace>  # Delete Previous Word
+  <o-f>: <o-delete>  # Delete Next Word
+  <o-p>: <m-v>  # Paste
 
   <(x)-enter>:
     - enter
     - left_control
     - null
-    - [+lazy] # - [ null ] or null to skip
+    - [+lazy]  # - [ null ] or null to skip
     # - { a: 100, s: 50, d: 500, h: 100 }
 
   \: [\, left_option, null, [+lazy]]
@@ -64,14 +60,14 @@ parameters:
   left_shift: ["<", left_shift]
   right_shift: [">", right_shift]
 
-
   # You can add or omit spaces between concatenated keys - your choice!
   h + `: shell(open ~)
 
-  right_control: /nav/      # tap toggle nav layer
+  right_control: /nav/  # tap toggle nav layer
 
-  right_command: [null, /nav/]  # to: null when tapped, nav layer when held,
-                                #     and no keysend when tapped
+  right_command:
+    [null, /nav/]  # to: null when tapped, nav layer when held,
+    #     and no keysend when tapped
 
   <o-right_shift>: sticky(left_shift, toggle)
 
@@ -79,11 +75,9 @@ parameters:
 # badlayername:
 #   "9": <s-9>
 
-
 /nav/:
-
-  <o-z>: /some_layer/+/some_other_layer/       # Proof of concept for multiple
-  z: [null, /some_layer/+/some_other_layer/]   # multi-layer toggling
+  <o-z>: /some_layer/+/some_other_layer/  # Proof of concept for multiple
+  z: [null, /some_layer/+/some_other_layer/]  # multi-layer toggling
 
   <o-quote>: /mouse/
 
@@ -117,9 +111,8 @@ parameters:
   <(x)-,>: backspace
   <(x)-.>: delete
 
-
   u: pgup
-  d: [pgdn, /win/] # Pgdn | win(dow control) sublayer
+  d: [pgdn, /win/]  # Pgdn | win(dow control) sublayer
   <o-u>: <o-pgup>
   <o-d>: <o-pgdn>
   g: home
@@ -127,7 +120,6 @@ parameters:
   spacebar: underscore
   x: app(Finder)
   r: app(Brave Browser)
-
 
   # Display 'Layer Enabled' notification. Also a good case for using sequence
   # syntax instead of array syntax
@@ -162,13 +154,12 @@ parameters:
   # # Example of layer-safeguard. Third position will be overridden by automated layer toggle off setting.
   # # f: [app(Firefox), /fn/, mute] # Launch Firefox | functions sublayer
 
-  f: [app(Firefox), /fn/] # Launch Firefox | functions sublayer
+  f: [app(Firefox), /fn/]  # Launch Firefox | functions sublayer
   w: app(Warp)
 
   y: app(System Preferences)
   k: app(Karabiner-Elements)
   kp-: app(Calca)
-
 
 /win/:
   m: <rg-m>
@@ -179,7 +170,6 @@ parameters:
   .: <rg-.>
   ",": <rg-,>
   "h": <rg-h>
-
 
 /mouse/:
   m: mouse(x, -2000)
@@ -192,38 +182,34 @@ parameters:
   <c-i>: mouse(horizontal_wheel, -100)
   s: mouse(speed_multiplier, 2.5)
 
-
 /sys/:
-
-  <mocs-q>: [ null, <sm-q>, null, [2000] ] # 2s delay on Log-Out
+  <mocs-q>: [null, <sm-q>, null, [2000]]  # 2s delay on Log-Out
   # <o-s>: var(sys_layer, 0)
 
   <o-e>: input(en)  # Set English input source
   <o-g>: 'input({ "input_source_id": "com.apple.keylayout.GreekPolytonic", "language": "el" })'
 
-  <c-e>: <cm-[>    # Emoji Picker
+  <c-e>: <cm-[>  # Emoji Picker
 
   t: mission_control
   i: <o-tab>
   e: volume_increment
   n: volume_decrement
   m: mute
-  <o-m>: [mute, null, mute] # Toggle mute when held
-  <oC-m>: [null, null, mute] # Only send mute on release/after key up
+  <o-m>: [mute, null, mute]  # Toggle mute when held
+  <oC-m>: [null, null, mute]  # Only send mute on release/after key up
 
   k: play_or_pause
   j: rewind
   "[": fastforward
   ",": display_brightness_increment
   h: display_brightness_decrement
-  q: <CM-q> # Lock Screen
-  u: shell(open -b com.apple.ScreenSaver.Engine) # Start Screen Saver
-  y: app(togglemenubar) # Show and Hide Menubar
+  q: <CM-q>  # Lock Screen
+  u: shell(open -b com.apple.ScreenSaver.Engine)  # Start Screen Saver
+  y: app(togglemenubar)  # Show and Hide Menubar
 
   # Notification displays when held
   <o-i>: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
-
-
 
 /fn/:
   <(x)-h>: f1
@@ -268,7 +254,7 @@ parameters:
   d: "]"
   <s-d>: ">"
   <(x)-r>: "-"
-  <(x)-g>: <s-=> # +
+  <(x)-g>: <s-=>  # +
   <(x)-quote>: quote
   <(x)-w>: <s-quote>
   <(x)-f>: "{"
@@ -285,7 +271,7 @@ parameters:
 /symnum/+/some_condition/:
   pgup+pgdn: ["notify(idHello, Hello!)", null, "notify(idHello,)"]
 
-# If the Karaml style config is too limiting or if a rule gets too comlex to be
+# If the Karaml style config is too limiting or if a rule gets too complex to be
 # worth it, you can append slightly modified JSON in the Karabiner JSON style
 # to this YAML map. Differences:
 # - Quotes are optional, but check the YAML docs for escaping rules
@@ -296,7 +282,7 @@ json:
   - {
       # No quotes in this rule, but note the single quotes around the
       # description, required because of the comma, i.e. `if tapped,`
-      description: 'Right Shift to > if tapped, Shift if held',
+      description: "Right Shift to > if tapped, Shift if held",
       from: { key_code: right_shift },
       to: { key_code: right_shift, lazy: true },
       to_if_alone: { key_code: period, modifiers: [right_shift] },
@@ -309,4 +295,3 @@ json:
       "to_if_alone": { "key_code": "comma", "modifiers": ["left_shift"] },
       "type": "basic",
     }
-

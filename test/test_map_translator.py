@@ -1,14 +1,14 @@
-from itertools import chain
-import pytest
 import re
-from string import ascii_uppercase, ascii_letters, digits, punctuation
+from itertools import chain
+from string import ascii_letters, ascii_uppercase, digits, punctuation
 
-import karaml.map_translator as mp
+import pytest
+from testing_assets import KEYCODE_COMBINATIONS
+
 import karaml.helpers as helpers
+import karaml.map_translator as mp
 from karaml.key_codes import ALIASES, KEY_CODE, MODIFIERS
 from karaml.map_translator import KeyStruct, ModifiedKey, TranslatedMap
-
-from testing_assets import KEYCODE_COMBINATIONS
 
 
 def test_TranslatedMap():
@@ -79,7 +79,7 @@ def test_validate_mods():
     for mod_str in sample_valid_mods:
         validated_mod = helpers.validate_mod_aliases(mod_str)
         assert validated_mod
-        assert type(validated_mod) == str
+        assert isinstance(validated_mod, str)
         assert "(" not in validated_mod
         assert ")" not in validated_mod
 
@@ -150,12 +150,12 @@ def test_parse_primary_key_and_mods():
 
     modded_key, modifiers = mp.parse_primary_key_and_mods(modded, modded)
     no_mod_key, none_type = mp.parse_primary_key_and_mods(no_mods, no_mods)
-    assert type(modded_key) == str
-    assert type(modifiers) == dict
+    assert isinstance(modded_key, str)
+    assert isinstance(modifiers, dict)
     assert modded_key == "j"
     assert modifiers["mandatory"] == ["left_control", "left_shift"]
 
-    assert type(no_mod_key) == str
+    assert isinstance(no_mod_key, str)
     # If there are no modifiers, the function returns an empty dict
     assert not none_type
     assert no_mod_key == "j"
@@ -164,7 +164,7 @@ def test_parse_primary_key_and_mods():
 def test_is_layer():
     valid_layer = "/nav/"
     valid_check = mp.translate_if_layer(valid_layer)
-    assert type(valid_check) == KeyStruct
+    assert isinstance(valid_check, KeyStruct)
     assert valid_check.key_type == "layer"
     assert valid_check.key_code == "nav"
     assert not valid_check.modifiers
@@ -179,7 +179,7 @@ def test_special_to_event_check():
     assert not mp.translate_if_template("j")
 
     se_case = mp.translate_if_template("app(Firefox)")
-    assert type(se_case) == KeyStruct
+    assert isinstance(se_case, KeyStruct)
     assert se_case.key_code == "open -a 'Firefox'.app"
     assert se_case.key_type == "shell_command"
     assert not se_case.modifiers
@@ -197,13 +197,13 @@ def test_resolve_alias():
         alias for alias in ALIASES.keys()
         # FIX: doesn't account for mutlimod aliases e.g. hyper
         if ALIASES[alias].modifiers == ["shift"]
-    ] + [letter for letter in ascii_uppercase]
+    ] + list(ascii_uppercase)
 
     for aliased_map, alias_named_tuple in ALIASES.items():
         mod_dict = {"mandatory": ["left_control"], "optional": ["fn"]}
         valid_alias = mp.resolve_alias(aliased_map, "alias", ALIASES, mod_dict)
         assert valid_alias
-        assert type(valid_alias) == KeyStruct
+        assert isinstance(valid_alias, KeyStruct)
         assert valid_alias.key_type == "key_code"
         assert valid_alias.key_code == alias_named_tuple.key_code
 
@@ -212,7 +212,6 @@ def test_resolve_alias():
                 "mandatory": ["left_control", "shift"],
                 "optional": ["fn"]
             }
-            pass
         else:
             assert valid_alias.modifiers == mod_dict
 
@@ -220,7 +219,7 @@ def test_resolve_alias():
 def test_is_valid_keycode():
 
     typical_cases_list = [
-        [k for k in KEY_CODE],
+        list(KEY_CODE),
         [f"<{m}-{k}>" for m in MODIFIERS for k in KEY_CODE],
         [f"<{m}({o})-j>" for m in MODIFIERS for o in MODIFIERS],
         ["<coms(x)-j>", "<(x)coms-j>", "<F-F>", '"', "~", "<g-~>", "escape",
@@ -232,7 +231,7 @@ def test_is_valid_keycode():
 
     for usr_key in typical_cases:
         valid_key_code = mp.translate_if_valid_keycode(usr_key, dummy_usr_map)
-        assert type(valid_key_code) == KeyStruct
+        assert isinstance(valid_key_code, KeyStruct)
 
         primary_key = re.search("[^>]+", usr_key.split("-")[-1]).group()
         if alias := ALIASES.get(primary_key):
@@ -241,11 +240,11 @@ def test_is_valid_keycode():
 
         assert valid_key_code.key_type == "key_code"
 
-    poninting_button_cases = ["button1", "<c-button1>", "<coms(x)-button1>"]
-    for usr_key in poninting_button_cases:
+    pointing_button_cases = ["button1", "<c-button1>", "<coms(x)-button1>"]
+    for usr_key in pointing_button_cases:
         valid_pointing_button = mp.translate_if_valid_keycode(
             usr_key, dummy_usr_map)
-        assert type(valid_pointing_button) == KeyStruct
+        assert isinstance(valid_pointing_button, KeyStruct)
         assert valid_pointing_button.key_code == "button1"
         assert valid_pointing_button.key_type == "pointing_button"
 
@@ -256,21 +255,26 @@ def test_is_valid_keycode():
     for usr_key in consumer_key_cases:
         valid_consumer_key = mp.translate_if_valid_keycode(
             usr_key, dummy_usr_map)
-        assert type(valid_consumer_key) == KeyStruct
+        assert isinstance(valid_consumer_key, KeyStruct)
         assert valid_consumer_key.key_code == "al_terminal_lock_or_screensaver"
         assert valid_consumer_key.key_type == "consumer_key_code"
 
 
 def test_key_code_translator():
 
-    valid_usr_maps = ["j", "<c-j>", "<c(o)-j>", "app(Firefox)", "left_shift",
-                      "button1", "al_terminal_lock_or_screensaver"] + [
-        alias for alias in ALIASES.keys()
-    ]
+    valid_usr_maps = [
+        "j",
+        "<c-j>",
+        "<c(o)-j>",
+        "app(Firefox)",
+        "left_shift",
+        "button1",
+        "al_terminal_lock_or_screensaver",
+    ] + list(ALIASES.keys())
 
     for sample in valid_usr_maps:
         sampleTranslated = mp.key_code_translator(sample, sample)
-        assert type(sampleTranslated) == KeyStruct
+        assert isinstance(sampleTranslated, KeyStruct)
 
     # Combinations (j+k) should be split up before being passed to this func
     # Invalid modifiers, optional modifier placement, invalid special events,
@@ -300,7 +304,7 @@ def test_get_multi_keys():
         if '+' not in case:
             assert not multi_keys
         elif '+' in case:
-            assert type(multi_keys) == list
+            assert isinstance(multi_keys, list)
             assert len(multi_keys) >= 2
 
 
@@ -315,9 +319,9 @@ def test_string_pfunc():
             else:
                 assert keystruct.key_code == word[i]
     word_lists = [
-        [c for c in ascii_letters],
-        [d for d in digits],
-        [p for p in punctuation],
+        list(ascii_letters),
+        list(digits),
+        list(punctuation),
         [key_code.key_code
          for alias, key_code in ALIASES.items()
          if len(alias) == 1]

@@ -1,8 +1,8 @@
 # TODO: Migrate all helper tests to this file
 
 import pytest
-from karaml.helpers import (validate_mouse_pos_args,
-                            check_and_validate_str_as_dict)
+
+from karaml.helpers import check_and_validate_str_as_dict, validate_mouse_pos_args
 
 
 def test_validate_mouse_pos_args():

@@ -1,14 +1,14 @@
-from sys import exit
+from sys import exit as sys_exit
+
 import karaml.cfg
 
 
 def configError(string: str):
     print("Error in config file:\n")
-    if karaml.cfg.debug_flag:
+    if karaml.cfg.DEBUG_FLAG:
         raise Exception(string)
-    else:
-        print(string)
-        exit()
+    print(string)
+    sys_exit()
 
 
 def invalidConditionValue(name: str, value: str):
@@ -134,8 +134,10 @@ def invalidParamValues(param_dict: dict, value: int):
 
 
 def invalidSoftFunct(string: str):
-    "Invalid software function argument: need well formed dict. Got:"
-    f" {string}"
+    configError(
+        "Invalid software function argument: need well formed dict. "
+        f"Got: {string}"
+    )
 
 
 def invalidStickyModValue(string: str):

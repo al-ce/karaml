@@ -1,1 +1,1 @@
-debug_flag = False
+DEBUG_FLAG = False
