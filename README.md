@@ -821,8 +821,6 @@ valid modifier key code), and whether to toggle the modifier, turn it on, or
 turn it off (`on`, `off`, or `toggle`).
 
 ```yaml
-
-```yaml
 /base/:
   ⌥ | ['right_shift: sticky(left_shift, toggle)', right_shift]
   ⌘ | ['right_shift: sticky(left_shift, on)', right_shift]
@@ -833,14 +831,14 @@ turn it off (`on`, `off`, or `toggle`).
 
 `string(a string of valid key codes or aliases)`
 
-Instead of mapping a key to type out a string of characters using the `+` joining method, e.g. `git checkout` like so:
+You could map a key to type out a string of characters using the `+` joining method, e.g. `git checkout` like so...
 
 ```yaml
 /base/:
   a | g: g+i+t+space+c+h+e+c+k+o+u+t
 ```
 
-You can use `string()` (though the above method is valid):
+...but for simplicity, you can use `string()` (though the above method is valid):
 
 ```yaml
 /base/:
@@ -921,8 +919,8 @@ command.
 
 Note that the `templates` map in your configuration file is loaded *BEFORE*
 your `aliases` map (regardless of where you place those maps in your config),
-so you can use templates in your aliases, but not the other
-way around.
+so you can use templates in your aliases, but you can't use aliases in your
+templates.
 
 ```yaml
 templates:
